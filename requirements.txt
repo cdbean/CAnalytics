@@ -1,0 +1,8 @@
+Django==1.7.4
+django-appconf==0.6
+django-compressor==1.4
+django-realtime==1.1
+psycopg2==2.6
+redis==2.10.3
+six==1.9.0
+wsgiref==0.1.2

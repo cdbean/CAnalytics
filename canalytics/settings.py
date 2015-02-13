@@ -1,5 +1,5 @@
 """
-Django settings for canalytics_v3 project.
+Django settings for canalytics project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -36,6 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'workspace',
+    'logger',
+    'annotator',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -48,9 +51,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'canalytics_v3.urls'
+ROOT_URLCONF = 'canalytics.urls'
 
-WSGI_APPLICATION = 'canalytics_v3.wsgi.application'
+WSGI_APPLICATION = 'canalytics.wsgi.application'
 
 
 # Database
@@ -68,16 +71,18 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
