@@ -1,0 +1,36 @@
+settings.py
+# Compiled source #
+*.pyc
+
+# runtime file #
+*.sock
+*.pid
+
+# OS generated file
+.DS_Store?
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# swp file by vim
+*.swp
+*.swo
+*.bak
+
+/CACHE/
+/*/CACHE/
+pip-log.txt
+run_gunicorn.sh
+/*/migrations/
+/logs/
+/.idea/
+.idea/
+
+# IDE configuration file
+/.idea/
+run_gunicorn.sh
+/static_deploy/*
+
+dump.rdb
+/*/.ropeproject/
