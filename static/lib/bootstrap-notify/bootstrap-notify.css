@@ -1,0 +1,43 @@
+.notifications {
+  position: fixed;
+  z-index: 9999;
+  font-size: 120%;
+}
+
+/* Positioning */
+.notifications.top-right {
+  right: 10px;
+  top: 45px;
+}
+
+.notifications.top-left {
+  left: 10px;
+  top: 25px;
+}
+
+.notifications.bottom-left {
+  left: 10px;
+  bottom: 25px;
+}
+
+.notifications.bottom-right {
+  right: 10px;
+  bottom: 25px;
+}
+
+/* Notification Element */
+.notifications > div {
+  position: relative;
+  margin: 5px 0px;
+}
+
+.alert .close {
+  right: -21px;
+  position: relative;
+  line-height: 20px;
+}
+
+.alert {
+  padding: 8px 35px 8px 14px;
+
+}

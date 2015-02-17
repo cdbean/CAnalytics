@@ -1,0 +1,95 @@
+{% load static %}
+{% load compress %}
+
+{% block extrajs %}
+{% compress js %}
+<script type="text/javascript" src="{% static 'dashboard/js/page_header.js' %}"></script>
+{% endcompress %}
+{% endblock %}
+
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">CAnalytics V3</a>
+    </div>
+
+    {% if user.is_authenticated and case %}
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav viz">
+        <li class="case dropdown">
+            <a id="case_btn" href="#" class="dropdown-toggle" data-toggle="dropdown">Cases<span class="caret"></span></a>
+            <ul class="case-list dropdown-menu">
+              <li><a href='#'>{{case.name}}</a></li>
+              <li><a href="{% url 'home' %}">Change case</a></li>
+            </ul>
+        </li>
+        <li class='dataset dropdown'>
+            <a id="datasource_btn" href="#" class="dropdown-toggle" data-toggle="dropdown">Dataset<span class="caret"></span></a>
+            <ul class="dataset-list dropdown-menu">
+              {% for ds in datasets %}
+              <li><a href="#"><label><input type="checkbox" value="{{ ds.id }}">{{ ds.name }}</label><span class="badge">{{ ds.entries }}</span></a></li>
+              {% endfor %}
+            </ul>
+        </li>
+        <li><a class="viz-opts" id="dataentry_table-btn" href="#">Data Entry</a></li>
+        <li>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Table<span class="caret"></a>
+            <ul class="dropdown-menu">
+                <li><a class="viz-opts" id="person_table-btn" href="#">People</a></li>
+                <li><a class="viz-opts" id="organization_table-btn" href="#">Organizations</a></li>
+                <li><a class="viz-opts" id="resource_table-btn" href="#">Resources</a></li>
+                <li><a class="viz-opts" id="location_table-btn" href="#">Locations</a></li>
+                <li><a class="viz-opts" id="event_table-btn" href="#">Events</a></li>
+            </ul>
+        </li>
+        <li><a class="viz-opts" id="timeline-btn" href="#">Timeline</a></li>
+        <li><a class="viz-opts" id="map-btn" href="#" >Map</a></li>
+        <li><a class="viz-opts" id="network-btn" href="#">Network</a></li>
+        <li><a class="viz-opts" id="notepad-btn" href="#">Notepad</a></li>
+        <li><a class="viz-opts" id="message-btn" href="#">Message</a></li>
+        <li><a class="viz-opts" id="history-btn" href="#">History</a></li>
+      </ul>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input id="search-field" type="text" class="form-control" placeholder="Search entity here...">
+        </div>
+        <button type="submit" class="btn btn-default">Search</button>
+      </form>
+      {% endif %}
+      <ul class="nav navbar-nav navbar-right">
+      {% if user.is_authenticated %}
+      <li class="dropdown">
+        <a id="username" href="#" class="dropdown-toggle" data-toggle="dropdown">{{user.username}} <span class="caret"></span></a>
+        <ul class="dropdown-menu mydropdown-menu" role="menu">
+            <li><a id="profile_btn" href="#">Profile</a> </li>
+            <li><a id="activity_btn" href="#">Activities</a> </li>
+            <li><a id='logout_btn' href="{% url 'account:logout' %}">Log out</a> </li>
+        </ul>
+      </li>
+      {% endif %}
+      </ul>
+      <ul id="userlist" class="nav navbar-nav navbar-right">
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div id='upload-data-dialog' style="display: none;">
+    <form id='upload-data-form' enctype='multipart/form-data' method='POST'>
+        <p class='message'></p>
+        <label for='dataset-name'>Dataset Name: </label><input id='dataset-name' name='dataset-name'><br><br>
+        <input type='file' name='uploadField' accept='.csv, .txt'><br/>
+        <input type='submit' value='Upload'><br/><br/>
+        <span>*Note: only .csv file is accepted at this moment. The file should be structured as </span><br>
+        <code>line number [tab] content [tab] date</code>
+    </form>
+</div>
+

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block extracss %}
+<link rel="stylesheet" type="text/css" href="{% static 'account/css/login.css' %}">
+{% endblock %}
+
+{% block page-header %}
+  {% include 'page_header.html' %}
+{% endblock %}
+
+{% block page-body %}
+  <form action="{% url 'home' %}" method='POST' class="form-signin">
+    <h2 class="form-signin-heading">Please select a case</h2>
+    <select id="case" name="case" class="form-control selectpicker" title="Select a case...">
+      {% for case in cases %}
+      <option value={{case.id}}>{{case.name}}</option>
+      {% endfor %}
+    </select>
+    <select id="group" name="group" class="form-control selectpicker" title="Select your group...">
+      {% for group in groups %}
+      <option value={{group.id}}>{{group.name}}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Enter Case</button>
+{% endblock %}
