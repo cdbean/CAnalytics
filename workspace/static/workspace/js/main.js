@@ -1,35 +1,70 @@
-wb = {}
-wb.store = {
-  entities: {}, // entities involved in the current case and the user
-  dataentries:{}, // data entries in the current case
-  datasets: {},  // datasets in the current case
-  relationships: {},  // relationships involved in the current case and the user
-  ENTITY_ENUM: ['person', 'location', 'organization', 'event', 'resource']
-};
-// profile, about the current case, users, group, etc.
-wb.info = {
-  case: CASE,  // the current case id
-  users: {},  // all users in the current group
-  group: GROUP,  // the current group
-  user: USER,  // the current user id
-  online_users: [],  // all online users id in the current group
-};
-// attributes for entities, temporarily hard coded here
-wb.static = {
-  event: ['people', 'address', 'date', 'priority', 'category'],
-  location: ['address', 'precision', 'priority'],
-  person: ['gender', 'nationality', 'ethnicity', 'race', 'religion', 'priority'],
-  organization: ['people', 'category', 'nationality', 'ethnicity', 'religion', 'priority'],
-  resource: ['condition', 'availability', 'category', 'priority'],
-  relationship: ['relation', 'description', 'priority']
-};
-
 loadData();
 
-$(function() {
-  $('ul.data-set li input[type=checkbox]').change(updateDataset)
+
+$.subscribe('data/loaded', function() {
+  // $('ul.dataset-list input:checkbox:first').prop('checked', true);
+  $('ul.dataset-list input:checkbox').change();
 });
 
+$(function() {
+  $('ul.dataset-list input:checkbox').change(updateDataset);
+
+  $('.viz-opts').click(onVizSelect);
+});
+
+
+function onVizSelect(e) {
+  var viz_opt = $(this).attr('id').split('-')[0];
+  viz_opt = viz_opt.split('_');
+  var viz_name = viz_opt[0];
+  var viz_form = viz_opt[1];
+  var viz;
+  if (viz_form === 'table') {
+      viz = $('<div>').vizentitytable({
+          title: viz_name,
+          dimension: wb.cf.dim[viz_name],
+          group: wb.cf.group[viz_name]
+      });
+  } else if (viz_name === 'dataentry') {
+      viz = $('<div>').vizdataentrytable({
+          title: 'Data Entry',
+          data: wb.shelf.dataentries
+      });
+  } else if (viz_name === 'timeline') {
+      viz = $('<div>').viztimeline({
+          title: 'Timeline',
+          width: 800,
+          height: 200,
+          dimension: wb.cf.dim.date,
+          group: wb.cf.group.date
+      });
+  } else if (viz_name === 'map') {
+      viz = $('<div>').vizmap({
+          title: 'Map',
+          dimension: wb.cf.dim.location,
+          group: wb.cf.group.location
+      });
+  } else if (viz_name === 'network') {
+      viz = $('<div>').viznetwork({
+          title: 'Network',
+          dimension: wb.cf.dim.relationship,
+          group: wb.cf.group.relationship
+      });
+  } else if (viz_name === 'notepad') {
+      viz = $('<div>').viznotepad({
+          title: 'Notepad'
+      });
+  } else if (viz_name === 'message') {
+    viz = $('<div>').vizmessage({
+      title: 'Message'
+    });
+  } else if (viz_name === 'history') {
+    viz = $('<div>').vizhistory({
+      title: 'History',
+      url: 'logs'
+    });
+  }
+}
 
 function loadData() {
   $.get(GLOBAL_URL.data, {
@@ -44,6 +79,7 @@ function onLoadData(data) {
     wb.info.users[d.id] = d;
   });
   data.entities.forEach(function(d) {
+    if (d.primary.date) d.primary.date = wb.utility.Date(d.primary.date);
     wb.store.entities[d.meta.id] = d;
   });
   data.relationships.forEach(function(d) {
@@ -62,24 +98,22 @@ function onLoadData(data) {
   $.publish('data/loaded');
 }
 
-function updateDataset(e) {
-  var checked = this.checked;
-  var value = $(this).val();
-
-  if (checked) {
-    addDataset(value);
-  } else {
-    removeDataset(value);
-  }
+function updateDataset() {
+  var ds = [];
+  $('ul.dataset-list input:checkbox:checked').each(function() {
+    ds.push(parseInt($(this).val()));
+  });
+  wb.shelf_by.datasets = ds;
+  updateViews();
 }
 
 
-function addDataset(ds) {
-  wb.store.datasets[ds].selected = true;
-}
-
-
-function removeDataset(ds) {
-  wb.store.datasets[ds].selected = false;
-
+function updateViews() {
+  $('.viz').each(function(i, viz) {
+    var viz = viz.data('instance');
+    if (viz) {
+      viz.updateData();
+      viz.update();
+    }
+  })
 }

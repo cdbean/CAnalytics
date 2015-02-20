@@ -6,48 +6,51 @@
 {% block extrajs %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.js" charset="utf-8"></script>
 <script type="text/javascript" src="{% static 'lib/ba-tiny-pubsub.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'lib/jquery-dialogextend-2.02/build/jquery.dialogextend.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/jquery-dialogextend-2.02/jquery.dialogextend.min.js' %}"></script>
 
-<script type="text/javascript" language="javascript" src="{% static 'workspace/lib/OpenLayers-2.13.1/OpenLayers.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'lib/OpenLayers-2.13.1/OpenLayers.js' %}"></script>
 
 <!-- enjoyhint library -->
-<script src="{% static 'lib/enjoyhint/enjoyhint.js' %}"></script>
+<script src="{% static 'lib/enjoyhint/enjoyhint.min.js' %}"></script>
 
 <script src="{%static 'lib/datetimepicker/jquery.datetimepicker.js'%}"></script>
 
 <!-- google place search -->
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
 
-<script src="{% static 'workspace/lib/selectize.js/selectize.js' %}"></script>
+<script src="{% static 'lib/selectize.js/selectize.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/jquery.dataTables.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/plugin/ColReorderWithResize.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jEditable/jquery.jeditable.js' %}"></script>
-<script type="text/javascript" language="javascript" src="{% static 'workspace/lib/ckeditor-4.4.3/ckeditor.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'lib/ckeditor-4.4.3/ckeditor.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/bootstrap-notify/bootstrap-notify.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jquery.cookie.js' %}"></script>
-
-<!-- for annotation -->
-{% compress js%}
-<script src="{% static 'annotator/lib/util.js' %}"></script>
-<script src="{% static 'annotator/lib/console.js' %}"></script>
-<script src="{% static 'annotator/lib/class.js' %}"></script>
-<script src="{% static 'annotator/lib/range.js' %}"></script>
-<script src="{% static 'annotator/lib/annotator.js' %}"></script>
-<script src="{% static 'annotator/lib/widget.js' %}"></script>
-<script src="{% static 'annotator/lib/editor.js' %}"></script>
-<script src="{% static 'annotator/lib/viewer.js' %}"></script>
-<script src="{% static 'annotator/lib/notification.js' %}"></script>
-<script src="{% static 'annotator/lib/xpath.js' %}"></script>
-<script src="{% static 'annotator/lib/plugin/store.js' %}"></script>
-<script type="text/javascript" language="javascript" src="{% static 'annotator/lib/plugin/tags.js' %}"></script>
-{% endcompress %}
-<!-- end for annotation -->
-
+<!-- https://github.com/melanke/Watch.JS -->
+<script type="text/javascript" src="{% static 'lib/watch.min.js' %}"></script>
 <!-- for sync -->
 {% ishout_js %}
 
+<!-- for annotation -->
+{% compress js%}
+<script type="text/javascript" src="{% static 'annotator/js/util.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/console.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/class.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/range.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/annotator.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/widget.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/editor.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/viewer.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/notification.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/xpath.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/plugin/store.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/plugin/tags.js' %}"></script>
+{% endcompress %}
+<!-- end for annotation -->
+
+
 {% compress js %}
 <script type="text/javascript" src="{% static 'workspace/js/wb.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/store.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/utility.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/vizbase.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/activitylog.js' %}"></script>

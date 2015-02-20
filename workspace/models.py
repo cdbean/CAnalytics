@@ -84,7 +84,7 @@ class Dataset(models.Model):
         attr['name'] = self.name
         attr['created_by'] = self.created_by.username if self.created_by != None else None
         attr['created_at'] = self.created_at.strftime('%m/%d/%Y') if self.created_at else None
-        attr['entries'] = self.dataentry_set.count()
+        attr['dataentries'] = list(self.dataentry_set.all().values_list('id', flat=True))
         return attr
 
     def __unicode__(self):
@@ -128,20 +128,22 @@ class Entity(models.Model):
 
     def findTargets(self):
         res = []
-        targets_id = list(Relationship.objects.filter(source=self).values_list("target"))
+        targets_id = list(Relationship.objects.filter(source=self).values_list("target", flat=True))
         for tar in targets_id:
-            res.append(tar[0])
+            res.append(tar)
         return Entity.objects.filter(id__in=res).select_subclasses()
 
     def findSources(self):
         res = []
-        sources_id = list(Relationship.objects.filter(target=self).values_list("source"))
+        sources_id = list(Relationship.objects.filter(target=self).values_list("source", flat=True))
         for sou in sources_id:
-            res.append(sou[0])
+            res.append(sou)
         return Entity.objects.filter(id__in=res).select_subclasses()
 
     def serialize(self):
-        return get_model_attr(self)
+        res = get_model_attr(self)
+        res['meta']['relationships'] = list(self.relates_as_target.all().values_list('id', flat=True)) + list(self.relates_as_source.all().values_list('id', flat=True))
+        res['meta']['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
 
 
 class Location(Entity):
@@ -236,6 +238,7 @@ class Relationship(models.Model):
         return self.source.name + '-' + self.target.name
 
     def serialize(self):
-        return get_model_attr(self)
+        res = get_model_attr(self)
+        res['meta']['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
 
 

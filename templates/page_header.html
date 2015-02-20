@@ -23,7 +23,7 @@
     {% if user.is_authenticated and case %}
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav viz">
+      <ul class="nav navbar-nav">
         <li class="case dropdown">
             <a id="case_btn" href="#" class="dropdown-toggle" data-toggle="dropdown">Cases<span class="caret"></span></a>
             <ul class="case-list dropdown-menu">
@@ -39,7 +39,7 @@
               {% endfor %}
             </ul>
         </li>
-        <li><a class="viz-opts" id="dataentry_table-btn" href="#">Data Entry</a></li>
+        <li><a class="viz-opts" id="dataentry-btn" href="#">Data Entry</a></li>
         <li>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Table<span class="caret"></a>
             <ul class="dropdown-menu">
