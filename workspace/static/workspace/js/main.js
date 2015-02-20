@@ -1,10 +1,6 @@
 loadData();
 
 
-$.subscribe('data/loaded', function() {
-  // $('ul.dataset-list input:checkbox:first').prop('checked', true);
-  $('ul.dataset-list input:checkbox').change();
-});
 
 $(function() {
   $('ul.dataset-list input:checkbox').change(updateDataset);

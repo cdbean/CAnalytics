@@ -4,11 +4,16 @@ watch(wb.store, function(prop, action, difference, oldval) {
   if (shelf) {
     if (difference) {
       if (difference.added.length) {
-        // put_on_shelf(difference.added);
+        shelf = shelf.concat(difference.added);
+        put_on_shelf(prop);
       }
       if (difference.removed.length) {
-        // put_off_shelf(difference.removed);
+        difference.removed.forEach(function(d) {
+          var i = shelf.indexOf(d);
+          shelf.splice(i, 1);
+        });
       }
+      publish('data/update', prop);
     }
   }
 }, 1, true); // one level deep
@@ -16,45 +21,45 @@ watch(wb.store, function(prop, action, difference, oldval) {
 
 watch(wb.shelf_by, function() {
   // do when filtering condition changes
+  reset_shelf();
   put_on_shelf();
+  publish('data/filter');
 });
 
-function put_on_shelf() {
-  reset_shelf();
 
+function put_on_shelf(shelf) {
   if (wb.shelf_by.datasets.length) {
-    wb.shelf.datasets = wb.shelf.datasets.filter(function(d) {
-      return wb.shelf_by.datasets.indexOf(d) > -1;
-    });
-    filter_by_dataset();
+    filter_by_dataset(shelf);
   }
 
   if (wb.shelf_by.dataentries.length) {
-    wb.shelf.dataentries = wb.shelf.dataentries.filter(function(d) {
-      return wb.shelf_by.indexOf(d) > -1;
-    });
-    filter_by_dataentry();
+    filter_by_dataentry(shelf);
   }
 
   if (wb.shelf_by.annotations.length) {
-    wb.shelf.annotations = wb.shelf.annotations.filter(function(d) {
-      return wb.shelf_by.annotations.indexOf(d) > -1;
-    });
-    filter_by_annotation();
+    filter_by_annotation(shelf);
   }
 
   if (wb.shelf_by.entities.length) {
-    filter_by_entity();
+    filter_by_entity(shelf);
   }
 
   if (wb.shelf_by.relationships.length) {
-    filter_by_relationship();
+    filter_by_relationship(shelf);
   }
 }
 
 
-function filter_by_dataset() {
+function filter_by_dataset(shelf) {
   var selected_dataentries = [];
+
+  if (['annotations', 'entities', 'relationships'].indexOf(shelf) > -1) return;
+
+  wb.shelf.datasets = wb.shelf.datasets.filter(function(d) {
+    return wb.shelf_by.datasets.indexOf(d) > -1;
+  });
+
+  if (shelf === 'datasets') return;
 
   wb.shelf.datasets.forEach(function(d) {
     var ds = wb.store.datasets[d];
@@ -63,14 +68,17 @@ function filter_by_dataset() {
   wb.shelf.dataentries = wb.shelf.dataentries.filter(function(d) {
     return selected_dataentries.indexOf(d) > -1;
   });
-
-  filter_by_dataentry();
 }
 
 
-function filter_by_dataentry() {
+function filter_by_dataentry(shelf) {
   var selected_annotations = [];
   var selected_relationships = [];
+
+  wb.shelf.dataentries = wb.shelf.dataentries.filter(function(d) {
+    return wb.shelf_by.indexOf(d) > -1;
+  });
+  if (shelf === 'dataentries') return;
 
   wb.shelf.dataentries.forEach(function(d) {
     var de = wb.store.dataentries[d];
@@ -79,6 +87,8 @@ function filter_by_dataentry() {
   wb.shelf.annotations = wb.shelf.annotations.filter(function(d) {
     return selected_annotations.indexOf(d) > -1;
   });
+  if (shelf === 'annotations') return;
+
   wb.shelf.annotations.forEach(function(d) {
     var ann = wb.store.annotations[d];
     selected_entities.push(ann.entity);
@@ -86,6 +96,8 @@ function filter_by_dataentry() {
   wb.shelf.entities = wb.shelf.entities.filter(function(d) {
     return selected_entities.indexOf(d) > -1;
   });
+  if (shelf === 'entities') return;
+
   wb.shelf.entities.forEach(function(d) {
     var ent = wb.store.entities[d];
     selected_relationships = selected_relationships.concat(ent.relationships);
@@ -101,6 +113,11 @@ function filter_by_annotation() {
   var selected_entities = [];
   var selected_relationships = [];
 
+  wb.shelf.annotations = wb.shelf.annotations.filter(function(d) {
+    return wb.shelf_by.annotations.indexOf(d) > -1;
+  });
+  if (shelf === 'annotations') return;
+
   wb.shelf.annotations.forEach(function(d) {
     var ann = wb.store.annotations[d];
     selected_dataentries.push(ann.dataentry);
@@ -110,9 +127,13 @@ function filter_by_annotation() {
   wb.shelf.dataentries = wb.shelf.dataentries.filter(function(d) {
     return selected_dataentries.indexOf(d) > -1;
   });
+  if (shelf === 'dataentries') return;
+
   wb.shelf.entities = wb.shelf.entities.filter(function(d) {
     return selected_entities.indexOf(d) > -1;
   });
+  if (shelf === 'entities') return;
+
   wb.shelf.relationships = wb.shelf.relationships.filter(function(d) {
     return selected_relationships.indexOf(d) > -1;
   });
@@ -133,9 +154,13 @@ function filter_by_entity() {
   wb.shelf.relationships = wb.shelf.relationships.filter(function(d) {
     return selected_relationships.indexOf(d) > -1;
   });
+  if (shelf === 'relationships') return;
+
   wb.shelf.annotations = wb.shelf.annotations.filter(function(d) {
     return selected_annotations.indexOf(d) > -1;
   });
+  if (shelf === 'annotations') return;
+
   wb.shelf.relationships.forEach(function(d) {
     var r = wb.store.relationships[d];
     selected_entities.push(r.primary.source);
@@ -144,6 +169,8 @@ function filter_by_entity() {
   wb.shelf.entities = wb.shelf.entities.filter(function(d) {
     return selected_entities.indexOf(d) > -1;
   });
+  if (shelf === 'entities') return;
+
   wb.shelf.annotation.forEach(function(d) {
     var ann = wb.store.annotations[d];
     selected_dataentries.push(ann.dataentry);
@@ -162,6 +189,8 @@ function filter_by_relationship() {
   wb.shelf.relationships = wb.shelf.relationships.filter(function(d) {
     return wb.shelf_by.relationships.indexOf(d) > -1;
   });
+  if (shelf === 'relationships') return;
+
   wb.shelf.relationships.forEach(function(d) {
     var r = wb.store.relationships[d];
     selected_entities.push(r.primary.source);
@@ -171,9 +200,13 @@ function filter_by_relationship() {
   wb.shelf.entities = wb.shelf.entities.filter(function(d) {
     return selected_entities.indexOf(d) > -1;
   });
+  if (shelf === 'entities') return;
+
   wb.shelf.annotations = wb.shelf.annotations.filter(function(d) {
     return selected_annotations.indexOf(d) > -1;
   });
+  if (shelf === 'annotations') return;
+
   wb.shelf.annotation.forEach(function(d) {
     var ann = wb.store.annotations[d];
     selected_dataentries.push(ann.dataentry);
