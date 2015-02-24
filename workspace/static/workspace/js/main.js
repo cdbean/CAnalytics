@@ -18,13 +18,11 @@ function onVizSelect(e) {
   if (viz_form === 'table') {
       viz = $('<div>').vizentitytable({
           title: viz_name,
-          dimension: wb.cf.dim[viz_name],
-          group: wb.cf.group[viz_name]
+          entity: viz_name,
       });
   } else if (viz_name === 'dataentry') {
       viz = $('<div>').vizdataentrytable({
           title: 'Data Entry',
-          data: wb.shelf.dataentries
       });
   } else if (viz_name === 'timeline') {
       viz = $('<div>').viztimeline({
@@ -100,16 +98,6 @@ function updateDataset() {
     ds.push(parseInt($(this).val()));
   });
   wb.shelf_by.datasets = ds;
-  updateViews();
 }
 
 
-function updateViews() {
-  $('.viz').each(function(i, viz) {
-    var viz = viz.data('instance');
-    if (viz) {
-      viz.updateData();
-      viz.update();
-    }
-  })
-}

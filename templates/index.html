@@ -5,7 +5,6 @@
 
 {% block extrajs %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.js" charset="utf-8"></script>
-<script type="text/javascript" src="{% static 'lib/ba-tiny-pubsub.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jquery-dialogextend-2.02/jquery.dialogextend.min.js' %}"></script>
 
 <script type="text/javascript" language="javascript" src="{% static 'lib/OpenLayers-2.13.1/OpenLayers.js' %}"></script>
@@ -18,7 +17,7 @@
 <!-- google place search -->
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places"></script>
 
-<script src="{% static 'lib/selectize.js/selectize.js' %}"></script>
+<script src="{% static 'lib/selectize.js/selectize.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/jquery.dataTables.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/plugin/ColReorderWithResize.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jEditable/jquery.jeditable.js' %}"></script>
@@ -29,6 +28,29 @@
 <script type="text/javascript" src="{% static 'lib/watch.min.js' %}"></script>
 <!-- for sync -->
 {% ishout_js %}
+
+
+{% compress js %}
+<script type="text/javascript" src="{% static 'workspace/js/wb.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/pubsub.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/events.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/store.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/utility.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/viz/table.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/vizbase.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/activitylog.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/notepad.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/entitytable.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/dataentrytable.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/timeline.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/map.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/network.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/message.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/history.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/help.js' %}"></script>
+<script type="text/javascript" src="{% static 'sync/sync.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/main.js' %}"></script>
+{% endcompress %}
 
 <!-- for annotation -->
 {% compress js%}
@@ -42,29 +64,12 @@
 <script type="text/javascript" src="{% static 'annotator/js/viewer.js' %}"></script>
 <script type="text/javascript" src="{% static 'annotator/js/notification.js' %}"></script>
 <script type="text/javascript" src="{% static 'annotator/js/xpath.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/plugin/attribute_widget.js' %}"></script>
 <script type="text/javascript" src="{% static 'annotator/js/plugin/store.js' %}"></script>
-<script type="text/javascript" src="{% static 'annotator/js/plugin/tags.js' %}"></script>
+<script type="text/javascript" src="{% static 'annotator/js/plugin/entity.js' %}"></script>
 {% endcompress %}
 <!-- end for annotation -->
 
-
-{% compress js %}
-<script type="text/javascript" src="{% static 'workspace/js/wb.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/store.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/utility.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/vizbase.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/activitylog.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/notepad.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/table.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/timeline.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/map.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/network.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/message.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/history.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/help.js' %}"></script>
-<script type="text/javascript" src="{% static 'sync/sync.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/main.js' %}"></script>
-{% endcompress %}
 {% endblock %}
 
 {% block extracss %}
@@ -96,7 +101,9 @@
         CASE = {{ case.id }};
         GROUP = {{ group.id }};
         GLOBAL_URL = {
-          data: "{% url 'ws:data' %}"
+          data: "{% url 'ws:data' %}",
+          annotation: "{% url 'annotation:annotation' %}"
+
         }
 
     </script>

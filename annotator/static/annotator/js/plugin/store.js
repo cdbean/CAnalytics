@@ -55,7 +55,9 @@ Annotator.Plugin.Store = (function(_super) {
     };
 
     Store.prototype._getAnnotations = function() {
-        if (this.options.loadFromSearch) {
+        if (this.options.loadFromLocal) {
+            return this.loadAnnotationsFromLocal(this.options.loadFromLocal);
+        } else if (this.options.loadFromSearch) {
             return this.loadAnnotationsFromSearch(this.options.loadFromSearch);
         } else {
             return this.loadAnnotations();
@@ -99,13 +101,16 @@ Annotator.Plugin.Store = (function(_super) {
             this.registerAnnotation(annotation);
             return this._apiRequest('create', annotation, function(data) {
                 var ann = data.annotation,
-                    entity = data.entity,
-                    relationship = data.relationship
+                    entities = data.entities,
+                    relationships = data.relationships
                 ;
                 _this.updateAnnotation(annotation, ann);
 
-                $.publish('/entity/change', entity);
-                $.publish("/relationship/add", [relationship]);
+                if (entities.length)
+                  $.publish('entity/created', entities);
+                if (relationships.length)
+                  $.publish("relationship/created", relationships);
+
                 wb.utility.notify('1 annotation added!', 'success');
             });
         } else {
@@ -166,7 +171,7 @@ Annotator.Plugin.Store = (function(_super) {
                     var highlights = annotation.highlights;
                     for (var i = 0; i < highlights.length; i++) {
                         $(highlights[i]).removeClass()
-                            .addClass('annotator-hl annotator-hl-' + ann.tag.entity_type)
+                            .addClass('annotator-hl annotator-hl-' + ann.entity.entity_type)
                         ;
                     }
                 } else {
@@ -269,6 +274,10 @@ Annotator.Plugin.Store = (function(_super) {
             data = {};
         }
         return this._onLoadAnnotations(data.rows || []);
+    };
+
+    Store.prototype.loadAnnotationsFromLocal = function(data) {
+      return this._onLoadAnnotations(data);
     };
 
     Store.prototype.dumpAnnotations = function() {

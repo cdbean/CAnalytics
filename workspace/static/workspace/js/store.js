@@ -13,7 +13,7 @@ watch(wb.store, function(prop, action, difference, oldval) {
           shelf.splice(i, 1);
         });
       }
-      publish('data/update', prop);
+      $.publish('data/update', prop);
     }
   }
 }, 1, true); // one level deep
@@ -23,7 +23,7 @@ watch(wb.shelf_by, function() {
   // do when filtering condition changes
   reset_shelf();
   put_on_shelf();
-  publish('data/filter');
+  $.publish('data/filter');
 });
 
 

@@ -6,11 +6,11 @@ from datetime import datetime
 
 # Create your models here.
 
-def get_field_value(instance, field):
+def get_field_value(instance, field_name):
     try:
-        field = instance._meta.get_field(field)
+        field = instance._meta.get_field(field_name)
         field_type = field.get_internal_type()
-        value = getattr(instance, field)
+        value = getattr(instance, field_name)
 
         if field_type == 'DateTimeField':
             value = value.strftime('%m/%d/%Y-%H:%M:%S') if value else None
@@ -18,10 +18,12 @@ def get_field_value(instance, field):
             value = value.wkt if value else None
         elif field_type == 'ForeignKey':
             value = value.id if value else None
+        elif field_type == 'ManyToManyField':
+            value = list(value.all().values_list('id', flat=True))
 
         return value
     except:
-        print 'Warning: trying to get an unknown field %s from %s' % (field, instance)
+        # print 'Warning: trying to get an unknown field %s from %s' % (field_name, instance)
         return None
 
 
@@ -33,11 +35,15 @@ def get_model_attr(instance):
     primary = attr['primary']
     for field_name in instance._meta.get_all_field_names():
         if field_name in excludes: continue
-        primary[field_name] = get_field_value(instance, field_name)
+        value = get_field_value(instance, field_name)
+        if value:
+            primary[field_name] = value
 
     meta = attr['meta']
     for field in meta_attr:
-        meta[field] = get_field_value(instance, field)
+        value = get_field_value(instance, field)
+        if value:
+            meta[field] = value
 
     other = attr['other']
 
@@ -144,6 +150,7 @@ class Entity(models.Model):
         res = get_model_attr(self)
         res['meta']['relationships'] = list(self.relates_as_target.all().values_list('id', flat=True)) + list(self.relates_as_source.all().values_list('id', flat=True))
         res['meta']['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
+        return res
 
 
 class Location(Entity):
@@ -227,6 +234,7 @@ class Relationship(models.Model):
     confidence  = models.FloatField(null=True, blank=True)
     priority    = models.FloatField(default=5, null=True, blank=True)  # priority defaults to 5, ranging from 0-9
     dataentry  = models.ForeignKey(DataEntry, null=True, blank=True)
+    attributes = models.ManyToManyField(Attribute, null=True, blank=True)
     created_at   = models.DateTimeField(default=datetime.now, verbose_name='created at')
     created_by  = models.ForeignKey(User, null=True, blank=True, verbose_name='created by', related_name='created_relationships')
     last_edited_by  = models.ForeignKey(User, null=True, blank=True, verbose_name='edited by', related_name='edited_relationships')
@@ -240,5 +248,5 @@ class Relationship(models.Model):
     def serialize(self):
         res = get_model_attr(self)
         res['meta']['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
-
+        return res
 

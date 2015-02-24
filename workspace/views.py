@@ -51,23 +51,18 @@ def data(request):
     datasets = case.dataset_set.all()
     for ds in datasets:
         res['datasets'].append(ds.serialize())
-    print 'ds'
     dataentries = DataEntry.objects.filter(dataset__in=datasets)
     for de in dataentries:
         res['dataentries'].append(de.serialize())
-    print 'de'
     entities = Entity.objects.filter(case=case, group=group).select_subclasses()
     for e in entities:
         res['entities'].append(e.serialize())
-    print 'entity'
     relationships = Relationship.objects.filter(case=case, group=group)
     for r in relationships:
         res['relationships'].append(r.serialize())
-    print 'rel'
     annotations = Annotation.objects.filter(case=case, group=group)
     for a in annotations:
         res['annotations'].append(a.serialize())
-    print 'ann'
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 

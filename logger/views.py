@@ -1,4 +1,3 @@
-from django.shortcuts import render
 
 
 # Create your views here.
@@ -7,4 +6,7 @@ def logs(request):
 
 
 def log(request):
+    pass
+
+def serverlog(data):
     pass

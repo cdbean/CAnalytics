@@ -31,16 +31,11 @@ class Annotation(models.Model):
         }]
         ann['anchor']   = self.dataentry.id
         ann['quote']   = self.quote
-        ann['tag'] = {'id': self.entity.id, 'entity_type': self.entity.entity_type}
+        ann['entity'] = {'id': self.entity.id, 'entity_type': self.entity.entity_type}
         ann['created_at'] = self.created_at.strftime('%m/%d/%Y-%H:%M:%S')
         ann['created_by'] = self.created_by.id
         ann['last_edited_by'] = self.last_edited_by.id
         ann['last_edited_at'] = self.last_edited_at.strftime('%m/%d/%Y-%H:%M:%S')
-
-        related = []
-        for e in self.related_entities.all():
-            related.append(e.id)
-        ann['related_entities'] = related
 
         return ann
 

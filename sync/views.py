@@ -28,3 +28,6 @@ def message(request):
     ishout_client.broadcast_group(group_name, 'message', msg.tojson())
     res = 'success'
     return HttpResponse(res)
+
+def sync_annotation(data, case, group, user):
+    pass

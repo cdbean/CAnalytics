@@ -1,15 +1,3 @@
-// enable sub/pub within individual elements
-$.each({
-    trigger  : 'publish',
-    on       : 'subscribe',
-    off      : 'unsubscribe'
-}, function ( key, val) {
-    jQuery.fn[val] = function() {
-        this[key].apply(this, Array.prototype.slice.call(arguments));
-    };
-});
-
-
 // override toString to easy display location entity
 OpenLayers.Feature.Vector.prototype.toString = function() {
     return this.geometry.toString();
@@ -31,6 +19,19 @@ wb.utility.formatTime = function(d) {
 wb.utility.formatDateTime = function(d) {
   if (d) d3.time.format("%B %d, %Y-%I:%M:%p");
   return '';
+};
+
+wb.utility.formatGeometry = function(entity) {
+  var wktParser = new OpenLayers.Format.WKT();
+  var feature = wktParser.read(entity.primary.geometry);
+  var origin_prj = new OpenLayers.Projection("EPSG:4326");
+  var dest_prj   = new OpenLayers.Projection("EPSG:900913");
+  if (feature) {
+      feature.geometry.transform(origin_prj, dest_prj); // projection of google map
+  }
+  feature.attributes.id = entity.primary.id;
+  feature.attributes.name = entity.primary.name;
+  return feature;
 };
 
 wb.utility.capfirst = function(string) {
@@ -104,4 +105,21 @@ wb.utility.scrollTo = function(ele, container) {
   $(container).animate({
     scrollTop: $(ele).offset().top - $(container).offset().top + $(container).scrollTop()
   });
+};
+
+
+wb.utility.parseEntityAttr = function(attr, value) {
+  if (attr === 'people') {
+    value = value || [];
+    value = value.map(function(d) {
+      return wb.store.entities[d].primary.name;
+    });
+    value = value.join(', ');
+  } else if (attr === 'location') {
+    if (value) {
+      var l = wb.store.entities[value];
+      value = l.primary.name || l.primary.address;
+    }
+  }
+  return value || '';
 };
