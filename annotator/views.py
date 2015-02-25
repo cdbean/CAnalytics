@@ -46,7 +46,7 @@ def post_annotation(request):
     if not ranges or not case or not group:
         return HttpResponseBadRequest()
     try:
-        entry = DataEntry.objects.get(id=2)
+        entry = DataEntry.objects.get(id=data['anchor'])
         group = Group.objects.get(id=group)
         case = Case.objects.get(id=case)
     except:
@@ -95,7 +95,7 @@ def post_annotation(request):
         'case': case
     })
     # sync annotation
-    sync_annotation(res, case, group, request.user)
+    sync_annotation('create', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 

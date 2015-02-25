@@ -4,5 +4,6 @@ from sync import views
 urlpatterns = patterns('',
     # Examples:
     url(r'^message$', views.message, name='message'),
+    url(r'^messages$', views.messages, name='messages'),
 )
 

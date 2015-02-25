@@ -27,22 +27,14 @@ function onVizSelect(e) {
   } else if (viz_name === 'timeline') {
       viz = $('<div>').viztimeline({
           title: 'Timeline',
-          width: 800,
-          height: 200,
-          dimension: wb.cf.dim.date,
-          group: wb.cf.group.date
       });
   } else if (viz_name === 'map') {
       viz = $('<div>').vizmap({
           title: 'Map',
-          dimension: wb.cf.dim.location,
-          group: wb.cf.group.location
       });
   } else if (viz_name === 'network') {
       viz = $('<div>').viznetwork({
           title: 'Network',
-          dimension: wb.cf.dim.relationship,
-          group: wb.cf.group.relationship
       });
   } else if (viz_name === 'notepad') {
       viz = $('<div>').viznotepad({
@@ -55,7 +47,7 @@ function onVizSelect(e) {
   } else if (viz_name === 'history') {
     viz = $('<div>').vizhistory({
       title: 'History',
-      url: 'logs'
+      url: GLOBAL_URL.history
     });
   }
 }
@@ -74,6 +66,7 @@ function onLoadData(data) {
   });
   data.entities.forEach(function(d) {
     if (d.primary.date) d.primary.date = wb.utility.Date(d.primary.date);
+    if (d.primary.geometry) d.primary.geometry = wb.utility.formatGeometry(d);
     wb.store.entities[d.meta.id] = d;
   });
   data.relationships.forEach(function(d) {

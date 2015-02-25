@@ -4,7 +4,7 @@ from logger import views
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^logs$', views.logs),
-    url(r'^log$', views.log),
+    url(r'^logs$', views.logs, name='logs'),
+    url(r'^log$', views.log, name='log'),
 )
 

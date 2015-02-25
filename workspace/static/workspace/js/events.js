@@ -41,7 +41,7 @@ function onEntitiesCreated() {
 }
 
 function onRelationshipsCreated() {
-  var relationship = [].slice.call(arguments, 1);
+  var relationships = [].slice.call(arguments, 1);
   for (var i = 0, len = relationships.length; i < len; i++) {
     var rel = relationships[i];
     wb.store.relationships[rel.meta.id] = rel;

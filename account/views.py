@@ -22,7 +22,9 @@ def login(request):
                 auth_login(request, user)
                 return redirect('ws:case', case=case.id, group=group.id)
             except:
-                pass
+                return HttpResponse('You have no permission to the case')
+        else:
+            return HttpResponse('User name and password do not match')
     else:
         cases = Case.objects.all()
         groups = Group.objects.all()

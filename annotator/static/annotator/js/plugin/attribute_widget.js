@@ -76,6 +76,10 @@ $.widget('custom.attribute_widget', {
                 res['geometry'] = {};
                 res['geometry']['geometry'] = [place.geometry.location.lng(), place.geometry.location.lat()];
                 res['geometry']['address'] = place.formatted_address;
+              } else if (attr === 'people') {
+                if (value) value = value.split(',');
+                else value = [];
+                res[attr] = value;
               } else {
                 attr = Annotator.Util.escape(attr);
                 value = Annotator.Util.escape(value);
@@ -87,7 +91,7 @@ $.widget('custom.attribute_widget', {
     },
 
     styleInput: function(attr, value, input) {
-      if (attr === 'date') {
+      if (/date/.test(attr)) {
         input.datetimepicker();
       } else if (attr === 'address') {
         // initialize as google place search

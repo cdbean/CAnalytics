@@ -1,3 +1,6 @@
+from django.contrib.gis.geos import fromstr
+from dateutil.parser import parse as parse_date
+
 from logger.views import serverlog
 from workspace.models import *
 
@@ -70,20 +73,22 @@ def create_entity(json, user, case, group):
 
 def set_entity_attr(entity, attrs, case, group):
     """ add attributes to entity """
-    ents = []  # return new created entities
-    rels = []  # return new created relationships
+    new_ents = []  # return new created entities
+    new_rels = []  # return new created relationships
     fields = entity._meta.get_all_field_names()
     entity.attributes.clear()
 
     for attr in attrs:
         if attr in fields:
             ents, rels = set_primary_attr(entity, attr, attrs[attr], case, group)
+            new_ents += ents
+            new_rels += rels
         else:
             attribute, created = Attribute.objects.get_or_create(attr=attr, val=attrs[attr])
             entity.attributes.add(attribute)
 
     entity.save()
-    return ents, rels
+    return new_ents, new_rels
 
 
 def set_primary_attr(entity, attr, value, case, group):
@@ -99,49 +104,58 @@ def set_primary_attr(entity, attr, value, case, group):
             entity.address = address
 
     elif attr == 'location':
-        if value and value.isdigit():
-            print value
-            location = Location.objects.get(id=value)
-            entity.location = location
-        else:
-            location = Location.objects.create(name=value, case=case, group=group)
-            entity.location = location
-            new_ents.append(location)
+        if value:
+            if value.isdigit():
+                location = Location.objects.get(id=value)
+                entity.location = location
+            else:
+                location = Location.objects.create(name=value, case=case, group=group)
+                entity.location = location
+                new_ents.append(location)
 
-        rel, created = Relationship.objects.get_or_create(
-            source=entity,
-            target=location,
-            relation='involve',
-            case=case,
-            group=group
-        )
-        if created:
-            new_rels.append(rel)
+            rel, created = Relationship.objects.get_or_create(
+                source=entity,
+                target=location,
+                relation='involve',
+                case=case,
+                group=group
+            )
+            if created:
+                new_rels.append(rel)
+        else:
+            entity.location = None
+            # TODO: delete relationships
     elif attr == 'people':
+        entity.people.clear()
         if value and len(value):
             for p in value:
-                if p.isdigit():
-                    p = Person.objects.get(id=p)
-                    entity.people.add(p)
-                else:
-                    p = entity.people.create(name=p, case=case, group=group)
-                    new_ents.append(p)
-                rel, created = Relationship.objects.get_or_create(
-                    source=entity,
-                    target=p,
-                    relation='involve',
-                    case=case,
-                    group=group
-                )
-                if created:
-                    new_rels.append(rel)
+                if p:
+                    if p.isdigit():
+                        p = Person.objects.get(id=p)
+                        entity.people.add(p)
+                    else:
+                        p = entity.people.create(name=p, case=case, group=group)
+                        new_ents.append(p)
+                    rel, created = Relationship.objects.get_or_create(
+                        source=entity,
+                        target=p,
+                        relation='involve',
+                        case=case,
+                        group=group
+                    )
+                    if created:
+                        new_rels.append(rel)
+    elif 'date' in attr:
+        try:
+            value = parse_date(value)
+            setattr(entity, attr, value)
+        except:
+            pass
     else: # normal field such as char and float
         if value == '':
             value = None
         else:
             try:
-                if attr == 'date':
-                    value = parse_date(value)
                 value = float(value)
             except:
                 pass

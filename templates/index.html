@@ -37,6 +37,7 @@
 <script type="text/javascript" src="{% static 'workspace/js/store.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/utility.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/viz/table.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/viz/timeline.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/vizbase.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/activitylog.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/notepad.js' %}"></script>
@@ -75,7 +76,7 @@
 {% block extracss %}
 {% compress css %}
 <link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-notify/bootstrap-notify.css' %}">
-<link href="{% static 'lib/datetimepicker/jquery.datetimepicker.css' %}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'lib/datetimepicker/jquery.datetimepicker.css' %}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/selectize.js/selectize.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/enjoyhint/enjoyhint.css' %}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'annotator/css/annotator.css' %}">
@@ -102,8 +103,11 @@
         GROUP = {{ group.id }};
         GLOBAL_URL = {
           data: "{% url 'ws:data' %}",
-          annotation: "{% url 'annotation:annotation' %}"
-
+          annotation: "{% url 'annotation:annotation' %}",
+          static: "/static/",
+          history: "{% url 'log:logs' %}",
+          message: "{% url 'sync:message' %}",
+          messages: "{% url 'sync:messages' %}",
         }
 
     </script>

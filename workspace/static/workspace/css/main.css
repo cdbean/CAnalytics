@@ -1,0 +1,96 @@
+/* dialog related */
+.ui-widget-header {
+    background: #7F9FE2;
+}
+
+.history .ui-widget-header {
+    background: #ccc;
+}
+
+.ui-widget.ui-dialog {
+    padding: 0;
+}
+.ui-dialog-titlebar {
+    border-radius: 0;
+}
+.ui-dialog-content {
+    overflow: scroll;
+}
+
+
+/* page header */
+.navbar-default {
+  background-color: #4d6cbb;
+}
+.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand, .navbar-default .navbar-brand:focus {
+  color: white;
+}
+.navbar-default .navbar-nav>li>a {
+  color: white;
+}
+.navbar-default .navbar-nav label {
+  margin-right: 4px;
+}
+.userlist {
+  margin-right: 5px;
+}
+.userlist-item .label {
+  padding: 5px 15px;
+  line-height: 20px;
+  position: relative;
+  display: block;
+  font-size: 100%;
+  margin: 10px 5px;
+}
+.nav input[type=radio],
+.nav input[type=checkbox] {
+  margin: 4px 4px;
+}
+
+
+
+#progressbar {
+    position: absolute;
+    top: 40%;
+    left: 45%;
+    width: 400px;
+    margin: 0 0 0 -130px;
+}
+.progress-label {
+    position: absolute;
+    left: 40%;
+    top: 4px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+  }
+
+
+html, body {
+  font: 12px sans serif;
+}
+
+/* entity */
+span.entity {
+  font-style: italic;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+span.entity:hover {
+  cursor: pointer;
+}
+span.entity:hover:after {
+  content: ' ';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px solid;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.active {
+  background-color: #B0BED9 important;
+}

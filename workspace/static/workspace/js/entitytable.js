@@ -27,7 +27,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         wb.shelf.entities.forEach(function(d) {
           var entity = wb.store.entities[d];
           if (entity && entity.primary.entity_type === entity_type) {
-            var row = [entity.meta.id, entity.primary.name];
+            var row = [entity.meta.id, entity.primary.name || ''];
             for (var i = 0, len = attrs.length; i < len; i++) {
               var attr = attrs[i];
               var value = wb.utility.parseEntityAttr(attr, entity.primary[attr]);
