@@ -244,7 +244,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
               if (entity.primary.entity_type === 'location')
                 shelf_by.splice(i, 1);
             }
-            activitylog({
+            wb.log({
                 operation: 'removed filter in',
                 item: 'map',
                 tool: 'map'
@@ -258,7 +258,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
               return wb.store.entity[id].primary.name;
             })
 
-            activitylog({
+            wb.log({
                 operation: 'filtered in',
                 item: 'map',
                 tool: 'map',

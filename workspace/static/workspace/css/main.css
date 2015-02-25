@@ -1,12 +1,16 @@
 /* dialog related */
+.ui-dialog {
+  overflow: visible;
+}
+.ui-dialog .ui-dialog-content {
+  overflow: visible;
+}
 .ui-widget-header {
     background: #7F9FE2;
 }
-
 .history .ui-widget-header {
     background: #ccc;
 }
-
 .ui-widget.ui-dialog {
     padding: 0;
 }
@@ -31,10 +35,14 @@
 .navbar-default .navbar-nav label {
   margin-right: 4px;
 }
-.userlist {
+.navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus {
+  color: #555;
+  background-color: #eee;
+}
+.navbar-default .userlist {
   margin-right: 5px;
 }
-.userlist-item .label {
+.navbar-default .userlist-item .label {
   padding: 5px 15px;
   line-height: 20px;
   position: relative;
@@ -46,7 +54,6 @@
 .nav input[type=checkbox] {
   margin: 4px 4px;
 }
-
 
 
 #progressbar {
@@ -70,16 +77,32 @@ html, body {
 }
 
 /* entity */
-span.entity {
+.entity.location :before {
+  content: url('../img/entity/location.png');
+}
+.entity.event :before {
+  content: url('../img/entity/event.png');
+}
+.entity.person :before {
+  content: url('../img/entity/person.png');
+}
+.entity.organization :before {
+  content: url('../img/entity/organization.png');
+}
+.entity.resource :before {
+  content: url('../img/entity/resource.png');
+}
+
+.entity {
   font-style: italic;
   margin-left: 3px;
   margin-right: 3px;
 }
 
-span.entity:hover {
+a.entity:hover {
   cursor: pointer;
 }
-span.entity:hover:after {
+a.entity:hover:after {
   content: ' ';
   display: inline-block;
   width: 0;
@@ -92,5 +115,5 @@ span.entity:hover:after {
 }
 
 .active {
-  background-color: #B0BED9 important;
+  background-color: #B0BED9 !important;
 }

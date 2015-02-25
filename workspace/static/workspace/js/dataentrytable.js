@@ -11,7 +11,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
       this.table = wb.viz.table()
         .height(this.element.height() - 80)
-        .title(this.options.title)
+        .title('dataentry')
         .columns(columns)
       ;
 

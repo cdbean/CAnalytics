@@ -83,15 +83,16 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.drag = this.force.drag();
 
         this.svg = this.svg.append('svg:g')
-            .call(this.zoom)
-            .append('g')
         ;
 
         this.svg.append('svg:rect')
             .attr('width', this.width)
             .attr('height', this.height)
             .attr('fill', 'white')
+            .call(this.zoom)
         ;
+
+        this.svg = this.svg.append('g');
 
         this.link = this.svg.selectAll("path");
         this.node = this.svg.selectAll("g");
@@ -500,7 +501,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     return d.selected = false;
                 });
 
-                activitylog({
+                wb.log({
                     operation: 'removed filter in',
                     item: 'network',
                     tool: 'network'
@@ -512,7 +513,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     rels_id.push(d.id);
                 })
                 wb.shelf_by.relationships = rels_id;
-                activitylog({
+                wb.log({
                     operation: 'filtered in',
                     item: 'network',
                     tool: 'network',
@@ -610,16 +611,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     showLinkInfo: function(l, pos) {
         $('.network-viewer .attr-list').remove();
+        var rel = wb.store.relationships[l.id];
         var str = "<table class='attr-list'>";
-        for (var attr in l) {
+        for (var attr in rel) {
           if (attr !== 'source' && attr !== 'target' && attr !== 'id'
               && attr !== 'created_by' && attr !== 'last_edited_by' && l[attr]) {
-            str += "<tr><th>" + wb.utility.capitalizeFirstLetter(attr)
-                  + ": </th><td>" + l[attr] + "</td></tr>";
+            str += "<tr><th>" + wb.utility.capfirst(attr)
+                  + ": </th><td>" + rel[attr] + "</td></tr>";
           }
         }
-        str += "<tr><th>Created by: </th><td>" + wb.profile.users[l.created_by].name + "</td></tr>";
-        str += "<tr><th>Last edited by: </th><td>" + wb.profile.users[l.last_edited_by].name + "</td></tr>";
+        str += "<tr><th>Created by: </th><td>" + wb.info.users[rel.meta.created_by].name + "</td></tr>";
+        str += "<tr><th>Last edited by: </th><td>" + wb.info.users[rel.meta.last_edited_by].name + "</td></tr>";
         str += "</table>";
         $(str).appendTo($('.network-viewer'));
 
@@ -898,9 +900,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }
       });
       container.selectAll('.node').classed('dim', function(o) {
-        if (o.relationships.indexOf(d.id) < 0) {
-          d3.select(this).classed('active', false);
-          return true;
+        if (o.id === d.source.id || o.id === d.target.id) {
+          d3.select(this).classed('active', true);
+          return false;
         } else {
           d3.select(this).classed('active', true);
           return false;

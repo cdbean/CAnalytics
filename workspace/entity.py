@@ -28,7 +28,7 @@ def get_or_create_entity(data, case, group, user):
 
     entity.name = data['name']
     entity.last_edited_by = user
-    new_ents, new_rels = set_entity_attr(entity, attrs, case, group)
+    new_ents, new_rels = set_entity_attr(entity, attrs, user, case, group)
     entity.save()
 
     operation = 'created' if created else 'updated'
@@ -71,7 +71,7 @@ def create_entity(json, user, case, group):
         return None
 
 
-def set_entity_attr(entity, attrs, case, group):
+def set_entity_attr(entity, attrs, user, case, group):
     """ add attributes to entity """
     new_ents = []  # return new created entities
     new_rels = []  # return new created relationships
@@ -80,7 +80,7 @@ def set_entity_attr(entity, attrs, case, group):
 
     for attr in attrs:
         if attr in fields:
-            ents, rels = set_primary_attr(entity, attr, attrs[attr], case, group)
+            ents, rels = set_primary_attr(entity, attr, attrs[attr], user, case, group)
             new_ents += ents
             new_rels += rels
         else:
@@ -91,7 +91,7 @@ def set_entity_attr(entity, attrs, case, group):
     return new_ents, new_rels
 
 
-def set_primary_attr(entity, attr, value, case, group):
+def set_primary_attr(entity, attr, value, user, case, group):
     new_ents = []  # return new created entities
     new_rels = []  # return new created relationships
 
@@ -109,7 +109,7 @@ def set_primary_attr(entity, attr, value, case, group):
                 location = Location.objects.get(id=value)
                 entity.location = location
             else:
-                location = Location.objects.create(name=value, case=case, group=group)
+                location = Location.objects.create(name=value, created_by=user, last_edited_by=user, case=case, group=group)
                 entity.location = location
                 new_ents.append(location)
 
@@ -121,6 +121,9 @@ def set_primary_attr(entity, attr, value, case, group):
                 group=group
             )
             if created:
+                rel.created_by = user
+                rel.last_edited_by = user
+                rel.save()
                 new_rels.append(rel)
         else:
             entity.location = None
@@ -144,6 +147,9 @@ def set_primary_attr(entity, attr, value, case, group):
                         group=group
                     )
                     if created:
+                        rel.created_by = user
+                        rel.last_edited_by = user
+                        rel.save()
                         new_rels.append(rel)
     elif 'date' in attr:
         try:

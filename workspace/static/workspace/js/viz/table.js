@@ -82,7 +82,7 @@ wb.viz.table = function() {
         if (selected_rows.length == 0) {
             wb.shelf_by.dataentries = [];
 
-            activitylog({
+            wb.log({
                 operation: 'removed filter in',
                 item: title,
                 tool: title,
@@ -96,12 +96,16 @@ wb.viz.table = function() {
             wb.shelf_by.dataentries = records_id;
 
             var selected_names = [];
-            if (title !== 'dataentry_table') {
+            if (title !== 'dataentry') {
               selected_names = records_id.map(function(id) {
-                return wb.store.entity[id].primary.name;
+                return wb.store.entities[id].primary.name;
+              });
+            } else {
+              selected_names = records_id.map(function(id) {
+                return wb.store.dataentries[id].name;
               });
             }
-            activitylog({
+            wb.log({
                 operation: 'filtered in',
                 item: title,
                 tool: title,

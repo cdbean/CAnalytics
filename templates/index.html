@@ -104,10 +104,11 @@
         GLOBAL_URL = {
           data: "{% url 'ws:data' %}",
           annotation: "{% url 'annotation:annotation' %}",
-          static: "/static/",
+          static: "{{STATIC_URL}}",
           history: "{% url 'log:logs' %}",
           message: "{% url 'sync:message' %}",
           messages: "{% url 'sync:messages' %}",
+          log: "{% url 'log:log' %}",
         }
 
     </script>
