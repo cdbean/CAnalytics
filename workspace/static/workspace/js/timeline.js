@@ -5,6 +5,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.options.base.resizeStop = this.resize.bind(this);
       this.options.extend.maximize = this.resize.bind(this);
       this.options.extend.restore  = this.resize.bind(this);
+      this.element.addClass('timeline');
       this._super('_create');
 
       var width = this.element.width() - 15;

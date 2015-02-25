@@ -3,6 +3,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
+        this.element.addClass('network');
         this._super('_create');
 
         this._setupUI();

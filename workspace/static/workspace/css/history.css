@@ -1,8 +1,9 @@
 ul.history-list {
-  /* overflow-y: scroll; */
+  overflow-y: auto;
   margin: 0;
   padding: 10px 20px 10px 20px;
   list-style: none;
+  height: 100%;
 }
 
 li.history-item {

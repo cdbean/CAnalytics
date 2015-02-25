@@ -30,11 +30,11 @@
   }
 
   function onDataUpdated(e, shelf) {
-
+    updateViewsBut(['.dataentry']);
   }
 
   function onDataFiltered() {
-    updateViews();
+    updateViewsBut();
   }
 
   function onEntitiesCreated() {
@@ -57,8 +57,9 @@
     }
   }
 
-  function updateViews() {
-    $('.viz').each(function(i, viz) {
+  function updateViewsBut(except) {
+    except = except || [];
+    $('.viz').not(except.join(',')).each(function(i, viz) {
       var viz = $(viz).data('instance');
       if (viz) {
         viz.updateData();

@@ -975,3 +975,7 @@
 .annotator-editor input.tag_name {
 	min-width: 100%;
 }
+
+.annotator-item .entity_name {
+  min-width: 100%;
+}

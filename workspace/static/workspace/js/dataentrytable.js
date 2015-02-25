@@ -6,6 +6,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this.options.extend.maximize = this.resize.bind(this);
       this.options.extend.restore  = this.resize.bind(this);
       this._super('_create');
+      this.element.addClass('dataentry');
 
       var columns = ['ID'].concat(wb.static.dataentry);
 

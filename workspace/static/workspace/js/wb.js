@@ -38,11 +38,12 @@ wb.info = {
 
 // attributes for entities, temporarily hard coded here
 wb.static = {
-  dataentry: ['dataset', 'content', 'date'],
-  event: ['people', 'location', 'start_date', 'end_date', 'priority', 'category'],
-  location: ['address', 'precision', 'priority'],
-  person: ['gender', 'nationality', 'ethnicity', 'race', 'religion', 'priority'],
-  organization: ['people', 'category', 'nationality', 'ethnicity', 'religion', 'priority'],
-  resource: ['condition', 'availability', 'category', 'priority'],
-  relationship: ['relation', 'description', 'priority']
+  dataentry: ['dataset', 'content', 'date', 'note'],
+  event: ['people', 'location', 'start_date', 'end_date', 'priority', 'category', 'note'],
+  location: ['address', 'precision', 'priority', 'note'],
+  person: ['gender', 'nationality', 'ethnicity', 'race', 'religion', 'priority', 'note'],
+  organization: ['people', 'category', 'nationality', 'ethnicity', 'religion', 'priority', 'note'],
+  resource: ['condition', 'availability', 'category', 'priority', 'note'],
+  relationship: ['source', 'target', 'relation', 'priority', 'note'],
+  meta: ['created_by', 'created_at', 'last_edited_by', 'last_edited_at'],
 };

@@ -4,16 +4,12 @@ $.widget('viz.vizeditor', {
   },
 
   _create: function() {
-    this.element.addClass('viewer');
+    this.element.addClass('editor');
     this.element.data('instance', this);
     if (this.options.relationship) this.element.data('relationship', this.options.relationship);
     if (this.options.entity) this.element.data('entity', this.options.entity);
 
     var html = ' \
-      <span class="viewer-controls"> \
-        <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-remove"></span></button> \
-        <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
-      </span> \
       <ul class="attr-list"> \
       </ul> \
     ';
@@ -25,10 +21,10 @@ $.widget('viz.vizeditor', {
     $
   },
 
-  show: function(location) {
+  show: function(pos) {
     this.element.show().css({
-      top: location.top,
-      left: location.left
+      top: pos.top,
+      left: pos.left
     });
   }
 });

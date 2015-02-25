@@ -1,4 +1,5 @@
 loadData();
+wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 
 
 
@@ -6,8 +7,22 @@ $(function() {
   $('ul.dataset-list input:checkbox').change(updateDataset);
 
   $('.viz-opts').click(onVizSelect);
+
+  $('body').on('click', 'a.entity, span.entity', onClickEntity);
+  $('body').on('click', onClickOutside);
 });
 
+
+function onClickOutside() {
+  wb.viewer.hide();
+}
+
+function onClickEntity(e) {
+  var entity = $(e.target).data('entity');
+  if (entity)
+    wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'));
+  e.stopPropagation();
+}
 
 function onVizSelect(e) {
   var viz_opt = $(this).attr('id').split('-')[0];

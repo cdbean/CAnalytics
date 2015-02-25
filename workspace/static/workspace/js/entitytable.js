@@ -3,6 +3,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
+        this.element.addClass('entity');
         this._super('_create');
 
         var columns = ['ID', 'Name'].concat(wb.static[this.options.entity]);

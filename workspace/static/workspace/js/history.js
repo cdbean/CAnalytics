@@ -46,14 +46,20 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       .css('color', user.color);
 
     var action = item.operation + ' ' + item.item;
+    var entity;
     if (item.data) {
       if (item.data.name) {
-        action += ' <span class="entity">' + item.data.name + '</span>';
+        action += ' <a class="item">' + item.data.name + '</span>';
       }
+
     }
     $('<span class="content">').appendTo(row)
       .html(action)
     ;
+    if (wb.store.ENTITY_ENUM.indexOf(item.item) > -1) {
+      var entity = wb.store.entities[item.data.id];
+      row.find('.item').addClass('entity').addClass(item.item).data('entity', entity);
+    }
 
     if (item.user === wb.info.user) {
       row.css('background-color', '#eee')
