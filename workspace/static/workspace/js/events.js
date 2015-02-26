@@ -62,7 +62,6 @@
     $('.viz').not(except.join(',')).each(function(i, viz) {
       var viz = $(viz).data('instance');
       if (viz) {
-        viz.updateData();
         viz.update();
       }
     })

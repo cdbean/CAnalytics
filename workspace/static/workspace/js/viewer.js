@@ -1,6 +1,6 @@
 $.widget('viz.vizviewer', {
   options: {
-
+    editable: false,
   },
 
   _create: function() {
@@ -9,23 +9,33 @@ $.widget('viz.vizviewer', {
     this.element.hide();
 
     var html = ' \
-      <span class="viewer-controls"> \
-        <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-remove"></span></button> \
-        <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
-      </span> \
       <h4 class="title"></h4> \
       <ul class="attr-list"> \
       </ul> \
     ';
+    var controls = ' \
+      <span class="viewer-controls"> \
+        <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-remove"></span></button> \
+        <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
+      </span> \
+    '
     this.element.append(html);
+    if (this.options.editable) {
+      this.element.prepend(controls);
+    }
     return this;
   },
 
-  data: function(d, type) {
-    if (type === 'entity') {
+  data: function(d) {
+    this.clearFields();
+
+    var type = '';
+    if (d.primary.entity_type) {
       type = d.primary.entity_type;
+    } else {
+      type = 'relationship';
     }
-    this.addTitle(type, d.primary.name);
+    this.addTitle(type, d.primary.name || d.primary.relation);
 
     var attrs = wb.static[type];
     for (var i = 0, len = attrs.length; i < len; i++) {

@@ -5,6 +5,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.base.dragStop = this.resize.bind(this);
         this._super("_create");
+        this.element.addClass('map');
 
         this.features = [];
         this.layers = [];

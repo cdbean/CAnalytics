@@ -638,32 +638,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         ;
     },
 
-    showNodeInfo: function(d, pos) {
-        $('.network-viewer .attr-list').remove();
-        var tooltip = "<table class='attr-list'>";
-        if (d.id) {
-            var entity = wb.store.entities[d.id];
-            var primary = entity.primary;
-            tooltip += '<tr><th>' + wb.utility.capfirst(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
-            var attrs = wb.static[primary.entity_type];
-            for (var i = 0, len = attrs.length; i < len; i++) {
-              var attr = attrs[i], value = primary[attr];
-              tooltip += '<tr><th>' + wb.utility.capfirst(attr) + '</th><td>' + value + '</td></tr>';
-            }
-            tooltip += '</table>';
-            $(tooltip).appendTo('.network-viewer')
-            $('.network-viewer').data('node', d);
-
-            var width = $('.network-viewer').outerWidth();
-            var height = $('.network-viewer').outerHeight();
-            d3.select(".network-viewer")
-                .style('position', 'absolute')
-                .style('left', pos.left - width/2 + "px")
-                .style('top', (pos.top - height - 10) + "px")
-                .style('display', 'block');
-        }
-    },
-
     hideLinkInfo: function() {
         setTimeout(function() {
           if (!$('.network-viewer:hover').length) {
@@ -735,15 +709,28 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         this.links = [];
 
-        wb.shelf.relationships.forEach(function(d) {
+        for (var d in wb.store.relationships) {
           var rel = wb.store.relationships[d];
           _this.addLink(rel)
-        });
+        }
+        this.restart();
+        this.setMode('normal');
     },
 
     update: function() {
-        this.restart();
-        this.setMode('normal');
+      var nodes = [];
+      this.svg.selectAll('.link').attr('display', function(d) {
+        if (wb.shelf.relationships.indexOf(d.id) > -1) {
+          nodes.push(d.source.id);
+          nodes.push(d.target.id);
+          return '';
+        }
+        return 'none';
+      });
+      this.svg.selectAll('.node').attr('display', function(d) {
+        if (nodes.indexOf(d.id) > -1) return '';
+        return 'none';
+      });
     },
 
     reload: function() {
@@ -824,16 +811,21 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     onMouseOverNode: function(d) {
       // this.highlightNode(d);
 
-      var pos = wb.utility.mousePosition(d3.event, this.element);
+      var pos = {top: d3.event.pageY, left: d3.event.pageX};
       this.showNodeInfoTimer = setTimeout(function() {
-        this.showNodeInfo(d, pos);
-      }.bind(this), 500);
+        var entity = wb.store.entities[d.id];
+        wb.viewer.data(entity, 'entity').show(pos);
+      }, 500);
     },
 
     onMouseOutNode: function(d) {
       // this.unhighlightNode(d);
       clearTimeout(this.showNodeInfoTimer);
-      this.hideNodeInfo(d);
+      setTimeout(function() {
+        if (!$('.viewer:hover').length) {
+          wb.viewer.hide();
+        }
+      }, 300);
     },
 
     onClickNode: function(d) {
@@ -855,17 +847,21 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     onMouseOverLink: function(d) {
       // this.highlightLink(d);
-
-      var pos = wb.utility.mousePosition(d3.event, this.element);
+      var pos = {top: d3.event.pageY, left: d3.event.pageX};
       this.showLinkInfoTimer = setTimeout(function() {
-        this.showLinkInfo(d, pos);
-      }.bind(this), 500);
+        var rel = wb.store.relationships[d.id];
+        wb.viewer.data(rel, 'relationship').show(pos);
+      }, 500);
     },
 
     onMouseOutLink: function(d) {
       // this.unhighlightLink(d);
       clearTimeout(this.showLinkInfoTimer);
-      this.hideLinkInfo(d);
+      setTimeout(function() {
+        if (!$('.viewer:hover').length) {
+          wb.viewer.hide();
+        }
+      }, 300);
     },
 
     onClickLink: function(d) {

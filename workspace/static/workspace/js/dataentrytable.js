@@ -18,9 +18,10 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
       this.updateData();
 
+      this._setupAnnotator();
+
       this.update();
 
-      // this._setupAnnotator();
     },
 
     _destroy: function() {
@@ -31,20 +32,20 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     updateData: function() {
       var data = [];
 
-      wb.shelf.dataentries.forEach(function(d) {
+      for (var d in wb.store.dataentries) {
         var de = wb.store.dataentries[d];
         if (de) {
           data.push([de.id, wb.store.datasets[de.dataset].name, de.content, de.date]);
         }
-      });
+      }
 
       this.table.data(data);
+      d3.select(this.element[0]).call(this.table);
 
     },
     // update view
     update: function() {
-        d3.select(this.element[0]).call(this.table);
-        this._resetAnnotator();
+      this.table.filter(wb.shelf.dataentries);
     },
 
     highlight: function(item) {

@@ -38,7 +38,7 @@ wb.info = {
 
 // attributes for entities, temporarily hard coded here
 wb.static = {
-  dataentry: ['dataset', 'content', 'date', 'note'],
+  dataentry: ['dataset', 'content', 'date'],
   event: ['people', 'location', 'start_date', 'end_date', 'priority', 'category', 'note'],
   location: ['address', 'precision', 'priority', 'note'],
   person: ['gender', 'nationality', 'ethnicity', 'race', 'religion', 'priority', 'note'],

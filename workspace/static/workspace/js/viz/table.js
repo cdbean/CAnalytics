@@ -65,6 +65,7 @@ wb.viz.table = function() {
                     }
                 });
             }
+
         });
     }
 
@@ -120,14 +121,29 @@ wb.viz.table = function() {
 
     }
 
+    exports.filter = function(d) {
+      // filter table
+      var shelf = '';
+      if (title === 'dataentry') {
+        shelf = 'dataentries';
+      } else {
+        shelf = 'entities';
+      }
+      var filter = '';
+      wb.shelf[shelf].forEach(function(d) {
+        filter += '^' + d + '$|';
+      });
+      filter = filter.substring(0, filter.length - 1); // remove the last '|' character
+      // if filter is empty string, set it to something impossible
+      filter = filter || '-1';
+      // 2nd param: which column to filter;
+      // 3rd param: to use regular expression or not
+      table.fnFilter(filter, 0, true);
+    };
+
     exports.margin = function(_) {
         if (!arguments.length) return margin;
         margin = _;
-        return exports;
-    };
-
-    exports.filter = function(_) {
-
         return exports;
     };
 

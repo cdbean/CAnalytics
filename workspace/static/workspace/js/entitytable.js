@@ -25,7 +25,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         var entity_type = this.options.entity;
         var attrs = wb.static[entity_type];
 
-        wb.shelf.entities.forEach(function(d) {
+        for (var i in wb.store.entities) {
           var entity = wb.store.entities[d];
           if (entity && entity.primary.entity_type === entity_type) {
             var row = [entity.meta.id, entity.primary.name || ''];
@@ -37,12 +37,15 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
             }
             data.push(row);
           }
-        });
+        }
         this.table.data(data);
-    },
-    update: function() {
         d3.select(this.element[0]).call(this.table);
     },
+
+    update: function() {
+      this.table.filter(wb.shelf.entities);
+    },
+
     reload: function() {
         this.element.empty();
         this.updateData();

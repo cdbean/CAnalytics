@@ -2,9 +2,6 @@
 .ui-dialog {
   overflow: visible;
 }
-.ui-dialog .ui-dialog-content {
-  overflow: visible;
-}
 .ui-widget-header {
     background: #7F9FE2;
 }

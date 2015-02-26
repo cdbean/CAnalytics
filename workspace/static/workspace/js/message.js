@@ -5,6 +5,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
 
   _create: function() {
     this._super('_create');
+    this.element.addClass('message');
 
     var message_html = ' \
       <div class="wrapper"> \
