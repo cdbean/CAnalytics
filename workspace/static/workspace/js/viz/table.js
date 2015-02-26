@@ -121,7 +121,7 @@ wb.viz.table = function() {
 
     }
 
-    exports.filter = function(d) {
+    exports.filter = function(subset) {
       // filter table
       var shelf = '';
       if (title === 'dataentry') {
@@ -130,7 +130,7 @@ wb.viz.table = function() {
         shelf = 'entities';
       }
       var filter = '';
-      wb.shelf[shelf].forEach(function(d) {
+      subset.forEach(function(d) {
         filter += '^' + d + '$|';
       });
       filter = filter.substring(0, filter.length - 1); // remove the last '|' character

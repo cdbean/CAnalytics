@@ -11,6 +11,9 @@
 .ui-widget.ui-dialog {
     padding: 0;
 }
+.ui-dialog .ui-dialog-content {
+    padding: 0;
+}
 .ui-dialog-titlebar {
     border-radius: 0;
 }

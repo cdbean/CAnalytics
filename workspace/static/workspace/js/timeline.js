@@ -8,9 +8,12 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.element.addClass('timeline');
       this._super('_create');
 
-      var width = this.element.width() - 15;
-      var height = this.element.height() - 15;
-      this.timeline = wb.viz.timeline(this.element[0], width, height);
+      var width = this.element.innerWidth() - 20;
+      var height = this.element.innerHeight() - 20;
+      // this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
+      this.timeline = wb.viz.timeline()
+        .width(width)
+        .height(height);
       this.updateData();
       this.update();
       return this;
@@ -21,7 +24,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     updateData: function() {
       var data = [];
-      wb.shelf.entities.forEach(function(d) {
+      for (var d in wb.store.entities) {
         var entity = wb.store.entities[d];
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
@@ -33,8 +36,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
             });
           }
         }
-      });
-      this.timeline.data(data).init();
+      }
+      this.timeline.data(data);
+      d3.select(this.element[0]).call(this.timeline);
     },
 
     update: function() {
@@ -43,7 +47,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     resize: function() {
       this._super('resize');
-      this.update();
+      var width = this.element.innerWidth() - 20;
+      var height = this.element.innerHeight() - 20;
+      this.timeline.width(width).height(height).redraw();
     }
 });
 

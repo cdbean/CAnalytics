@@ -25,7 +25,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         var entity_type = this.options.entity;
         var attrs = wb.static[entity_type];
 
-        for (var i in wb.store.entities) {
+        for (var d in wb.store.entities) {
           var entity = wb.store.entities[d];
           if (entity && entity.primary.entity_type === entity_type) {
             var row = [entity.meta.id, entity.primary.name || ''];

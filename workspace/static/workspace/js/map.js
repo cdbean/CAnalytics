@@ -120,7 +120,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     },
     updateData: function() {
         var point_feas = [], line_feas = [];
-        wb.shelf.entities.forEach(function(d) {
+        for (var d in wb.store.entities) {
           var entity = wb.store.entities[d];
           if (entity.primary.entity_type === 'location') {
             var geometry = entity.primary.geometry;
@@ -132,12 +132,19 @@ $.widget("viz.vizmap", $.viz.vizbase, {
               }
             }
           }
-        });
+        }
         this.linelayer.addFeatures(line_feas);
         this.pointlayer.addFeatures(point_feas);
         this.features = this.pointlayer.features.concat(this.linelayer.features);
     },
     update: function() {
+        this.features.forEach(function(d) {
+          d.style = d.style || {};
+          if (wb.shelf.entities.indexOf(d.attributes.id) > -1)
+            d.style = null;
+          else
+            d.style.display = 'none';
+        })
         this.linelayer.redraw();
         this.pointlayer.redraw();
 

@@ -29,7 +29,7 @@ wb.utility.formatGeometry = function(entity) {
   if (feature) {
       feature.geometry.transform(origin_prj, dest_prj); // projection of google map
   }
-  feature.attributes.id = entity.primary.id;
+  feature.attributes.id = entity.meta.id;
   feature.attributes.name = entity.primary.name;
   return feature;
 };

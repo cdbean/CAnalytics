@@ -1,28 +1,24 @@
 /* axis */
 
-.axis { /* axis labels */
+.viz.timeline .axis { /* axis labels */
     fill: #808080;
     font-family: sans-serif;
     font-size: 10px;
 }
 
-.axis line{ /* axis tick marks */
+.viz.timeline .axis line{ /* axis tick marks */
     stroke-width : 1;
     stroke: grey;
     shape-rendering: crispEdges;
 }
 
-.axis path { /* axis line */
+.viz.timeline .axis path { /* axis line */
     stroke-width : 1;
     stroke: grey;
     shape-rendering: crispEdges;
 }
 
-/* timeline band */
 
-.band { /* band background */
-    fill: #FAFAFA;
-}
 
 /* labels */
 
@@ -38,12 +34,6 @@
     font-weight: bold;
 }
 
-.bandMidLabel {
-    fill: red;
-    font: 10px sans-serif;
-    font-style: italic;
-    font-weight: bold;
-}
 
 /* brush */
 
@@ -95,18 +85,6 @@
     background-color: #FFFFFF;
 }
 
-.tooltip {
-    width: auto;
-    position: absolute;
-    visibility: hidden;
-    color : black;
-    cursor:default;
-    background-color: #FFFFEE;
-    border: 1px solid;
-    padding: 4px;
-    shape-rendering: crispEdges;
-    pointer-events: none;
-}
 
 
 
