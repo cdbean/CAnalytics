@@ -10,8 +10,8 @@ wb.viz.timeline = function() {
   var trackHeight, itemHeight, itemMinWidth = 100;
 
   var scaleX, scaleY;
-  var svg;
-  var axis;
+  var svg, chart, xAxis, xBrush;
+  var axis, zoom, brush;
 
   function exports(selection) {
 
@@ -33,34 +33,54 @@ wb.viz.timeline = function() {
     itemHeight = trackHeight * .8;
 
     selection.each(function() {
-      svg = d3.select(this).append('svg')
-        .attr('width', outwidth)
-        .attr('height', outheight);
-      g = svg.append('g')
-        .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
-        ;
-      g.append('clipPath')
-        .attr('id', 'clip')
-        .append('rect')
-        .attr('width', width)
-        .attr('height', height);
-      var chart = g.append('g')
-        .attr('class', 'chart')
-        .attr('clip-path', 'url(#clip)');
+      if (!svg)  {
+        svg = d3.select(this).append('svg')
+          .attr('width', outwidth)
+          .attr('height', outheight);
+        g = svg.append('g')
+          .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
+          ;
+        g.append('clipPath')
+          .attr('id', 'clip')
+          .append('rect')
+          .attr('width', width)
+          .attr('height', height);
+        chart = g.append('g')
+          .attr('class', 'chart')
+          .attr('clip-path', 'url(#clip)');
 
-      var zoom = d3.behavior.zoom()
-        .x(scaleX)
-        .on('zoom', zoomed);
+        zoom = d3.behavior.zoom()
+          .on('zoom', zoomed);
 
-      chart.append('rect')
-        .attr('class', 'chart-rect')
-        .attr('width', width)
-        .attr('height', height)
-        .call(zoom);
+        chart.append('rect')
+          .attr('class', 'chart-rect')
+          .attr('width', width)
+          .attr('height', height)
+          .call(zoom);
 
-      chart.selectAll('g')
-        .data(data)
-        .enter()
+        brush = d3.svg.brush()
+          .on('brush', brushing)
+          .on('brushend', brushed);
+
+        xBrush = g.append('svg')
+          .attr('class', 'x brush');
+
+        xAxis = g.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height  + ")")
+      }
+
+      zoom.x(scaleX);
+      brush.x(scaleX);
+
+      var items = chart.selectAll('svg')
+        .data(data, function(d) {
+          return d.id;
+      });
+
+      items.exit().remove();
+
+      new_items = items.enter()
         .append('svg')
         .attr('x', function(d) { return scaleX(d.start); })
         .attr('y', function(d) { return scaleY(d.track); })
@@ -69,9 +89,11 @@ wb.viz.timeline = function() {
           return width < 100 ? 100 : width;
         })
         .attr("height", itemHeight)
-        .attr("class", function (d) { return d.instant ? "item instant" : "item interval"; });
+        .attr("class", function (d) { return d.instant ? "item instant" : "item interval"; })
+        .on('mouseover', onMouseOver)
+        .on('mouseout', onMouseOut);
 
-      var intervals = chart.selectAll('.interval')
+      var intervals = new_items.filter('.interval')
       intervals.append("rect")
         .attr("width", "100%")
         .attr("height", "100%");
@@ -81,10 +103,8 @@ wb.viz.timeline = function() {
         .attr("y", 10)
         .text(function (d) { return d.label; });
 
-      var instants = chart.selectAll(".instant");
+      var instants = new_items.filter(".instant");
       instants.append("circle")
-        .attr("cx", itemHeight / 2)
-        .attr("cy", itemHeight / 2)
         .attr("r", 5);
       instants.append("text")
         .attr("class", "instantLabel")
@@ -92,22 +112,26 @@ wb.viz.timeline = function() {
         .attr("y", 10)
         .text(function (d) { return d.label; });
 
+      items.selectAll('.item.instant circle')
+        .attr("cx", itemHeight / 2)
+        .attr("cy", itemHeight / 2);
+
       // x axis
       axis = d3.svg.axis()
         .scale(scaleX)
         .orient("bottom")
         // .tickSize(6, 0)
 
-      var xAxis = g.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(0," + height  + ")")
-        .call(axis);
+      xAxis.call(axis);
 
-      exports.redraw();
+      d3.select('body')
+        .on('keydown', onKeyDown)
+        .on('keyup', onKeyUp)
     });
   }
 
   exports.redraw = function() {
+    tracks = calculateTracks(data);
     width = outwidth - margin.left - margin.right;
     height = outheight - margin.top - margin.bottom;
     trackHeight = Math.min(height / tracks.length, 20);
@@ -119,25 +143,33 @@ wb.viz.timeline = function() {
     svg.select('#clip').select('rect').attr('width', width).attr('height', height);
     svg.select('.chart-rect').attr('width', width).attr('height', height);
 
-    svg.selectAll('.item')
-      .attr("x", function (d) { return scaleX(d.start);})
-      .attr("y", function (d) { return scaleY(d.track);})
-      .attr("width", function (d) {
-          var width = scaleX(d.end) - scaleX(d.start);
-          return Math.max(width, itemMinWidth);
+    chart.selectAll('.item')
+      .attr('x', function(d) { return scaleX(d.start); })
+      .attr('y', function(d) { return scaleY(d.track); })
+      .attr('width', function(d) {
+        var width = scaleX(d.end) - scaleX(d.start);
+        return width < 100 ? 100 : width;
       })
       .attr("height", itemHeight)
+    chart.selectAll('.item.instant')
       .selectAll('circle')
       .attr("cx", itemHeight / 2)
-      .attr("cy", itemHeight / 2);
-
+      .attr("cy", itemHeight / 2)
 
     svg.select('.axis')
       .attr("transform", "translate(0," + height  + ")")
       .call(axis);
 
     return exports;
-  }
+  };
+
+  exports.filter = function(subset) {
+    svg.selectAll('.item')
+      .attr('display', function(d) {
+        if (subset.indexOf(d.id) > -1) return '';
+        else return 'none';
+      });
+  };
 
   exports.height = function(_) {
     if (!arguments.length) return outheight;
@@ -160,8 +192,6 @@ wb.viz.timeline = function() {
 
 
   function zoomed() {
-    console.log('zoom');
-    tracks = calculateTracks(data);
     exports.redraw();
   };
 
@@ -203,12 +233,12 @@ wb.viz.timeline = function() {
 
     data.forEach(function (item){
         item.start = parseDate(item.start);
-        if (item.end == "") {
-            item.end = new Date(item.start.getTime() + instantOffset);
-            item.instant = true;
-        } else {
+        if (item.end) {
             item.end = parseDate(item.end);
             item.instant = false;
+        } else {
+            item.end = new Date(item.start.getTime() + instantOffset);
+            item.instant = true;
         }
     });
     sortData('descending');
@@ -253,6 +283,67 @@ wb.viz.timeline = function() {
   function parseDate(d) {
     var format = d3.time.format("%m/%d/%Y-%H:%M:%S");
     return format.parse(d);
+  }
+
+
+  function onMouseOver(d) {
+    var pos = {top: d3.event.pageY, left: d3.event.pageX};
+    showNodeInfoTimer = setTimeout(function() {
+      var entity = wb.store.entities[d.id];
+      wb.viewer.data(entity, 'entity').show(pos);
+    }, 500);
+  }
+
+  function onMouseOut(d) {
+    clearTimeout(showNodeInfoTimer);
+    setTimeout(function() {
+      if (!$('.viewer:hover').length) {
+        wb.viewer.hide();
+      }
+    }, 300);
+  }
+
+
+  function onKeyDown() {
+    if (d3.event.shiftKey)
+      setBrushMode();
+  }
+
+  function onKeyUp() {
+    setNormalMode();
+  }
+
+  function setBrushMode() {
+    zoom.on('zoom', null);
+    brush.x(scaleX);
+    xBrush.style('display', '').attr('height', height).call(brush);
+    xBrush.selectAll('rect').attr('y', 0).attr('height', height);
+    console.log('start brush');
+  }
+
+  function setNormalMode() {
+    xBrush.style('display', 'none');
+    svg.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
+    zoom.on('zoom', zoomed);
+  }
+
+  function brushing() {
+    var ext = brush.extent()
+    svg.selectAll('.item').classed('active', function(d) {
+      return d.start <= ext[1] || d.end >= ext[0];
+    });
+  }
+
+  function brushed() {
+    var shelf_by = wb.shelf_by.entities.slice();
+    data.forEach(function(d) {
+      var i = shelf_by.indexOf(d.id);
+      if (i > -1) shelf_by.splice(i, 1);
+    });
+    svg.selectAll('.item.selected').each(function(d) {
+      shelf_by.push(d.id);
+    });
+    wb.shelf_by.entities = shelf_by;
   }
 
 

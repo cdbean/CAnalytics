@@ -11,9 +11,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
       // this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
-      this.timeline = wb.viz.timeline()
-        .width(width)
-        .height(height);
+      this.timeline = wb.viz.timeline().width(width).height(height);
       this.updateData();
       this.update();
       return this;
@@ -41,8 +39,12 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       d3.select(this.element[0]).call(this.timeline);
     },
 
-    update: function() {
+    updateView: function() {
       this.timeline.redraw();
+    },
+
+    filter: function() {
+      this.timeline.filter(wb.shelf.entities);
     },
 
     resize: function() {

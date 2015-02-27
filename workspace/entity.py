@@ -152,11 +152,14 @@ def set_primary_attr(entity, attr, value, user, case, group):
                         rel.save()
                         new_rels.append(rel)
     elif 'date' in attr:
-        try:
-            value = parse_date(value)
-            setattr(entity, attr, value)
-        except:
-            pass
+        if value == '':
+            value = None
+        else:
+            try:
+                value = parse_date(value)
+            except:
+                pass
+        setattr(entity, attr, value)
     else: # normal field such as char and float
         if value == '':
             value = None

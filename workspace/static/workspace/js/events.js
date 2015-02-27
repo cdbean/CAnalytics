@@ -30,7 +30,7 @@
   }
 
   function onDataUpdated(e, shelf) {
-    updateViewsBut(['.dataentry']);
+    updateDataBut(['.dataentry']);
   }
 
   function onDataFiltered() {
@@ -55,6 +55,16 @@
       var rel = relationships[i];
       wb.store.relationships[rel.meta.id] = rel;
     }
+  }
+
+  function updateDataBut(except) {
+    except = except || [];
+    $('.viz').not(except.join(',')).each(function(i, viz) {
+      var viz = $(viz).data('instance');
+      if (viz) {
+        viz.updateData();
+      }
+    })
   }
 
   function updateViewsBut(except) {

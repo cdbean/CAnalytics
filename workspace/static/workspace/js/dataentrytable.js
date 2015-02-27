@@ -43,8 +43,13 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       d3.select(this.element[0]).call(this.table);
 
     },
-    // update view
-    update: function() {
+
+    updateView: function() {
+      this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+    },
+
+
+    filter: function() {
       this.table.filter(wb.shelf.dataentries);
     },
 
@@ -174,6 +179,6 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     resize: function() {
         this._super('resize');
-        this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+        this.updateView();
     }
 });

@@ -42,7 +42,11 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         d3.select(this.element[0]).call(this.table);
     },
 
-    update: function() {
+    updateView: function() {
+
+    },
+
+    filter: function() {
       this.table.filter(wb.shelf.entities);
     },
 

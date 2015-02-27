@@ -48,21 +48,21 @@
 }
 
 .interval {
-    fill: steelblue;
+    fill: rgb(169, 197, 221);
     stroke-width: 6;
     cursor : default;
     pointer-events: true;
 }
 
 .instant {
-    fill: steelblue;
+    fill: rgb(169, 197, 221);
     stroke-width: 6;
     cursor : default;
     /*pointer-events: true;*/
 }
 
 .instantLabel {
-    fill : blue;
+    fill : black;
     font: 10px sans-serif;
     shape-rendering: crispEdges;
 }

@@ -455,8 +455,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.svg.append('g')
             .attr('class', 'brush')
             .call(this.brush
-                .on("brushstart", brushstart)
-                .on("brush", brushing)
                 .on("brushend", brushend)
                 .x(brushX)
                 .y(brushY)
@@ -497,7 +495,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var e = _this.brush.extent();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
-                wb.shelf.relationships = [];
+                wb.shelf_by.relationships = [];
                 d3.selectAll(".node").classed("selected", function(d) {
                     return d.selected = false;
                 });
@@ -717,7 +715,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.setMode('normal');
     },
 
-    update: function() {
+    updateView: function() {
+
+    },
+
+    filter: function() {
       var nodes = [];
       this.svg.selectAll('.link').attr('display', function(d) {
         if (wb.shelf.relationships.indexOf(d.id) > -1) {

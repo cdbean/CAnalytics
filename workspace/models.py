@@ -118,7 +118,7 @@ class Entity(models.Model):
     name          = models.CharField(max_length=1000)
     priority      = models.FloatField(default=5, null=True, blank=True)  # ranging from 0-9
     entity_type    = models.CharField(max_length=50, blank=True)
-    note          = models.TextField(blank=True)
+    note          = models.TextField(blank=True, null=True)
     attributes    = models.ManyToManyField(Attribute, blank=True, null=True)
     created_by     = models.ForeignKey(User, null=True, blank=True, verbose_name='created by', related_name='created_entities')
     created_at     = models.DateTimeField(auto_now_add=True, verbose_name='created at')
