@@ -106,6 +106,7 @@ function updateDataset() {
     ds.push(parseInt($(this).val()));
   });
   wb.shelf_by.datasets = ds;
+  $.publish('data/filter');
 }
 
 

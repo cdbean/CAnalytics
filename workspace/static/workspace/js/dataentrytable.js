@@ -14,13 +14,16 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         .height(this.element.height() - 80)
         .title('dataentry')
         .columns(columns)
+        .on('filter', function() {
+          $.publish('data/filter', '#' + this.element.attr('id'));
+        }.bind(this))
       ;
 
       this.updateData();
 
       this._setupAnnotator();
 
-      this.update();
+      this.updateView();
 
     },
 
@@ -44,12 +47,8 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     },
 
+
     updateView: function() {
-      this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
-    },
-
-
-    filter: function() {
       this.table.filter(wb.shelf.dataentries);
     },
 
@@ -179,6 +178,6 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     resize: function() {
         this._super('resize');
-        this.updateView();
+        this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
     }
 });

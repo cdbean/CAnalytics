@@ -27,7 +27,7 @@ wb.viz.table = function() {
                     "sRowSelect": "multi", // for multi select with ctrl and shift
                     "sDom": "Rlfrtip", // enable column resizing
                 });
-                $(table).on('click', 'tr.even td:first, tr.odd td:first', onFilter);
+                $(table).on('click', 'tr.even td:first-child, tr.odd td:first-child', onFilter);
             }
 
             table.fnClearTable();
@@ -81,7 +81,13 @@ wb.viz.table = function() {
         }
         var selected_rows = $('tr.row_selected', table);
         if (selected_rows.length == 0) {
+          if (title === 'dataentry')
             wb.shelf_by.dataentries = [];
+          else
+            data.forEach(function(d) {
+              var i = wb.shelf_by.entities.indexOf(d[0]);
+              if (i > -1) wb.shelf_by.entities.splice(i, 1);
+            });
 
             wb.log({
                 operation: 'removed filter in',
@@ -94,7 +100,10 @@ wb.viz.table = function() {
               var id = $(row).data('id');
                 records_id.push(id);
             });
-            wb.shelf_by.dataentries = records_id;
+            if (title === 'dataentry')
+              wb.shelf_by.dataentries = records_id;
+            else
+              wb.shelf_by.entities = wb.shelf_by.entities.concat(records_id)
 
             var selected_names = [];
             if (title !== 'dataentry') {

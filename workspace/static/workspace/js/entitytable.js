@@ -15,9 +15,12 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
             .on('edit', function(entity, attr) {
                 $.publish('/entity/attribute/update', [entity, attr]);
             })
+            .on('filter', function() {
+              $.publish('data/filter', '#' + this.element.attr('id'));
+            }.bind(this))
         ;
         this.updateData();
-        this.update();
+        this.updateView();
     },
 
     updateData: function() {
@@ -43,10 +46,6 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     },
 
     updateView: function() {
-
-    },
-
-    filter: function() {
       this.table.filter(wb.shelf.entities);
     },
 

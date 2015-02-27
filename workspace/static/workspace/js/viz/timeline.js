@@ -13,6 +13,8 @@ wb.viz.timeline = function() {
   var svg, chart, xAxis, xBrush;
   var axis, zoom, brush;
 
+  var dispatch = d3.dispatch('filter');
+
   function exports(selection) {
 
     width = outwidth - margin.left - margin.right;
@@ -318,7 +320,6 @@ wb.viz.timeline = function() {
     brush.x(scaleX);
     xBrush.style('display', '').attr('height', height).call(brush);
     xBrush.selectAll('rect').attr('y', 0).attr('height', height);
-    console.log('start brush');
   }
 
   function setNormalMode() {
@@ -330,7 +331,8 @@ wb.viz.timeline = function() {
   function brushing() {
     var ext = brush.extent()
     svg.selectAll('.item').classed('active', function(d) {
-      return d.start <= ext[1] || d.end >= ext[0];
+      return (d.start <= ext[1]  && d.start >= ext[0])
+        || (d.end >= ext[0] && d.end <= ext[1]);
     });
   }
 
@@ -340,13 +342,14 @@ wb.viz.timeline = function() {
       var i = shelf_by.indexOf(d.id);
       if (i > -1) shelf_by.splice(i, 1);
     });
-    svg.selectAll('.item.selected').each(function(d) {
+    svg.selectAll('.item.active').each(function(d) {
       shelf_by.push(d.id);
     });
     wb.shelf_by.entities = shelf_by;
+    dispatch.filter();
   }
 
 
-  return exports;
+  return d3.rebind(exports, dispatch, 'on');
 };
 

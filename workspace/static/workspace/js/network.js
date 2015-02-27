@@ -11,7 +11,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this._setupForceLayout();
 
         this.updateData();
-        this.update();
+        this.updateView();
 
     },
 
@@ -455,6 +455,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.svg.append('g')
             .attr('class', 'brush')
             .call(this.brush
+                .on("brush", brushing)
                 .on("brushend", brushend)
                 .x(brushX)
                 .y(brushY)
@@ -469,25 +470,19 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var e = _this.brush.extent();
             var selected_nodes = [], selected_relationships = [];
             d3.selectAll(".node").classed("selected", function(d) {
-                d.selected = e[0][0] <= brushX.invert(d.x) && brushX.invert(d.x) <= e[1][0]
+                return  e[0][0] <= brushX.invert(d.x) && brushX.invert(d.x) <= e[1][0]
                     && e[0][1] <= brushY.invert(d.y) && brushY.invert(d.y) <= e[1][1];
-                if (d.selected) {
-                    selected_nodes.push(d);
-                    selected_relationships = selected_relationships.concat(d.relationships);
-                }
-                return d.selected;
             });
-
-            if (selected_relationships.length > 0) {
-                selected_relationships = wb.utility.uniqueArray(selected_relationships);
-
-                _this.options.dimension.filter(function(d) {
-                    if (d > 0) return selected_relationships.indexOf(d) >= 0;
-                    return false;
-                });
-
-                $.publish('/data/filter', _this.element.attr("id"))
-            }
+            d3.selectAll(".link").classed("selected", function(d) {
+                return  (e[0][0] <= brushX.invert(d.source.x)
+                    && brushX.invert(d.source.x) <= e[1][0]
+                    && e[0][1] <= brushY.invert(d.source.y)
+                    && brushY.invert(d.source.y) <= e[1][1])
+                    || (e[0][0] <= brushX.invert(d.target.x)
+                    && brushX.invert(d.target.x) <= e[1][0]
+                    && e[0][1] <= brushY.invert(d.target.y)
+                    && brushY.invert(d.target.y) <= e[1][1]);
+            });
         }
 
         function brushend() {
@@ -508,8 +503,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             }
             else {
                 var rels_id = [];
+                var selected_names = [];
                 d3.selectAll('.link.selected').each(function(d) {
+                    var r = wb.store.relationships[d.id];
                     rels_id.push(d.id);
+                    selected_names.push(r.primary.relation);
                 })
                 wb.shelf_by.relationships = rels_id;
                 wb.log({
@@ -517,11 +515,12 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     item: 'network',
                     tool: 'network',
                     data: {
-                      'id': nodes_id.join(','),
-                      'name': selected_name.join(',')
+                      'id': rels_id.join(','),
+                      'name': selected_names.join(',')
                     }
                 });
             }
+            $.publish('data/filter', '#' + _this.element.attr("id"));
 
 //            vis.selectAll("circle").attr("fill", function(d) {
 //                truth = e[0][0] <= brushX.invert(d.x) && brushX.invert(d.x) <= e[1][0]
@@ -716,10 +715,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     updateView: function() {
-
-    },
-
-    filter: function() {
       var nodes = [];
       this.svg.selectAll('.link').attr('display', function(d) {
         if (wb.shelf.relationships.indexOf(d.id) > -1) {

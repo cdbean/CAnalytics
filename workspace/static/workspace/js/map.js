@@ -115,7 +115,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
 
         this.mapControls = mapControls;
 
-        this.update();
+        this.updateView();
 
     },
     updateData: function() {
@@ -137,7 +137,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.pointlayer.addFeatures(point_feas);
         this.features = this.pointlayer.features.concat(this.linelayer.features);
     },
-    update: function() {
+
+    updateView: function() {
         this.features.forEach(function(d) {
           d.style = d.style || {};
           if (wb.shelf.entities.indexOf(d.attributes.id) > -1)
@@ -165,13 +166,13 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             }
           }
         }
-        var entity = wb.store.entity[feature.attributes.id];
+        var entity = wb.store.entities[feature.attributes.id];
         var primary = entity.primary;
         var popup = '<div id="map-popup" class="entity-tooltip"><table>';
-        popup += '<tr><th>' + wb.utility.capitalizeFirstLetter(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
+        popup += '<tr><th>' + wb.utility.capfirst(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
         for (var attr in primary) {
             if (attr !== 'id' && attr !== 'entity_type' && attr !== 'name' && primary[attr]) {
-                popup += '<tr><th>' + wb.utility.capitalizeFirstLetter(attr) + '</th><td>' + primary[attr] + '</td></tr>';
+                popup += '<tr><th>' + wb.utility.capfirst(attr) + '</th><td>' + primary[attr] + '</td></tr>';
             }
         }
         popup += '</table></div>';
@@ -247,11 +248,10 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         });
 
         if (selectedFeas.length == 0) {
-            for (var i = 0, len = shelf_by.length; i < len; i++) {
-              var entity = wb.store.entities[shelf_by[i]];
-              if (entity.primary.entity_type === 'location')
-                shelf_by.splice(i, 1);
-            }
+            this.features.forEach(function(d) {
+              var i = wb.shelf_by.entities.indexOf(d.attributes.id);
+              if (i > -1) wb.shelf_by.entities.splice(i, 1);
+            });
             wb.log({
                 operation: 'removed filter in',
                 item: 'map',
@@ -261,9 +261,11 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             selectedFeas.forEach(function(d) {
               if (shelf_by.indexOf(d) < 0)
                 shelf_by.push(d);
-            })
+            });
+            shelf_by = wb.utility.uniqueArray(shelf_by);
+
             var selected_names = selectedFeas.map(function(id) {
-              return wb.store.entity[id].primary.name;
+              return wb.store.entities[id].primary.name;
             })
 
             wb.log({
@@ -276,6 +278,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
                 })
             });
         }
+        $.publish('data/filter', '#' + this.element.attr('id'));
     },
 
     resize: function() {

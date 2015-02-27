@@ -13,7 +13,7 @@ wb.log = function(act) {
   };
   $.extend(action, act);
 
-  $.post(GLOBAL_URL.log, log, function(error, result) {
+  $.post(GLOBAL_URL.log, action, function(error, result) {
 
   });
 };
