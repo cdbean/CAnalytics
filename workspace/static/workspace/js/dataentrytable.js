@@ -8,7 +8,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this._super('_create');
       this.element.addClass('dataentry');
 
-      var columns = ['ID'].concat(wb.static.dataentry);
+      var columns = ['ID'].concat(wb.store.static.dataentry);
 
       this.table = wb.viz.table()
         .height(this.element.height() - 80)
@@ -35,10 +35,10 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     updateData: function() {
       var data = [];
 
-      for (var d in wb.store.dataentries) {
-        var de = wb.store.dataentries[d];
+      for (var d in wb.store.items.dataentries) {
+        var de = wb.store.items.dataentries[d];
         if (de) {
-          data.push([de.id, wb.store.datasets[de.dataset].name, de.content, de.date]);
+          data.push([de.id, wb.store.items.datasets[de.dataset].name, de.content, de.date]);
         }
       }
 
@@ -49,7 +49,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
 
     updateView: function() {
-      this.table.filter(wb.shelf.dataentries);
+      this.table.filter(wb.store.shelf.dataentries);
     },
 
     highlight: function(item) {
@@ -87,7 +87,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
               'case': wb.info.case,
               'group': wb.info.group
             },
-            loadFromLocal: _.values(wb.store.annotations)
+            loadFromLocal: _.values(wb.store.items.annotations)
         });
         ele.annotator('addPlugin', 'Entity');
     },
@@ -108,7 +108,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       var annotator = ele.data('annotator');
       if (annotator) {
         var store = annotator.plugins['Store'];
-        store.loadAnnotationsFromLocal(wb.store.annotations);
+        store.loadAnnotationsFromLocal(wb.store.items.annotations);
       }
     },
 

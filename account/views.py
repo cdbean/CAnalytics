@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.http import HttpResponse
 
+import json
+
 from django.contrib.auth.models import User, Group
 from workspace.models import Case
 
@@ -59,3 +61,13 @@ def logout(request):
     auth_logout(request)
     return redirect('account:login')
 
+def users(request):
+    res = []
+    group = request.user.groups.get(id=request.GET['group'])
+    users = group.user_set.all()
+    for u in users:
+        res.append({
+            'id': u.id,
+            'name': u.username
+        })
+    return HttpResponse(json.dumps(res), content_type='application/json')

@@ -37,13 +37,13 @@ $.widget('viz.vizviewer', {
     }
     this.addTitle(type, d.primary.name || d.primary.relation);
 
-    var attrs = wb.static[type];
+    var attrs = wb.store.static[type];
     for (var i = 0, len = attrs.length; i < len; i++) {
       var attr = attrs[i], value = d.primary[attr];
       if (value)
         this.addField({key: attr, value: value});
     }
-    var metas = wb.static.meta;
+    var metas = wb.store.static.meta;
     for (var i = 0, len = metas.length; i < len; i++) {
       var attr = metas[i], value = d.meta[attr];
       if (value)
@@ -77,7 +77,7 @@ $.widget('viz.vizviewer', {
     $element.find('.attr-key').text(attr.key + ': ');
     if (key === 'people') {
       value = value.map(function(d) {
-        return wb.store.entities[d].primary.name;
+        return wb.store.items.entities[d].primary.name;
       });
     }
     else if (key === 'created_by' || key === 'last_edited_by') {

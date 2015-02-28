@@ -31,8 +31,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     updateData: function() {
       var data = [];
-      for (var d in wb.store.entities) {
-        var entity = wb.store.entities[d];
+      for (var d in wb.store.items.entities) {
+        var entity = wb.store.items.entities[d];
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
             data.push({
@@ -49,7 +49,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     },
 
     updateView: function() {
-      this.timeline.filter(wb.shelf.entities);
+      this.timeline.filter(wb.store.shelf.entities);
     },
 
     setupUI: function() {

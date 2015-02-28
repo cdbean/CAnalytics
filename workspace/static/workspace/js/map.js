@@ -120,8 +120,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     },
     updateData: function() {
         var point_feas = [], line_feas = [];
-        for (var d in wb.store.entities) {
-          var entity = wb.store.entities[d];
+        for (var d in wb.store.items.entities) {
+          var entity = wb.store.items.entities[d];
           if (entity.primary.entity_type === 'location') {
             var geometry = entity.primary.geometry;
             if (geometry) {
@@ -141,7 +141,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     updateView: function() {
         this.features.forEach(function(d) {
           d.style = d.style || {};
-          if (wb.shelf.entities.indexOf(d.attributes.id) > -1)
+          if (wb.store.shelf.entities.indexOf(d.attributes.id) > -1)
             d.style = null;
           else
             d.style.display = 'none';
@@ -166,7 +166,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             }
           }
         }
-        var entity = wb.store.entities[feature.attributes.id];
+        var entity = wb.store.items.entities[feature.attributes.id];
         var primary = entity.primary;
         var popup = '<div id="map-popup" class="entity-tooltip"><table>';
         popup += '<tr><th>' + wb.utility.capfirst(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
@@ -238,7 +238,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     },
 
     filterByLocation: function(feature) {
-        var shelf_by = wb.shelf_by.entities;
+        var shelf_by = wb.store.shelf_by.entities;
         var selectedFeas = []; // selected feature ids
         // get the id of all selected features
         this.layers.forEach(function(layer) {
@@ -249,8 +249,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
 
         if (selectedFeas.length == 0) {
             this.features.forEach(function(d) {
-              var i = wb.shelf_by.entities.indexOf(d.attributes.id);
-              if (i > -1) wb.shelf_by.entities.splice(i, 1);
+              var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
+              if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
             });
             wb.log({
                 operation: 'removed filter in',
@@ -265,7 +265,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             shelf_by = wb.utility.uniqueArray(shelf_by);
 
             var selected_names = selectedFeas.map(function(id) {
-              return wb.store.entities[id].primary.name;
+              return wb.store.items.entities[id].primary.name;
             })
 
             wb.log({

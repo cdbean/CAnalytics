@@ -61,7 +61,7 @@ Annotator.Plugin.Entity = (function(_super) {
           // put entity attributes in the list
           var attribute_widget = $(self.attrField).find('.annotator-attribute-widget').data('instance');
           attribute_widget.reset();
-          var attributes = wb.static[value];
+          var attributes = wb.store.static[value];
           if (attributes) {
             for (var i = 0, len = attributes.length; i < len; i++) {
               var attr = attributes[i];
@@ -71,7 +71,7 @@ Annotator.Plugin.Entity = (function(_super) {
         });
 
         this.subscribe('entity/name/update', function(value) {
-            var entity = wb.store.entities[value];
+            var entity = wb.store.items.entities[value];
             if (!self.annotation.entity) {
                 self.annotation.entity = {};
             }
@@ -107,8 +107,8 @@ Annotator.Plugin.Entity = (function(_super) {
       // if group is provided, only get options for that group
       var _this = this;
       var opts = [], optgroups = [];
-      for (var key in wb.store.entities) {
-        var entity = wb.store.entities[key];
+      for (var key in wb.store.items.entities) {
+        var entity = wb.store.items.entities[key];
         if (group) {
           if (entity.primary.entity_type !== group) continue;
         }
@@ -118,7 +118,7 @@ Annotator.Plugin.Entity = (function(_super) {
           label: entity.primary.name
         });
       }
-      optgroups = wb.store.ENTITY_ENUM.map(function(entity) {
+      optgroups = wb.store.static.entity_types.map(function(entity) {
         return {value: entity, label: _this.capitalizeFirstLetter(entity)};
       });
 
@@ -144,7 +144,7 @@ Annotator.Plugin.Entity = (function(_super) {
     Entity.prototype.updateEntityNameField = function(field, annotation) {
         var name;
         if (annotation.entity) {
-            var entity = wb.store.entities[annotation.entity.id];
+            var entity = wb.store.items.entities[annotation.entity.id];
             name = entity.primary.name;
         } else {
             name = annotation.quote;
@@ -221,7 +221,7 @@ Annotator.Plugin.Entity = (function(_super) {
         var attribute_widget = $(field).find('.annotator-attribute-widget').data('instance');
         attribute_widget.reset();
         if (annotation.entity && annotation.entity.id) {
-            var entity = wb.store.entities[annotation.entity.id];
+            var entity = wb.store.items.entities[annotation.entity.id];
             for (var attr in entity.primary) {
                 if (attr !== 'entity_type' && attr !== 'id' && attr !== 'name' && attr !== 'geometry') { // skip these attributes
                     attribute_widget.add(attr, entity.primary[attr], 'primary');
@@ -251,10 +251,10 @@ Annotator.Plugin.Entity = (function(_super) {
     Entity.prototype.updateViewer = function(field, annotation) {
         if (annotation.entity) {
             var table = '<table id="annotator-viewer-table">';
-            var entity = wb.store.entities[annotation.entity.id];
+            var entity = wb.store.items.entities[annotation.entity.id];
             var primary = entity.primary;
             table += '<tr><th>' + this.capitalizeFirstLetter(primary.entity_type) + ':</th><td>' + primary.name + '</td></tr>';
-            var attrs = wb.static[entity.primary.entity_type];
+            var attrs = wb.store.static[entity.primary.entity_type];
             for (var i = 0, len = attrs.length; i < len; i++) {
               var attr = attrs[i];
               var value = wb.utility.parseEntityAttr(attr, primary[attr]);

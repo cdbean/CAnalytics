@@ -6,7 +6,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         this.element.addClass('entity');
         this._super('_create');
 
-        var columns = ['ID', 'Name'].concat(wb.static[this.options.entity]);
+        var columns = ['ID', 'Name'].concat(wb.store.static[this.options.entity]);
         this.table = wb.viz.table()
             .columns(columns)
             .height(this.element.height() - 80)
@@ -26,10 +26,10 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     updateData: function() {
         var data = [];
         var entity_type = this.options.entity;
-        var attrs = wb.static[entity_type];
+        var attrs = wb.store.static[entity_type];
 
-        for (var d in wb.store.entities) {
-          var entity = wb.store.entities[d];
+        for (var d in wb.store.items.entities) {
+          var entity = wb.store.items.entities[d];
           if (entity && entity.primary.entity_type === entity_type) {
             var row = [entity.meta.id, entity.primary.name || ''];
             for (var i = 0, len = attrs.length; i < len; i++) {
@@ -46,7 +46,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     },
 
     updateView: function() {
-      this.table.filter(wb.shelf.entities);
+      this.table.filter(wb.store.shelf.entities);
     },
 
     reload: function() {

@@ -36,8 +36,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             .attr("pointer-events", "all")
         ;
         // define node image
-        for (var i = 0; i < wb.store.ENTITY_ENUM.length; i++) {
-            var entity_type = wb.store.ENTITY_ENUM[i];
+        for (var i = 0; i < wb.store.static.entity_types.length; i++) {
+            var entity_type = wb.store.static.entity_types[i];
             this.svg.append('svg:defs')
                 .append('svg:pattern').attr('id', 'img-'+entity_type).attr('patternUnits', 'userSpaceOnUse').attr('x', '12').attr('y', '12').attr('height','24').attr('width','24')
                 .append('image').attr('x', '0').attr('y', '0').attr('width', 24).attr('height', 24).attr('xlink:href', GLOBAL_URL.static + 'workspace/img/entity/' + entity_type + '.png')
@@ -129,7 +129,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     _setupUI: function() {
       // filter bar
-      var entity_types = wb.store.ENTITY_ENUM;
+      var entity_types = wb.store.static.entity_types;
       var filterbar = '<div class="network-filterbar"><ul>';
       for (var i = 0; i < entity_types.length; i++) {
           filterbar += '<li><input type="checkbox" id="'
@@ -464,7 +464,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var e = _this.brush.extent();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
-                wb.shelf_by.relationships = [];
+                wb.store.shelf_by.relationships = [];
                 d3.selectAll(".node").classed("selected", function(d) {
                     return d.selected = false;
                 });
@@ -479,11 +479,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 var rels_id = [];
                 var selected_names = [];
                 d3.selectAll('.link.selected').each(function(d) {
-                    var r = wb.store.relationships[d.id];
+                    var r = wb.store.items.relationships[d.id];
                     rels_id.push(d.id);
                     selected_names.push(r.primary.relation);
                 })
-                wb.shelf_by.relationships = rels_id;
+                wb.store.shelf_by.relationships = rels_id;
                 wb.log({
                     operation: 'filtered in',
                     item: 'network',
@@ -577,7 +577,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     showLinkInfo: function(l, pos) {
         $('.network-viewer .attr-list').remove();
-        var rel = wb.store.relationships[l.id];
+        var rel = wb.store.items.relationships[l.id];
         var str = "<table class='attr-list'>";
         for (var attr in rel) {
           if (attr !== 'source' && attr !== 'target' && attr !== 'id'
@@ -674,8 +674,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         this.links = [];
 
-        for (var d in wb.store.relationships) {
-          var rel = wb.store.relationships[d];
+        for (var d in wb.store.items.relationships) {
+          var rel = wb.store.items.relationships[d];
           _this.addLink(rel)
         }
         this.restart();
@@ -685,7 +685,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     updateView: function() {
       var nodes = [];
       this.svg.selectAll('.link').attr('display', function(d) {
-        if (wb.shelf.relationships.indexOf(d.id) > -1) {
+        if (wb.store.shelf.relationships.indexOf(d.id) > -1) {
           nodes.push(d.source.id);
           nodes.push(d.target.id);
           return '';
@@ -735,7 +735,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         g.append("svg:circle")
             .attr('r', 12)
             .attr('fill', function(d) {
-                var entity = wb.store.entities[d.id];
+                var entity = wb.store.items.entities[d.id];
                 return "url(#img-" + entity.primary.entity_type + ")";
             })
         ;
@@ -747,7 +747,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             .style("text-anchor", "middle")
             .attr("dy", "-.95em")
             .text(function(d) {
-                var ent = wb.store.entities[d.id];
+                var ent = wb.store.items.entities[d.id];
                 return ent.primary.name.length < 20 ? ent.primary.name : ent.primary.name.substring(0, 20) + '...';
             })
             .style("-webkit-user-select", "none"); // disable text selection when dragging mouse
@@ -778,7 +778,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
       var pos = {top: d3.event.pageY, left: d3.event.pageX};
       this.showNodeInfoTimer = setTimeout(function() {
-        var entity = wb.store.entities[d.id];
+        var entity = wb.store.items.entities[d.id];
         wb.viewer.data(entity, 'entity').show(pos);
       }, 500);
     },
@@ -814,7 +814,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       // this.highlightLink(d);
       var pos = {top: d3.event.pageY, left: d3.event.pageX};
       this.showLinkInfoTimer = setTimeout(function() {
-        var rel = wb.store.relationships[d.id];
+        var rel = wb.store.items.relationships[d.id];
         wb.viewer.data(rel, 'relationship').show(pos);
       }, 500);
     },

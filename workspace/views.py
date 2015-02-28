@@ -27,27 +27,23 @@ def case(request, case, group):
     datasets = case.dataset_set.all()
     for ds in datasets:
         ds.entries = ds.dataentry_set.count()
+    users = group.user_set.all()
     return render(request, 'index.html', {
         "case": case,
         "group": group,
-        "datasets": datasets
+        "datasets": datasets,
+        "users": users
     })
 
 
 def data(request):
-    res = {'datasets': [], 'dataentries': [], 'entities': [], 'relationships': [], 'annotations': [], 'users': []}
+    res = {'datasets': [], 'dataentries': [], 'entities': [], 'relationships': [], 'annotations': []}
     try:
         group = request.user.groups.get(id=request.GET['group'])
         case = group.case_set.get(id=request.GET['case'])
     except:
         return HttpResponseBadRequest()
 
-    users = group.user_set.all()
-    for u in users:
-        res['users'].append({
-            'id': u.id,
-            'name': u.username
-        })
     datasets = case.dataset_set.all()
     for ds in datasets:
         res['datasets'].append(ds.serialize())

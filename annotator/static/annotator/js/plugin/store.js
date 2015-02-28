@@ -111,6 +111,7 @@ Annotator.Plugin.Store = (function(_super) {
                 if (relationships.length)
                   $.publish("relationship/created", relationships);
 
+                $.publish('annotation/created', annotation);
                 wb.utility.notify('1 annotation added!', 'success');
             });
         } else {
@@ -189,10 +190,17 @@ Annotator.Plugin.Store = (function(_super) {
         var _this = this;
         if (annotation.id) { // if an annotation has no id, it is temporary annotation, no need to publish events
             this._apiRequest('destroy', annotation, function(data) {
-                var relationship = data.relationship;
+                var annotation = data.annotation,
+                    entity = data.entity,
+                    relationship = data.relationship;
+
+                if (entity && entity.deleted)
+                  $.publish('entity/deleted', entity);
+                if (relationship && relationship.deleted)
+                  $.publish('relationship/deleted', relationship);
 
                 _this.unregisterAnnotation(annotation);
-                $.publish('/relationship/delete', [[relationship]]);
+                $.publish('annotation/deleted', annotation);
                 wb.utility.notify('1 annotation deleted', 'success');
             });
         } else {

@@ -8,7 +8,7 @@ ishout.on('userlist', function(data) {
 });
 
 ishout.on('entity.create', function(entity) {
-  if (! (entity.primary.id in wb.store.entity)) {
+  if (! (entity.primary.id in wb.store.items.entities)) {
     wb.store.entity[entity.primary.id] = entity;
   }
 });

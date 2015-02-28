@@ -115,12 +115,12 @@ wb.utility.parseEntityAttr = function(attr, value) {
   if (attr === 'people') {
     value = value || [];
     value = value.map(function(d) {
-      return wb.store.entities[d].primary.name;
+      return wb.store.items.entities[d].primary.name;
     });
     value = value.join(', ');
   } else if (attr === 'location') {
     if (value) {
-      var l = wb.store.entities[value];
+      var l = wb.store.items.entities[value];
       value = l.primary.name || l.primary.address;
     }
   }

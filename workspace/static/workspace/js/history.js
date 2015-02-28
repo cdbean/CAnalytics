@@ -56,8 +56,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     $('<span class="content">').appendTo(row)
       .html(action)
     ;
-    if (wb.store.ENTITY_ENUM.indexOf(item.item) > -1) {
-      var entity = wb.store.entities[item.data.id];
+    if (wb.store.static.entity_types.indexOf(item.item) > -1) {
+      var entity = wb.store.items.entities[item.data.id];
       row.find('.item').addClass('entity').addClass(item.item).data('entity', entity);
     }
 
@@ -92,15 +92,13 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
         var viz_form = viz_opt[1];
         var viz;
         if (viz_form === 'table') {
-            if (viz_name === 'dataentry') {
-                viz = $('<div>').vizdataentrytable({
-                    title: 'Data Entry' + subtitle,
-                });
-            } else {
-                viz = $('<div>').vizentitytable({
-                    title: viz_name + subtitle,
-                });
-            }
+            viz = $('<div>').vizentitytable({
+                title: viz_name + subtitle,
+            });
+        } else if (viz_name === 'dataentry') {
+            viz = $('<div>').vizdataentrytable({
+                title: 'Data Entry' + subtitle,
+            });
         } else if (viz_name === 'timeline') {
             viz = $('<div>').viztimeline({
                 title: 'Timeline' + subtitle,
@@ -125,7 +123,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
           viz = $('<div>').vizdataentrytable({
               title: 'Data Entry' + subtitle,
           });
-        } else if (wb.store.ENTITY_ENUM.indexOf(viz_name) > -1) {
+        } else if (wb.store.static.entity_types.indexOf(viz_name) > -1) {
           viz = $('<div>').vizentitytable({
               title: viz_name + subtitle,
           });
@@ -137,9 +135,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
             if (data.data && data.data.id) {
               viz.data('instance').highlight(data.data.id)
             }
-            wb.vartifacts.push(viz);
         }
-
       }
     }
 

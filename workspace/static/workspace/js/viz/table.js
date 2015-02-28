@@ -82,11 +82,11 @@ wb.viz.table = function() {
         var selected_rows = $('tr.row_selected', table);
         if (selected_rows.length == 0) {
           if (title === 'dataentry')
-            wb.shelf_by.dataentries = [];
+            wb.store.shelf_by.dataentries = [];
           else
             data.forEach(function(d) {
-              var i = wb.shelf_by.entities.indexOf(d[0]);
-              if (i > -1) wb.shelf_by.entities.splice(i, 1);
+              var i = wb.store.shelf_by.entities.indexOf(d[0]);
+              if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
             });
 
             wb.log({
@@ -101,18 +101,18 @@ wb.viz.table = function() {
                 records_id.push(id);
             });
             if (title === 'dataentry')
-              wb.shelf_by.dataentries = records_id;
+              wb.store.shelf_by.dataentries = records_id;
             else
-              wb.shelf_by.entities = wb.shelf_by.entities.concat(records_id)
+              wb.store.shelf_by.entities = wb.store.shelf_by.entities.concat(records_id)
 
             var selected_names = [];
             if (title !== 'dataentry') {
               selected_names = records_id.map(function(id) {
-                return wb.store.entities[id].primary.name;
+                return wb.store.items.entities[id].primary.name;
               });
             } else {
               selected_names = records_id.map(function(id) {
-                return wb.store.dataentries[id].name;
+                return wb.store.items.dataentries[id].name;
               });
             }
             wb.log({

@@ -302,7 +302,7 @@ wb.viz.timeline = function() {
   function onMouseOver(d) {
     var pos = {top: d3.event.pageY, left: d3.event.pageX};
     showNodeInfoTimer = setTimeout(function() {
-      var entity = wb.store.entities[d.id];
+      var entity = wb.store.items.entities[d.id];
       wb.viewer.data(entity, 'entity').show(pos);
     }, 500);
   }
@@ -326,7 +326,7 @@ wb.viz.timeline = function() {
   }
 
   function brushed() {
-    var shelf_by = wb.shelf_by.entities.slice();
+    var shelf_by = wb.store.shelf_by.entities.slice();
     data.forEach(function(d) {
       var i = shelf_by.indexOf(d.id);
       if (i > -1) shelf_by.splice(i, 1);
@@ -334,7 +334,7 @@ wb.viz.timeline = function() {
     svg.selectAll('.item.active').each(function(d) {
       shelf_by.push(d.id);
     });
-    wb.shelf_by.entities = shelf_by;
+    wb.store.shelf_by.entities = shelf_by;
     dispatch.filter();
   }
 

@@ -113,20 +113,36 @@ def del_annotation(request, id):
         print 'Error: annotation not found: ', id
         return HttpResponseNotFound()
 
+    res = {'annotation': {}, 'entity': {}, 'relationship': {}}
+    entity_info = {}
+    relationship_info = {}
+
     group = annotation.group
     case = annotation.case
     relationship = annotation.relationship
-    res['entity'] = annotation.entity.get_attr()
-    res['relationship'] = relationship.get_attr()
+    entity = annotation.entity
     res['annotation'] = annotation.serialize()
     annotation.delete()
-    relationship.delete()
+    if entity:
+        entity_info = entity.serialize()
+        if entity.annotation_set.count() == 0:
+            entity.delete()
+            entity_info['deleted'] = True
+    elif relationship:
+        relationship_info = relationship.serialize()
+        if relationship.annotation_set.count() == 0:
+            relationship.delete()
+            relationship_info['deleted'] = True
+
+    res['entity'] = entity_info
+    res['relationship'] = relationship_info
+    print res
 
     serverlog({
         'user': request.user,
         'operation': 'deleted',
         'item': 'annotation',
-        'tool': 'dataentry_table',
+        'tool': 'dataentry',
         'data': {
             'id': annotation.id,
             'name': annotation.quote
@@ -135,7 +151,7 @@ def del_annotation(request, id):
         'group': group
     })
 
-    sync.views.sync_annotation('delete', res, case, group, request.user)
+    sync_annotation('delete', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
