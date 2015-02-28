@@ -8,6 +8,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.element.addClass('timeline');
       this._super('_create');
 
+      this.setupUI();
+
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
       // this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
@@ -22,6 +24,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.updateView();
       return this;
     },
+
     _destroy: function() {
       this._super('_destroy');
     },
@@ -47,6 +50,26 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     updateView: function() {
       this.timeline.filter(wb.shelf.entities);
+    },
+
+    setupUI: function() {
+      var html = ' \
+        <ul class="controls"> \
+          <li class="control filter" title="Filter"> \
+        </ul> \
+      ';
+      this.element.append(html);
+
+      var _this = this;
+
+      this.element.find('.control').click(function() {
+        $(this).toggleClass('selected');
+        if ($(this).hasClass('selected')) {
+          _this.timeline.setBrushMode();
+        } else {
+          _this.timeline.setNormalMode();
+        }
+      });
     },
 
     resize: function() {

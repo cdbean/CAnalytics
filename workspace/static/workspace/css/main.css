@@ -1,27 +1,3 @@
-/* dialog related */
-.ui-dialog {
-  overflow: visible;
-}
-.ui-widget-header {
-    background: #7F9FE2;
-}
-.history .ui-widget-header {
-    background: #ccc;
-}
-.ui-widget.ui-dialog {
-    padding: 0;
-}
-.ui-dialog .ui-dialog-content {
-    padding: 0;
-}
-.ui-dialog-titlebar {
-    border-radius: 0;
-}
-.ui-dialog-content {
-    overflow: scroll;
-}
-
-
 /* page header */
 .navbar-default {
   background-color: #4d6cbb;

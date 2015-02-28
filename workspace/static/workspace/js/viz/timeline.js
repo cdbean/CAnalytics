@@ -39,6 +39,7 @@ wb.viz.timeline = function() {
         svg = d3.select(this).append('svg')
           .attr('width', outwidth)
           .attr('height', outheight);
+
         g = svg.append('g')
           .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
           ;
@@ -126,9 +127,6 @@ wb.viz.timeline = function() {
 
       xAxis.call(axis);
 
-      d3.select('body')
-        .on('keydown', onKeyDown)
-        .on('keyup', onKeyUp)
     });
   }
 
@@ -172,6 +170,19 @@ wb.viz.timeline = function() {
         else return 'none';
       });
   };
+
+  exports.setBrushMode = function() {
+    zoom.on('zoom', null);
+    brush.x(scaleX);
+    xBrush.style('display', '').attr('height', height).call(brush);
+    xBrush.selectAll('rect').attr('y', 0).attr('height', height);
+  };
+
+  exports.setNormalMode = function() {
+    xBrush.style('display', 'none');
+    svg.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
+    zoom.on('zoom', zoomed);
+  }
 
   exports.height = function(_) {
     if (!arguments.length) return outheight;
@@ -303,29 +314,6 @@ wb.viz.timeline = function() {
         wb.viewer.hide();
       }
     }, 300);
-  }
-
-
-  function onKeyDown() {
-    if (d3.event.shiftKey)
-      setBrushMode();
-  }
-
-  function onKeyUp() {
-    setNormalMode();
-  }
-
-  function setBrushMode() {
-    zoom.on('zoom', null);
-    brush.x(scaleX);
-    xBrush.style('display', '').attr('height', height).call(brush);
-    xBrush.selectAll('rect').attr('y', 0).attr('height', height);
-  }
-
-  function setNormalMode() {
-    xBrush.style('display', 'none');
-    svg.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
-    zoom.on('zoom', zoomed);
   }
 
   function brushing() {

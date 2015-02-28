@@ -18,23 +18,6 @@
     shape-rendering: crispEdges;
 }
 
-
-
-/* labels */
-
-.bandLabel {
-    fill: #F0F0F0;
-    font: 10px sans-serif;
-    font-weight: bold;
-}
-
-.bandMinMaxLabel {
-    fill: blue;
-    font: 10px sans-serif;
-    font-weight: bold;
-}
-
-
 /* brush */
 
 .brush .extent {
@@ -44,7 +27,7 @@
 }
 
 .chart {
-    fill: #EEEEEE;
+    fill: white;
 }
 
 .interval {

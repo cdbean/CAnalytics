@@ -7,7 +7,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this._super('_create');
 
         this._setupUI();
-        this._setupEventListener();
         this._setupForceLayout();
 
         this.updateData();
@@ -83,23 +82,24 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.brush = d3.svg.brush();
         this.drag = this.force.drag();
 
-        this.svg = this.svg.append('svg:g')
+        var g = this.svg.append('svg:g')
         ;
 
-        this.svg.append('svg:rect')
+        g.append('svg:rect')
             .attr('width', this.width)
             .attr('height', this.height)
             .attr('fill', 'white')
+            .attr('class', 'chart-area')
             .call(this.zoom)
         ;
 
-        this.svg = this.svg.append('g');
+        this.chart = this.svg.append('g');
 
-        this.link = this.svg.selectAll("path");
-        this.node = this.svg.selectAll("g");
+        this.link = this.chart.selectAll("path");
+        this.node = this.chart.selectAll("g");
 
         // line displayed when dragging new nodes
-        this.drag_line = this.svg.append('svg:path')
+        this.drag_line = this.chart.append('svg:path')
             .attr('class', 'dragline hidden')
             .attr('d', 'M0,0L0,0');
     },
@@ -146,54 +146,28 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       filterbar += '</ul></div>';
       this.element.append(filterbar);
 
-      // network viewer
-      var viewer = '\
-        <div class="network-viewer"> \
-            <span class="network-viewer-controls"> \
-              <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-remove"></span></button> \
-              <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
-            </span> \
-        </div> \
-      ';
-      //
-      // network editor
-      var editor = '\
-        <div class="network-editor"> \
-            <div class="relationship-label"> \
-              <span class="rel-source"></span> \
-              <span class="glyphicon glyphicon-arrow-right"></span> \
-              <span class="rel-target"></span> \
-            </div> \
-            <form> \
-              <input name="relation" id="relation" placeholder="Relationship..."/>  \
-              <textarea name="description" id="desc" placeholder="Description..."/>  \
-              <button type="button" title="Save" class="save"><span class="glyphicon glyphicon-ok-circle"></span></button> \
-              <button type="button" title="cancel" class="cancel"><span class="glyphicon glyphicon-remove-circle"></span></button> \
-            </form> \
-        </div> \
-      ';
-      $(viewer).appendTo(this.element);
-      $(editor).appendTo(this.element);
-    },
-
-
-    _setupEventListener: function() {
-      d3.select('body')
-        .on("keydown", this._onSetMode.bind(this))
-        .on("keyup", this._onExitMode.bind(this));
-
       $('.network-filterbar :checkbox').change(this._onSetFilter.bind(this));
 
-      $('.network-editor .save').click(this._onEditorSave.bind(this));
-      $('.network-editor .cancel').click(this._onEditorCancel.bind(this));
+      var html = ' \
+        <ul class="controls"> \
+          <li class="control filter" title="Filter"> \
+          <li class="control draw" title="Draw"> \
+        </ul> \
+      ';
+      this.element.append(html);
 
-      $('.network-viewer .delete').click(this._onViewerDelete.bind(this));
-      $('.network-viewer .edit').click(this._onViewerEdit.bind(this));
+      var _this = this;
 
-      $('.network-viewer').mouseleave(function() {
-        $(this).hide();
-        $('.network-viewer').data('link', null);
-        $('.network-viewer').data('node', null);
+      this.element.find('.control').click(function() {
+        $(this).toggleClass('selected');
+        if ($(this).hasClass('selected')) {
+          if ($(this).hasClass('filter'))
+            _this.setMode('filter');
+          else if ($(this).hasClass('draw'))
+            _this.setMode('draw');
+        } else {
+          _this.setNormalMode();
+        }
       });
     },
 
@@ -452,7 +426,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var brushX=d3.scale.linear().range([0, this.width]),
             brushY=d3.scale.linear().range([0, this.height]);
 
-        this.svg.append('g')
+        this.chart.append('g')
             .attr('class', 'brush')
             .call(this.brush
                 .on("brush", brushing)
@@ -521,12 +495,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 });
             }
             $.publish('data/filter', '#' + _this.element.attr("id"));
-
-//            vis.selectAll("circle").attr("fill", function(d) {
-//                truth = e[0][0] <= brushX.invert(d.x) && brushX.invert(d.x) <= e[1][0]
-//                    && e[0][1] <= brushY.invert(d.y) && brushY.invert(d.y) <= e[1][1];
-//                if (truth) { d.selected = true; }
-//            });
         }
     },
 
@@ -580,26 +548,26 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     showLinkEditor: function(l) {
-      var $editor = $('.network-editor').show()
-          // .css('top', (this.mouseup_node.y + this.mousedown_node.y)/2.0)
-          // .css('left', (this.mouseup_node.x + this.mousedown_node.x)/2.0)
-          .css('top', (l.source.y + l.target.y)/2.0)
-          .css('left', (l.source.x + l.target.x)/2.0)
-          .data('link', l)
-      ;
-
-      var node_type = l.source.id.split('-')[0];
-      if (node_type === 'dataentry') {
-        var source = 'dataentry';
-      } else {
-        var source = l.source.primary.name;
-      }
-      var target = l.target.primary.name;
-      $editor.find('.rel-source').text(source);
-      $editor.find('.rel-target').text(target);
-      // add link attributes if any
-      $editor.find('#relation').val(l.relation);
-      $editor.find('#desc').val(l.description);
+      // var $editor = $('.network-editor').show()
+      //     // .css('top', (this.mouseup_node.y + this.mousedown_node.y)/2.0)
+      //     // .css('left', (this.mouseup_node.x + this.mousedown_node.x)/2.0)
+      //     .css('top', (l.source.y + l.target.y)/2.0)
+      //     .css('left', (l.source.x + l.target.x)/2.0)
+      //     .data('link', l)
+      // ;
+      //
+      // var node_type = l.source.id.split('-')[0];
+      // if (node_type === 'dataentry') {
+      //   var source = 'dataentry';
+      // } else {
+      //   var source = l.source.primary.name;
+      // }
+      // var target = l.target.primary.name;
+      // $editor.find('.rel-source').text(source);
+      // $editor.find('.rel-target').text(target);
+      // // add link attributes if any
+      // $editor.find('#relation').val(l.relation);
+      // $editor.find('#desc').val(l.description);
     },
 
 
