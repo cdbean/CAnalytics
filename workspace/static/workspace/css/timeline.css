@@ -20,11 +20,6 @@
 
 /* brush */
 
-.brush .extent {
-    stroke: gray;
-    fill: blue;
-    fill-opacity: .1;
-}
 
 .chart {
     fill: white;

@@ -22,16 +22,19 @@ wb.utility.formatDateTime = function(d) {
 };
 
 wb.utility.formatGeometry = function(entity) {
-  var wktParser = new OpenLayers.Format.WKT();
-  var feature = wktParser.read(entity.primary.geometry);
-  var origin_prj = new OpenLayers.Projection("EPSG:4326");
-  var dest_prj   = new OpenLayers.Projection("EPSG:900913");
-  if (feature) {
-      feature.geometry.transform(origin_prj, dest_prj); // projection of google map
+  if (entity.primary.geometry) {
+    var wktParser = new OpenLayers.Format.WKT();
+    var feature = wktParser.read(entity.primary.geometry);
+    var origin_prj = new OpenLayers.Projection("EPSG:4326");
+    var dest_prj   = new OpenLayers.Projection("EPSG:900913");
+    if (feature) {
+        feature.geometry.transform(origin_prj, dest_prj); // projection of google map
+    }
+    feature.attributes.id = entity.meta.id;
+    feature.attributes.name = entity.primary.name;
+    return feature;
   }
-  feature.attributes.id = entity.meta.id;
-  feature.attributes.name = entity.primary.name;
-  return feature;
+  return null;
 };
 
 wb.utility.capfirst = function(string) {

@@ -7,7 +7,7 @@ wb.viz.timeline = function() {
   ;
   var data = [];
   var tracks = [];
-  var trackHeight, itemHeight, itemMinWidth = 100;
+  var trackHeight, itemHeight, itemMinWidth = 20;
 
   var scaleX, scaleY;
   var svg, chart, xAxis, xBrush;
@@ -89,7 +89,7 @@ wb.viz.timeline = function() {
         .attr('y', function(d) { return scaleY(d.track); })
         .attr('width', function(d) {
           var width = scaleX(d.end) - scaleX(d.start);
-          return width < 100 ? 100 : width;
+          return Math.max(width, itemMinWidth);
         })
         .attr("height", itemHeight)
         .attr("class", function (d) { return d.instant ? "item instant" : "item interval"; })
@@ -148,7 +148,7 @@ wb.viz.timeline = function() {
       .attr('y', function(d) { return scaleY(d.track); })
       .attr('width', function(d) {
         var width = scaleX(d.end) - scaleX(d.start);
-        return width < 100 ? 100 : width;
+        return Math.max(width, itemMinWidth)
       })
       .attr("height", itemHeight)
     chart.selectAll('.item.instant')
@@ -320,7 +320,8 @@ wb.viz.timeline = function() {
     var ext = brush.extent()
     svg.selectAll('.item').classed('active', function(d) {
       return (d.start <= ext[1]  && d.start >= ext[0])
-        || (d.end >= ext[0] && d.end <= ext[1]);
+        || (d.end >= ext[0] && d.end <= ext[1])
+        || (d.start <= ext[0] && d.end >= ext[1]);
     });
   }
 

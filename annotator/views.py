@@ -104,8 +104,41 @@ def put_annotation(request):
     pass
 
 
-def del_annotation(request):
-    pass
+def del_annotation(request, id):
+    if not id:
+        return HttpResponseBadRequest()
+    try:
+        annotation = Annotation.objects.get(id=id)
+    except Annotation.DoesNotExist:
+        print 'Error: annotation not found: ', id
+        return HttpResponseNotFound()
+
+    group = annotation.group
+    case = annotation.case
+    relationship = annotation.relationship
+    res['entity'] = annotation.entity.get_attr()
+    res['relationship'] = relationship.get_attr()
+    res['annotation'] = annotation.serialize()
+    annotation.delete()
+    relationship.delete()
+
+    serverlog({
+        'user': request.user,
+        'operation': 'deleted',
+        'item': 'annotation',
+        'tool': 'dataentry_table',
+        'data': {
+            'id': annotation.id,
+            'name': annotation.quote
+        },
+        'case': case,
+        'group': group
+    })
+
+    sync.views.sync_annotation('delete', res, case, group, request.user)
+
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
 
 
 def get_annotations(request):

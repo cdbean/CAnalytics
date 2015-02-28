@@ -3,6 +3,27 @@
   $.subscribe('data/loaded', function() {
     reset_shelf();
     put_on_shelf();
+
+    watch(wb.store, function(prop, action, difference, oldval) {
+      var shelf = wb.shelf[prop];
+      if (shelf) {
+        if (difference) {
+          if (difference.added.length) {
+            difference.added.forEach(function(d) {
+              shelf.push(+d);
+            })
+            put_on_shelf(prop);
+          }
+          if (difference.removed.length) {
+            difference.removed.forEach(function(d) {
+              var i = shelf.indexOf(+d);
+              shelf.splice(i, 1);
+            });
+          }
+          $.publish('data/update', prop);
+        }
+      }
+    }, 1, true); // one level deep
   });
 
 
@@ -31,6 +52,7 @@
 
   function onDataUpdated(e, shelf) {
     updateDataBut(['.dataentry']);
+    updateViewsBut(['.dataentry']);
   }
 
   function onDataFiltered() {
@@ -62,7 +84,7 @@
 
   function updateDataBut(except) {
     except = except || [];
-    $('.viz').not(except.join(',')).each(function(i, viz) {
+    $('.viz').not(except.join(',')).not('.locked').each(function(i, viz) {
       var viz = $(viz).data('instance');
       if (viz) {
         viz.updateData();
@@ -72,7 +94,7 @@
 
   function updateViewsBut(except) {
     except = except || [];
-    $('.viz').not(except.join(',')).each(function(i, viz) {
+    $('.viz').not(except.join(',')).not('.locked').each(function(i, viz) {
       var viz = $(viz).data('instance');
       if (viz) {
         viz.updateView();

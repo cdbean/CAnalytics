@@ -56,4 +56,9 @@
   background-position: -77px -24px;
 }
 
+.viz .brush .extent {
+    stroke: gray;
+    fill: blue;
+    fill-opacity: .1;
+}
 
