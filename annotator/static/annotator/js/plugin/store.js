@@ -101,15 +101,15 @@ Annotator.Plugin.Store = (function(_super) {
             this.registerAnnotation(annotation);
             return this._apiRequest('create', annotation, function(data) {
                 var ann = data.annotation,
-                    entities = data.entities,
-                    relationships = data.relationships
+                    entity = data.entity,
+                    relationship = data.relationship
                 ;
                 _this.updateAnnotation(annotation, ann);
 
                 if (entities.length)
-                  $.publish('entity/created', entities);
+                  $.publish('entity/created', entity);
                 if (relationships.length)
-                  $.publish("relationship/created", relationships);
+                  $.publish("relationship/created", relationship);
 
                 $.publish('annotation/created', annotation);
                 wb.utility.notify('1 annotation added!', 'success');
@@ -160,15 +160,15 @@ Annotator.Plugin.Store = (function(_super) {
         var _this = this;
         if (__indexOf.call(this.annotations, annotation) >= 0) {
             return this._apiRequest('update', annotation, (function(data) {
-                var ann = data.annotation,
-                    entities = data.entities,
-                    relationships = data.relationships
+                var ann = data.annotations,
+                    entity = data.entity,
+                    relationship = data.relationship
                 ;
                 if (relationships.length){
-                    $.publish('relationship/updated', relationships);
+                    $.publish('relationship/updated', relationship);
                 }
                 if (entities.length) {
-                    $.publish('entity/updated', entities);
+                    $.publish('entity/updated', entity);
                 }
                 _this.updateAnnotation(annotation, ann);
                 $.publish('annotation/updated', ann);

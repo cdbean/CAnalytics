@@ -134,7 +134,7 @@
   function onNewMessage(e, msg) {
     $('.viz.message').each(function(i, viz) {
       viz = $(viz).data('instance');
-      viz.loadMessage(data);
+      viz.loadMessage(msg);
     });
   }
 })();

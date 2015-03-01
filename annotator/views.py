@@ -5,7 +5,7 @@ import json
 from django.contrib.auth.models import User, Group
 from workspace.entity import get_or_create_entity
 from workspace.models import DataEntry, Case
-from sync.views import sync_annotation
+from sync.views import sync_item
 from logger.views import serverlog
 from annotator.models import Annotation
 
@@ -37,7 +37,7 @@ def annotations(request):
 
 
 def post_annotation(request):
-    res = {}
+    res = {'annotation': {}, 'entity': [], 'relationship': []}
     data = json.loads(request.body)
     ranges = data.get('ranges', '')
     quote  = data.get('quote', '')
@@ -76,10 +76,10 @@ def post_annotation(request):
     annotation.save()
 
     res['annotation'] = annotation.serialize()
-    res['relationships'] = [rel.serialize()] if rel else []
-    res['relationships'] += [r.serialize() for r in new_rels]
-    res['entities'] = [entity.serialize()] if entity else []
-    res['entities'] += [e.serialize() for e in new_ents]
+    res['relationship'] = [rel.serialize()] if rel else []
+    res['relationship'] += [r.serialize() for r in new_rels]
+    res['entity'] = [entity.serialize()] if entity else []
+    res['entity'] += [e.serialize() for e in new_ents]
 
     # save to activity log
     serverlog({
@@ -95,7 +95,7 @@ def post_annotation(request):
         'case': case
     })
     # sync annotation
-    sync_annotation('create', res, case, group, request.user)
+    sync_item('create', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -111,7 +111,7 @@ def update_annotation(request, id):
 
     group = annotation.group
     case = annotation.case
-    res = {'annotation': {}, 'entities': {}, 'relationships': {}}
+    res = {'annotation': {}, 'entity': [], 'relationship': []}
     data = json.loads(request.body)
     entity = data.get('entity', None)
     rel = data.get('relationship', None)
@@ -127,22 +127,20 @@ def update_annotation(request, id):
     annotation.save()
 
     res['annotation'] = annotation.serialize()
-    res['relationships'] = [rel.serialize()] if rel else []
-    res['relationships'] += [r.serialize() for r in new_rels]
-    res['entities'] = [entity.serialize()] if entity else []
-    res['entities'] += [e.serialize() for e in new_ents]
+    res['relationship'] = [rel.serialize()] if rel else []
+    res['relationship'] += [r.serialize() for r in new_rels]
+    res['entity'] = [entity.serialize()] if entity else []
+    res['entity'] += [e.serialize() for e in new_ents]
 
     for r in del_rels:
         r_info = r.serialize()
         r_info['deleted'] = True
-        res['relationships'].append(r_info)
+        res['relationship'].append(r_info)
         r.delete()
 
-    sync_annotation('update', res, case, group, request.user)
+    sync_item('update', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
-
-
 
 
 def del_annotation(request, id):
@@ -192,7 +190,7 @@ def del_annotation(request, id):
         'group': group
     })
 
-    sync_annotation('delete', res, case, group, request.user)
+    sync_item('delete', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
