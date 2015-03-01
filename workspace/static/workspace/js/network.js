@@ -181,14 +181,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           display = 'none';
       }
       this.svg.selectAll('.node').transition().style('display', function(o) {
-          if (o.primary && o.primary.entity_type === value) {
+          var entity = wb.store.items.entities[o.id];
+          if (entity.primary.entity_type === value) {
               return display;
           } else {
               return this.style.display;
           }
       });
       this.svg.selectAll('.link').transition().style('display', function(o) {
-          if ((o.source.primary.entity_type === value) || (o.target.primary.entity_type === value)) {
+          var source_ent = wb.store.items.entities[o.source.id];
+          var target_ent = wb.store.items.entities[o.target.id];
+          if ((source_ent.primary.entity_type === value) || (target_ent.primary.entity_type === value)) {
               return display;
           } else {
               return this.style.display;

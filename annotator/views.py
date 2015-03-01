@@ -16,7 +16,7 @@ def annotation(request, id=0):
         return post_annotation(request)
 
     elif request.method == 'PUT':
-        return put_annotation(request, id)
+        return update_annotation(request, id)
 
     elif request.method == 'DELETE':
         return del_annotation(request, id)
@@ -30,7 +30,7 @@ def annotations(request):
         return post_annotations(request)
 
     elif request.method == 'PUT':
-        return put_annotations(request)
+        return update_annotations(request)
 
     elif request.method == 'DELETE':
         return del_annotations(request)
@@ -55,7 +55,7 @@ def post_annotation(request):
     entity = data.get('entity', None)
     rel = data.get('relationship', None)
     if entity:
-        entity, created, new_ents, new_rels = get_or_create_entity(entity, case, group, request.user)
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, request.user)
     if rel:
         rel, created, new_ents = get_or_create_relationship(rel, case, group, request.user)
 
@@ -100,8 +100,49 @@ def post_annotation(request):
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
-def put_annotation(request):
-    pass
+def update_annotation(request, id):
+    if not id:
+        return HttpResponseBadRequest()
+    try:
+        annotation = Annotation.objects.get(id=id)
+    except Annotation.DoesNotExist:
+        print 'Error: annotation not found: ', id
+        return HttpResponseNotFound()
+
+    group = annotation.group
+    case = annotation.case
+    res = {'annotation': {}, 'entities': {}, 'relationships': {}}
+    data = json.loads(request.body)
+    entity = data.get('entity', None)
+    rel = data.get('relationship', None)
+
+    if entity:
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, request.user)
+    if rel:
+        rel, created, new_ents = get_or_create_relationship(rel, case, group, request.user)
+
+    annotation.last_edited_by = request.user
+    annotation.entity = entity
+    annotation.relationship = rel
+    annotation.save()
+
+    res['annotation'] = annotation.serialize()
+    res['relationships'] = [rel.serialize()] if rel else []
+    res['relationships'] += [r.serialize() for r in new_rels]
+    res['entities'] = [entity.serialize()] if entity else []
+    res['entities'] += [e.serialize() for e in new_ents]
+
+    for r in del_rels:
+        r_info = r.serialize()
+        r_info['deleted'] = True
+        res['relationships'].append(r_info)
+        r.delete()
+
+    sync_annotation('update', res, case, group, request.user)
+
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
 
 
 def del_annotation(request, id):
@@ -177,7 +218,7 @@ def post_annotations(request):
     pass
 
 
-def put_annotations(request):
+def update_annotations(request):
     pass
 
 

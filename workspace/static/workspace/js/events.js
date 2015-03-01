@@ -15,6 +15,12 @@
   $.subscribe('entity/deleted', onEntitiesDeleted);
 
   $.subscribe('relationship/created', onRelationshipsCreated);
+  $.subscribe('relationship/updated', onRelationshipsUpdated);
+  $.subscribe('relationship/deleted', onRelationshipsDeleted);
+
+  $.subscribe('annotation/created', onAnnotationsCreated);
+  $.subscribe('annotation/updated', onAnnotationsUpdated);
+  $.subscribe('annotation/deleted', onAnnotationsDeleted);
 
   $.subscribe('message/new', onNewMessage);
 
@@ -46,12 +52,17 @@
   }
 
   function onEntitiesUpdated() {
-    onEntitiesCreated(arguments);
+    var entities = [].slice.call(arguments, 1);
+    for (var i = 0, len = entities.length; i < len; i++) {
+      var e = entities[i];
+      if (e.deleted) wb.store.removeItems(e, 'entities');
+      else wb.store.addItems(e, 'entities');
+    }
   }
 
   function onEntitiesDeleted() {
     var entities = [].slice.call(arguments, 1);
-    wb.store.items.removeItems(entities, 'entities');
+    wb.store.removeItems(entities, 'entities');
   }
 
   function onRelationshipsCreated() {
@@ -60,12 +71,38 @@
   }
 
   function onRelationshipsUpdated() {
-    onRelationshipsUpdated(arguments);
+    var rels = [].slice.call(arguments, 1);
+    for (var i = 0, len = rels.length; i < len; i++) {
+      var r = rels[i];
+      if (r.deleted) wb.store.removeItems(r, 'relationships');
+      else wb.store.addItems(r, 'relationships');
+    }
   }
 
   function onRelationshipsDeleted() {
     var rels = [].slice.call(arguments, 1);
     wb.store.removeItems(rels, 'relationships');
+  }
+
+
+  function onAnnotationsCreated() {
+    var anns = [].slice.call(arguments, 1);
+    wb.store.addItems(anns, 'annotations');
+
+  }
+
+  function onAnnotationsUpdated() {
+    var anns = [].slice.call(arguments, 1);
+    for (var i = 0, len = anns.length; i < len; i++) {
+      var r = anns[i];
+      if (r.deleted) wb.store.removeItems(r, 'annotations');
+      else wb.store.addItems(r, 'annotations');
+    }
+  }
+
+  function onAnnotationsDeleted() {
+    var anns = [].slice.call(arguments, 1);
+    wb.store.removeItems(anns, 'annotations');
   }
 
   function updateDataBut(except) {

@@ -196,6 +196,13 @@ Annotator.Plugin.Entity = (function(_super) {
         if (annotation.entity && annotation.entity.entity_type) {
             selectize.addItem(annotation.entity.entity_type);
         }
+        if (annotation.entity && annotation.entity.id) {
+          // if the entity has already been set
+          // do not allow to change the type
+          selectize.disable();
+        } else {
+          selectize.enable();
+        }
     };
 
     Entity.prototype.setEntityType = function(field, annotation) {
@@ -222,10 +229,10 @@ Annotator.Plugin.Entity = (function(_super) {
         attribute_widget.reset();
         if (annotation.entity && annotation.entity.id) {
             var entity = wb.store.items.entities[annotation.entity.id];
-            for (var attr in entity.primary) {
-                if (attr !== 'entity_type' && attr !== 'id' && attr !== 'name' && attr !== 'geometry') { // skip these attributes
-                    attribute_widget.add(attr, entity.primary[attr], 'primary');
-                }
+            var attrs = wb.store.static[entity.primary.entity_type];
+            for (var i = 0, len = attrs.length; i < len; i++) {
+                var attr = attrs[i];
+                attribute_widget.add(attr, entity.primary[attr], 'primary');
             }
             for (var attr in entity.other) {
                 attribute_widget.add(attr, entity.other[attr], 'other');

@@ -161,25 +161,17 @@ Annotator.Plugin.Store = (function(_super) {
         if (__indexOf.call(this.annotations, annotation) >= 0) {
             return this._apiRequest('update', annotation, (function(data) {
                 var ann = data.annotation,
-                    entity = data.entity,
-                    relationship = data.relationship
+                    entities = data.entities,
+                    relationships = data.relationships
                 ;
-                if (relationship){
-                    // if server responds with relationship, it means entity changed
-                    // otherwise, if entity does not change, there is no need to update relationship, thus the server does not send back relationship
-                    $.publish('/entity/change', entity);
-                    $.publish('/relationship/change', [[relationship]]);
-                    var highlights = annotation.highlights;
-                    for (var i = 0; i < highlights.length; i++) {
-                        $(highlights[i]).removeClass()
-                            .addClass('annotator-hl annotator-hl-' + ann.entity.entity_type)
-                        ;
-                    }
-                } else {
-                    // if entity type does not change; only attributes change
-                    $.publish('/entity/change', [entity]);
+                if (relationships.length){
+                    $.publish('relationship/updated', relationships);
+                }
+                if (entities.length) {
+                    $.publish('entity/updated', entities);
                 }
                 _this.updateAnnotation(annotation, ann);
+                $.publish('annotation/updated', ann);
                 wb.utility.notify('1 annotation updated!', 'success');
             }));
         }
