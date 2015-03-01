@@ -92,7 +92,7 @@ wb.store = {
       if (id in _this.items[type])
         delete _this.items[type][id];
     });
-  }
+  },
 
   // observe any change of store items
   _watchItems: function() {
@@ -147,7 +147,7 @@ wb.store = {
   cleanShelf: function(shelf) {
     for (var d in this.shelf_by) {
       if (this.shelf_by[d].length) {
-        this[cleanShelfBy + d](shelf);
+        this['cleanShelfBy' + wb.utility.capfirst(d)](shelf);
       }
     }
   },

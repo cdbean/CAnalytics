@@ -126,8 +126,8 @@ $.widget('custom.attribute_widget', {
     prepareSelectOptions: function(group) {
       // if group is provided, only get options for that group
       var opts = [], optgroups = [];
-      for (var key in wb.store.entities) {
-        var entity = wb.store.entities[key];
+      for (var key in wb.store.items.entities) {
+        var entity = wb.store.items.entities[key];
         if (group) {
           if (entity.primary.entity_type !== group) continue;
         }
@@ -137,7 +137,7 @@ $.widget('custom.attribute_widget', {
           label: entity.primary.name
         });
       }
-      optgroups = wb.store.ENTITY_ENUM.map(function(entity) {
+      optgroups = wb.store.static.entity_types.map(function(entity) {
         return {value: entity, label: wb.utility.capfirst(entity)};
       });
 
