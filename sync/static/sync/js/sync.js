@@ -52,7 +52,24 @@
   }
 
   function onEntityUpdated(data) {
+    if (data.user === wb.info.user) return;
 
+    var entity;
+    if (data.entity) {
+      $.publish('entity/updated', data.entity);
+      if (data.entity.constructor === Array)
+        entity = data.entity[0];
+      else
+        entity = data.entity;
+    }
+    if (data.relationship)
+      $.publish('relationship/updated', data.relationship);
+
+    wb.utility.notify(wb.info.users[data.user].name
+                      + ' updated  '
+                      + entity.primary.entity_type
+                      + ' '
+                      + entity.primary.name);
   }
 
   function onEntityDeleted(data) {

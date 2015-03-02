@@ -6,6 +6,8 @@ import json
 from django.contrib.auth.models import Group
 from workspace.models import Case, DataEntry, Entity, Relationship
 from annotator.models import Annotation
+from workspace.entity import get_or_create_entity
+from sync.views import sync_item
 
 # Create your views here.
 @login_required
@@ -65,7 +67,25 @@ def data(request):
 
 
 def entity(request, id):
-    pass
+    if request.method == 'POST':
+        res = {'entity': [], 'relationship': []}
+        data = json.loads(request.POST['data'])
+        case = Case.objects.get(id=data['case'])
+        group = Group.objects.get(id=data['group'])
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(data, case, group, request.user)
+        res['entity'] = [entity.serialize()] if entity else []
+        res['entity'] += [e.serialize() for e in new_ents]
+        res['relationship'] += [r.serialize() for r in new_rels]
+
+        for r in del_rels:
+            r_info = r.serialize()
+            r_info['deleted'] = True
+            res['relationship'].append(r_info)
+            r.delete()
+
+        sync_item('update', 'entity', res, case, group, request.user)
+
+        return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 def entities(request):

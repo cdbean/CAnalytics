@@ -58,8 +58,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       .html(action)
     ;
     if (wb.store.static.entity_types.indexOf(item.item) > -1) {
-      var entity = wb.store.items.entities[item.data.id];
-      row.find('.item').addClass('entity').addClass(item.item).data('entity', entity);
+      row.find('.item').addClass('entity').addClass(item.item).data('entity', {id: item.data.id});
     }
 
     if (item.user === wb.info.user) {

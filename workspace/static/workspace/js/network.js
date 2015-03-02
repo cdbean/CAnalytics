@@ -416,7 +416,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             _this.selected_link = link;
             _this.selected_node = null;
 
-            _this.showLinkEditor(link);
+            // _this.showLinkEditor(link);
+            var pos = {top: d3.event.pageY, left: d3.event.pageX};
+            wb.editor.data({
+              primary: {source: source.id, target: target.id}
+            }, 'relationship').show(pos);
 
 
             _this.restart();

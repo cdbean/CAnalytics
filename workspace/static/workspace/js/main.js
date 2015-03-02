@@ -10,6 +10,7 @@ wb.store.loadItems(GLOBAL_URL.data, {
 
 // initialize viewer
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
+wb.editor = $('<div>').appendTo('body').vizeditor().data('instance');
 
 // get all users in this group
 $.get(GLOBAL_URL.users, {
@@ -42,9 +43,11 @@ $(function() {
   }
 
   function onClickEntity(e) {
-    var entity = $(e.target).data('entity');
-    if (entity)
+    var ent = $(e.target).data('entity');
+    if (ent) {
+      var entity = wb.store.items.entities[ent.id];
       wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'));
+    }
     e.stopPropagation();
   }
 

@@ -2,11 +2,11 @@
 //
 $.widget('viz.vizviewer', {
   options: {
-    editable: false, // whether showing edit and delete button
+    editable: true, // whether showing edit and delete button
   },
 
   _create: function() {
-    this.element.addClass('viewer');
+    this.element.addClass('popup viewer');
     this.element.data('instance', this);
     this.element.hide();
 
@@ -25,18 +25,21 @@ $.widget('viz.vizviewer', {
     if (this.options.editable) {
       this.element.prepend(controls);
     }
+
+    this.element.on('click', '.delete', this._onClickDelete.bind(this));
+    this.element.on('click', '.edit', this._onClickEdit.bind(this));
     return this;
   },
 
-  data: function(d) {
+  data: function(d, type) {
     this.clearFields();
 
-    var type = '';
-    if (d.primary.entity_type) {
+    this.item = d;
+    this.item_type = type;
+
+    if (type === 'entity')
       type = d.primary.entity_type;
-    } else {
-      type = 'relationship';
-    }
+
     this.addTitle(type, d.primary.name || d.primary.relation);
 
     var attrs = wb.store.static[type];
@@ -66,6 +69,7 @@ $.widget('viz.vizviewer', {
     this.element.find('.title').text(str);
   },
 
+  // @attr: object {key: <attr-name>, value: <attr-value>}
   addField: function(attr) {
     var key = attr.key, value = attr.value;
     var $element = $('\
@@ -102,8 +106,8 @@ $.widget('viz.vizviewer', {
 
   hide: function() {
     this.clearFields();
-    this.entity = null;
-    this.relationship = null;
+    this.item = null;
+    this.item_type = null;
     this.element.hide();
     return this;
   },
@@ -114,11 +118,20 @@ $.widget('viz.vizviewer', {
     return this;
   },
 
-  _onEditClick: function() {
+  _onClickEdit: function() {
+    var width = this.element.outerWidth();
+    var height = this.element.outerHeight();
+    var pos = this.element.position();
 
+    wb.editor.data(this.item, this.item_type)
+      .show({
+        top: pos.top + 10 + height,
+        left: pos.left + width/2
+      });
+    this.hide();
   },
 
-  _onDeleteClick: function() {
+  _onClickDelete: function() {
 
-  }
+  },
 });
