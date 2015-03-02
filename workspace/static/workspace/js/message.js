@@ -87,7 +87,11 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
 
   },
 
-  update: function() {
+  updateView: function() {
+
+  },
+
+  updateData: function() {
 
   }
 });

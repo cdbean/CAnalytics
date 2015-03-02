@@ -1,10 +1,14 @@
+// entry of the app
+//
 $('#progressbar').show().progressbar({ value: false });
 
+// load data
 wb.store.loadItems(GLOBAL_URL.data, {
   case: wb.info.case,
   group: wb.info.group
 });
 
+// initialize viewer
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 
 // get all users in this group

@@ -23,6 +23,7 @@
   $.subscribe('annotation/deleted', onAnnotationsDeleted);
 
   $.subscribe('message/new', onNewMessage);
+  $.subscribe('action/new', onNewAction);
 
   $.subscribe('user/online', onUserOnline);
 
@@ -157,6 +158,13 @@
     $('.viz.message').each(function(i, viz) {
       viz = $(viz).data('instance');
       viz.loadMessage(msg);
+    });
+  }
+
+  function onNewAction(e, act) {
+    $('.viz.history').each(function(i, viz) {
+      viz = $(viz).data('instance');
+      viz.add(act);
     });
   }
 })();

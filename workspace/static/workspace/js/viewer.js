@@ -1,6 +1,8 @@
+// information viewer
+//
 $.widget('viz.vizviewer', {
   options: {
-    editable: false,
+    editable: false, // whether showing edit and delete button
   },
 
   _create: function() {

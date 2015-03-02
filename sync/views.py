@@ -65,5 +65,5 @@ def sync_item(action, item, data, case, group, user):
 
 def broadcast_activity(data, case, group, user):
     name = group_name(case, group)
-    ishout_client.broadcast_group(name, 'activitylog', data)
+    ishout_client.broadcast_group(name, 'action', data)
 
