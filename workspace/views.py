@@ -93,8 +93,24 @@ def entities(request):
 
 
 def relationship(request, id):
-    pass
+    if request.method == 'POST':
+        create_relationship(request)
+    elif request.method == 'PUT':
+        update_relationship(request, id)
+    elif request.method == 'DELETE':
+        delete_relationship(request, id)
 
 
 def relationships(request):
+    pass
+
+
+def create_relationship(request):
+    pass
+
+
+def update_relationship(request):
+    pass
+
+def delete_relationship(request):
     pass

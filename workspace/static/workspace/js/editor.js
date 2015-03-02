@@ -140,7 +140,7 @@ $.widget('viz.vizeditor', {
           labelField: 'label',
           valueField: 'value',
           searchField: 'label',
-          create: true,
+          create: false,
           closeAfterSelect: true
       });
     }
