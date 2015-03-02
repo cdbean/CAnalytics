@@ -108,93 +108,22 @@ def set_primary_attr(entity, attr, value, user, case, group):
             entity.address = address
 
     elif attr == 'location':
-        if value:
-            if value.isdigit():
-                location = Location.objects.get(id=value)
-            else:
-                location = Location.objects.create(name=value, created_by=user, last_edited_by=user, case=case, group=group)
-                new_ents.append(location)
+        new_loc, new_loc_rels, del_loc_rels = set_attr_location(entity, value, user, case, group)
 
-            if entity.location != location:
-                if entity.location:
-                    del_rel = Relationship.objects.get(
-                        source=entity,
-                        target=entity.location,
-                        relation='involve',
-                        case=case,
-                        group=group
-                    )
-                    del_rels.append(del_rel)
-
-                entity.location = location
-                rel = Relationship.objects.create(
-                    source=entity,
-                    target=location,
-                    relation='involve',
-                    case=case,
-                    group=group,
-                    created_by = user,
-                    last_edited_by = user
-                )
-                new_rels.append(rel)
-        else:
-            if entity.location:
-                del_rel = Relationship.objects.get(
-                    source=entity,
-                    target=entity.location,
-                    relation='involve',
-                    case=case,
-                    group=group
-                )
-                del_rels.append(del_rel)
-                entity.location = None
+        new_ents += new_loc
+        new_rels += new_loc_rels
+        del_rels += del_loc_rels
     elif attr == 'people':
-        old_people_rels = []
-        old_people = entity.people.all()
-        new_people = []
-        if len(old_people):
-            old_people_rels = Relationship.objects.filter(
-                source=entity,
-                target__in=old_people,
-                relation='involve',
-                case=case,
-                group=group
-            )
+        new_people, new_people_rels, del_people_rels = set_attr_people(entity, value, user, case, group)
+        new_ents += new_people
+        new_rels += new_people_rels
+        del_rels += del_people_rels
+    elif attr == 'organization':
+        new_org, new_org_rels, del_org_rels = set_attr_organization(entity, value, user, case, group)
 
-        if value and len(value):
-            for p in value:
-                if p:
-                    if p.isdigit():
-                        p = Person.objects.get(id=p)
-                        entity.people.add(p)
-                    else:
-                        p = entity.people.create(name=p, case=case, group=group)
-                        new_ents.append(p)
-                    new_people.append(p)
-                    rel, created = Relationship.objects.get_or_create(
-                        source=entity,
-                        target=p,
-                        relation='involve',
-                        case=case,
-                        group=group
-                    )
-                    if created:
-                        rel.created_by = user
-                        rel.last_edited_by = user
-                        rel.save()
-                        new_rels.append(rel)
-
-        for p in old_people:
-            if p not in new_people:
-                entity.people.remove(p)
-                del_rel = Relationship.objects.get(
-                    source=entity,
-                    target=p,
-                    relation='involve',
-                    case=case,
-                    group=group
-                )
-                del_rels.append(del_rel)
+        new_ents += new_org
+        new_rels += new_org_rels
+        del_rels += del_org_rels
 
     elif 'date' in attr:
         if value == '':
@@ -219,3 +148,164 @@ def set_primary_attr(entity, attr, value, user, case, group):
     entity.save()
 
     return new_ents, new_rels, del_rels
+
+
+def set_attr_location(entity, value, user, case, group):
+    new_ents = []
+    new_rels = []
+    del_rels = []
+
+    if value:
+        if value.isdigit():
+            location = Location.objects.get(id=value)
+        else:
+            location = Location.objects.create(name=value, created_by=user, last_edited_by=user, case=case, group=group)
+            new_ents.append(location)
+
+        if entity.location != location:
+            if entity.location:
+                del_rel = Relationship.objects.get(
+                    source=entity,
+                    target=entity.location,
+                    relation='involve',
+                    case=case,
+                    group=group
+                )
+                del_rels.append(del_rel)
+
+            entity.location = location
+            rel = Relationship.objects.create(
+                source=entity,
+                target=location,
+                relation='involve',
+                case=case,
+                group=group,
+                created_by = user,
+                last_edited_by = user
+            )
+            new_rels.append(rel)
+    else:
+        if entity.location:
+            del_rel = Relationship.objects.get(
+                source=entity,
+                target=entity.location,
+                relation='involve',
+                case=case,
+                group=group
+            )
+            del_rels.append(del_rel)
+            entity.location = None
+
+    return new_ents, new_rels, del_rels
+
+
+
+def set_attr_people(entity, value, user, case, group):
+    old_people_rels = []
+    old_people = entity.people.all()
+    new_ents = []  # new people entity
+    new_rel_people = []  # new related people
+    new_rels = []  # new relationships
+    del_rels = []
+
+    if len(old_people):
+        old_people_rels = Relationship.objects.filter(
+            source=entity,
+            target__in=old_people,
+            relation='involve',
+            case=case,
+            group=group
+        )
+
+    if value and len(value):
+        for p in value:
+            if p:
+                if p.isdigit():
+                    p = Person.objects.get(id=p)
+                    entity.people.add(p)
+                else:
+                    p = entity.people.create(name=p, case=case, group=group)
+                    new_ents.append(p)
+                new_rel_people.append(p)
+                rel, created = Relationship.objects.get_or_create(
+                    source=entity,
+                    target=p,
+                    relation='involve',
+                    case=case,
+                    group=group
+                )
+                if created:
+                    rel.created_by = user
+                    rel.last_edited_by = user
+                    rel.save()
+                    new_rels.append(rel)
+
+    for p in old_people:
+        if p not in new_rel_people:
+            entity.people.remove(p)
+            del_rel = Relationship.objects.get(
+                source=entity,
+                target=p,
+                relation='involve',
+                case=case,
+                group=group
+            )
+            del_rels.append(del_rel)
+
+    return new_ents, new_rels, del_rels
+
+
+def set_attr_organization(entity, value, user, case, group):
+    old_org_rels = []
+    old_org = entity.organizations.all()
+    new_ents = []  # new organization entity
+    new_rel_org = []  # new related orgs
+    new_rels = []  # new relationships
+    del_rels = []
+
+    if len(old_org):
+        old_org_rels = Relationship.objects.filter(
+            source=entity,
+            target__in=old_org,
+            relation='involve',
+            case=case,
+            group=group
+        )
+
+    if value and len(value):
+        for p in value:
+            if p:
+                if p.isdigit():
+                    p = Organization.objects.get(id=p)
+                    entity.organizations.add(p)
+                else:
+                    p = entity.organizations.create(name=p, case=case, group=group)
+                    new_ents.append(p)
+                new_rel_org.append(p)
+                rel, created = Relationship.objects.get_or_create(
+                    source=entity,
+                    target=p,
+                    relation='involve',
+                    case=case,
+                    group=group
+                )
+                if created:
+                    rel.created_by = user
+                    rel.last_edited_by = user
+                    rel.save()
+                    new_rels.append(rel)
+
+    for p in old_org:
+        if p not in new_rel_org:
+            entity.organizations.remove(p)
+            del_rel = Relationship.objects.get(
+                source=entity,
+                target=p,
+                relation='involve',
+                case=case,
+                group=group
+            )
+            del_rels.append(del_rel)
+
+    return new_ents, new_rels, del_rels
+

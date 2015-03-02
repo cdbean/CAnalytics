@@ -29,9 +29,31 @@
 
   function onUserOnline() {
     var users = [].slice.call(arguments, 1);
+
+    wb.info.online_users = users;
+    //
+    // render current user list on page header
+    $('.navbar #userlist').empty();
+    for (var i = 0; i < wb.info.online_users.length; i++) {
+      var id = wb.info.online_users[i];
+      // do not show current user
+      if (id == wb.info.user) continue;
+
+      var name = wb.info.users[id].name;
+      var color = wb.info.users[id].color;
+      var li = $('<li class="userlist-item dropdown"></li>')
+        .appendTo($('.navbar #userlist'));
+
+      $('<span class="label label-primary"></span>').appendTo(li)
+        .text(name)
+        .css('color', color)
+      ;
+    }
+
   }
 
   function onDataLoaded() {
+    $('#progressbar').hide();
   }
 
   function onDataUpdated() {

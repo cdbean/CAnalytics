@@ -106,9 +106,9 @@ Annotator.Plugin.Store = (function(_super) {
                 ;
                 _this.updateAnnotation(annotation, ann);
 
-                if (entities.length)
+                if (entity.length)
                   $.publish('entity/created', entity);
-                if (relationships.length)
+                if (relationship.length)
                   $.publish("relationship/created", relationship);
 
                 $.publish('annotation/created', annotation);
@@ -164,10 +164,10 @@ Annotator.Plugin.Store = (function(_super) {
                     entity = data.entity,
                     relationship = data.relationship
                 ;
-                if (relationships.length){
+                if (relationship.length){
                     $.publish('relationship/updated', relationship);
                 }
-                if (entities.length) {
+                if (entity.length) {
                     $.publish('entity/updated', entity);
                 }
                 _this.updateAnnotation(annotation, ann);

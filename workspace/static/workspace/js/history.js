@@ -87,13 +87,14 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
           + data.time
           + ' by '
           + wb.info.users[data.user].name;
-        viz_opt = data.item.split('_');
+        viz_opt = data.tool.split('_');
         var viz_name = viz_opt[0];
         var viz_form = viz_opt[1];
         var viz;
         if (viz_form === 'table') {
             viz = $('<div>').vizentitytable({
                 title: viz_name + subtitle,
+                entity: viz_name,
             });
         } else if (viz_name === 'dataentry') {
             viz = $('<div>').vizdataentrytable({

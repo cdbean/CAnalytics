@@ -112,7 +112,7 @@ wb.utility.scrollTo = function(ele, container) {
 
 
 wb.utility.parseEntityAttr = function(attr, value) {
-  if (attr === 'people') {
+  if (attr === 'people' || attr === 'organizations') {
     value = value || [];
     value = value.map(function(d) {
       return wb.store.items.entities[d].primary.name;

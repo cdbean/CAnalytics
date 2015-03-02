@@ -80,6 +80,10 @@ $.widget('custom.attribute_widget', {
                 if (value) value = value.split(',');
                 else value = [];
                 res[attr] = value;
+              } else if (attr === 'organizations') {
+                if (value) value = value.split(',');
+                else value = [];
+                res[attr] = value;
               } else {
                 attr = Annotator.Util.escape(attr);
                 value = Annotator.Util.escape(value);
@@ -102,6 +106,16 @@ $.widget('custom.attribute_widget', {
         input.val(5)
       } else if (attr === 'people') {
         var opts = this.prepareSelectOptions('person');
+        $(input).selectize({
+            options: opts.opts,
+            labelField: 'label',
+            valueField: 'value',
+            searchField: 'label',
+            create: true,
+            closeAfterSelect: true
+          });
+      } else if (attr === 'organizations') {
+        var opts = this.prepareSelectOptions('organization');
         $(input).selectize({
             options: opts.opts,
             labelField: 'label',

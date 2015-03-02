@@ -86,7 +86,7 @@ def post_annotation(request):
         'user': request.user,
         'operation': 'created',
         'item': 'annotation',
-        'tool': 'dataentry_table',
+        'tool': 'dataentry',
         'data': {
             'id': annotation.id,
             'name': annotation.quote

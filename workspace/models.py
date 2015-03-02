@@ -200,6 +200,7 @@ class Organization(Entity):
 
 class Event(Entity):
     people       = models.ManyToManyField(Person, null=True, blank=True)
+    organizations = models.ManyToManyField(Organization, null=True, blank=True)
     location     = models.ForeignKey(Location, null=True, blank=True)
     category     = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     start_date   = models.DateTimeField(null=True, blank=True)
