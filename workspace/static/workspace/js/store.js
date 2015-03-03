@@ -248,7 +248,7 @@ wb.store = {
   cleanShelfByEntities: function(shelf) {
     var selected_relationships = [];
     var selected_annotations = [];
-    var selected_entities = wb.shelf_by.entities.slice();
+    var selected_entities = this.shelf_by.entities.slice();
     var selected_dataentries = [];
     var _this = this;
 
@@ -278,7 +278,7 @@ wb.store = {
     if (shelf === 'entities') return;
 
     this.shelf.annotations.forEach(function(d) {
-      var ann = this.items.annotations[d];
+      var ann = _this.items.annotations[d];
       selected_dataentries.push(ann.anchor);
     });
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {
