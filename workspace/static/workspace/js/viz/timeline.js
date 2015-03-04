@@ -7,7 +7,7 @@ wb.viz.timeline = function() {
   ;
   var data = [];
   var tracks = [];
-  var trackHeight, itemHeight, itemMinWidth = 20;
+  var trackHeight, itemHeight, itemMinWidth = 100;
 
   var scaleX, scaleY;
   var svg, chart, xAxis, xBrush;
