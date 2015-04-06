@@ -106,6 +106,9 @@ def set_primary_attr(entity, attr, value, user, case, group):
             geometry = fromstr('POINT(%s %s)' %(geometry[0], geometry[1]))  # longitude comes first
             entity.geometry = geometry
             entity.address = address
+        else:
+            entity.geometry = None
+            entity.address = address
 
     elif attr == 'location':
         new_loc, new_loc_rels, del_loc_rels = set_attr_location(entity, value, user, case, group)

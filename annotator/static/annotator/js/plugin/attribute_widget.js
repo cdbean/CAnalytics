@@ -71,11 +71,16 @@ $.widget('custom.attribute_widget', {
             var value = $(row).find('.annotator-attribute-value').val();
             if (attr) {
               if (attr === 'address') {
+                res['geometry'] = {};
                 var autocomplete = $(row).find('.annotator-attribute-value').data('autocomplete');
                 var place = autocomplete.getPlace();
-                res['geometry'] = {};
-                res['geometry']['geometry'] = [place.geometry.location.lng(), place.geometry.location.lat()];
-                res['geometry']['address'] = place.formatted_address;
+                if (place) {
+                  res['geometry']['geometry'] = [place.geometry.location.lng(), place.geometry.location.lat()];
+                  res['geometry']['address'] = place.formatted_address;
+                } else {
+                  res['geometry']['geometry'] = null;
+                  res['geometry']['address']= $(row).find('.annotator-attribute-value').val();
+                }
               } else if (attr === 'people') {
                 if (value) value = value.split(',');
                 else value = [];
