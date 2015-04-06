@@ -100,8 +100,26 @@ $.widget('custom.attribute_widget', {
     },
 
     styleInput: function(attr, value, input) {
-      if (/date/.test(attr)) {
-        input.datetimepicker();
+      if (attr === 'start_date') {
+        input.datetimepicker({
+          onShow: function() {
+            var $input = $('.annotator-attribute-input[value=end_date]');
+            var date = $input.parent().next().children().val();
+            this.setOptions({
+              value: date
+            });
+          }
+        });
+      } else if (attr === 'end_date') {
+        input.datetimepicker({
+          onShow: function() {
+            var $input = $('.annotator-attribute-input[value=start_date]');
+            var date = $input.parent().next().children().val();
+            this.setOptions({
+              value: date
+            });
+          }
+        });
       } else if (attr === 'address') {
         // initialize as google place search
         var autocomplete = new google.maps.places.Autocomplete(input[0]);
