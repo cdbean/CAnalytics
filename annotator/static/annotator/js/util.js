@@ -210,6 +210,9 @@ Util.preventEventDefault = function(event) {
   return event != null ? typeof event.preventDefault === "function" ? event.preventDefault() : void 0 : void 0;
 };
 
-/*
-//@ sourceMappingURL=util.map
-*/
+
+Util.findNodeByText = function(node, re) {
+  if (node.nodeType === 3) {
+
+  }
+}

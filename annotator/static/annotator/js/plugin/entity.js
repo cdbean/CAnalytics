@@ -48,13 +48,11 @@ Annotator.Plugin.Entity = (function(_super) {
             load: this.updateAttrField,
             submit: this.setEntityAttr
         });
-        // there is problem with apply to all function
-        // do not add it for the moment
-        // this.applyAllField = this.annotator.editor.addField({
-        //     type: 'checkbox',
-        //     label: Annotator._t('Apply to all data'),
-        //     submit: this.applyToAll
-        // });
+        this.applyAllField = this.annotator.editor.addField({
+            type: 'checkbox',
+            label: Annotator._t('Apply to all data'),
+            submit: this.applyToAll
+        });
 
         this.subscribe('entity/type/update', function(value) {
           // do when the entity type is changed
@@ -251,7 +249,13 @@ Annotator.Plugin.Entity = (function(_super) {
     Entity.prototype.applyToAll = function(field, annotation) {
         if ($(field).find(':checkbox').prop('checked')) {
             // Let annotator to deal with it
-            this.publish('/annotation/applyall', [annotation]);
+            // this.publish('/annotation/applyall', [annotation]);
+            if (window.find) {
+              while(window.find(annotation.quote)) {
+                var ann = this.annotator.setupAnnotation(this.annotator.createAnnotation());
+                console.dir(ann);
+              }
+            }
         }
     };
 
