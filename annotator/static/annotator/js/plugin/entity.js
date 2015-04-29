@@ -247,16 +247,11 @@ Annotator.Plugin.Entity = (function(_super) {
     };
 
     Entity.prototype.applyToAll = function(field, annotation) {
-        if ($(field).find(':checkbox').prop('checked')) {
-            // Let annotator to deal with it
-            // this.publish('/annotation/applyall', [annotation]);
-            if (window.find) {
-              while(window.find(annotation.quote)) {
-                var ann = this.annotator.setupAnnotation(this.annotator.createAnnotation());
-                console.dir(ann);
-              }
-            }
-        }
+
+      if ($(field).find(':checkbox').prop('checked')) {
+        // Let annotator to deal with it
+        this.publish('/annotation/applyall', [annotation]);
+      }
     };
 
     Entity.prototype.updateViewer = function(field, annotation) {

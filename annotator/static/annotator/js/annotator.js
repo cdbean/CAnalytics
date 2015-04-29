@@ -569,61 +569,50 @@ Annotator = (function(_super) {
     };
 
     Annotator.prototype.onCreateAllAnnotations = function(annotation) {
-        // find this annotated text throughout data and tag it
-        // step 1: find all quotes
-        // step 2: create annotation instances
-        // step 3: register annotations and send request
         this.unsubscribe('annotationEditorSubmit');
         this.unsubscribe('annotationEditorHidden');
         this.unsubscribe('/annotation/applyall');
 
         var existing_anns = this.plugins.Store.annotations;
-        var annotations = [];
 
-        var root = this.wrapper[0];
-        $(root).find('table.dataTable > tbody > tr').each(matchAnnotation);
-        this.deleteAnnotation(annotation); // delete the temporary annotation
-
-        this.publish('/annotations/created', [annotations])
-
-        function matchAnnotation(i, row) {
-            var cell = row.children[1];
-            var re = new RegExp(annotation.quote, 'ig'); // case-insensitive
-            var match;
-            while (match = re.exec($(cell).text())) {
-                var new_ann = {};
-                new_ann.ranges = [{}];
-                new_ann.highlights = annotation.highlights;
-                new_ann.entity = annotation.entity;
-                new_ann.quote = annotation.quote;
-                new_ann.ranges[0].start = '';
-                new_ann.ranges[0].end = ''; //start and end is not important
-                new_ann.ranges[0].startOffset = match.index;
-                new_ann.ranges[0].endOffset = match.index + match[0].length;
-                new_ann.anchor = $(row).data("id");
-
-                // check if the quote has already been annotated
-                var existed = false;
-                for (var k = 0, len = existing_anns.length; k < len; k++) {
-                    var ann = existing_anns[k];
-                    if (ann.anchor === new_ann.anchor && ann.tag.id === new_ann.tag.id
-                        && ((ann.ranges[0].startOffset <= new_ann.ranges[0].startOffset && ann.ranges[0].endOffset >= new_ann.ranges[0].endOffset)
-                        || (ann.ranges[0].startOffset >= new_ann.ranges[0].startOffset && ann.ranges[0].endOffset <= new_ann.ranges[0].endOffset))) {
-                        // if there exists one annotation that contains or is contained within the new annotation, and has the same tag and anchor
-                        // then do not add new annotation
-                        existed = true;
-                        break;
-                    }
-                }
-                // if annotation does not exist, add it
-                if (! existed) {
-                    $(new_ann.highlights).removeClass('annotator-hl-temporary');
-                    var tagcss = 'annotator-hl-' + new_ann.tag.entity_type;
-                    $(new_ann.highlights).addClass(tagcss)
-                    annotations.push(new_ann);
-                }
-            }
+        var range = rangy.createRange();
+        var searchScopeRange = rangy.createRange();
+        searchScopeRange.selectNodeContents(document.body);
+        var options = {
+          caseSensitive: false,
+          wholeWordsOnly: true,
+          withinRange: searchScopeRange,
+          direction: "forward" // This is redundant because "forward" is the default
         };
+        range.selectNodeContents(document.body);
+
+        var searchTerm = new RegExp(annotation.quote, 'gi');
+
+        var new_anns = [];
+        while(range.findText(searchTerm, options)) {
+          // skip text that has been annotated
+          var existed = false;
+          for (var i = 0; i < existing_anns.length; i++) {
+            var exist_ann = existing_anns[i];
+            if (range === exist_ann.ranges[0]) {
+              existed = true;
+              break;
+            }
+          }
+          if (existed) continue;
+
+          var new_ann = this.createAnnotation();
+          new_ann.ranges = [range];
+          new_ann.quote = annotation.quote;
+          new_ann.entity = annotation.entity;
+          new_ann = this.setupAnnotation(new_ann);
+          new_anns.push(new_ann);
+
+          range.collapse(false);
+        }
+
+        this.deleteAnnotation(annotation); // delete the temporary annotation
+        this.publish('/annotations/created', [new_anns]);
     };
 
     // update all annotations with the same quote

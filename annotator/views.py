@@ -73,7 +73,6 @@ def post_annotation(request):
         group=group,
         case=case
     )
-    annotation.save()
 
     res['annotation'] = annotation.serialize()
     res['relationship'] = [rel.serialize()] if rel else []
@@ -213,7 +212,66 @@ def get_annotations(request):
 
 
 def post_annotations(request):
-    pass
+    res = {'annotations': [], 'entities': [], 'relationships': []}
+    data = json.loads(request.body)
+
+    group = data.get('group', '')
+    case = data.get('case', '')
+    annotations = data.get('annotations', [])
+
+    if not group or not case or not annotations:
+        return HttpResponseBadRequest()
+
+    group = Group.objects.get(id=group)
+    case = Case.objects.get(id=case)
+    for ann in annotations:
+        entry = DataEntry.objects.get(id=ann['anchor'])
+        ranges = ann['ranges']
+        entity = ann.get('entity', None)
+        rel = ann.get('relationship', None)
+        if entity:
+            entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, request.user)
+        if rel:
+            rel, created, new_ents = get_or_create_relationship(rel, case, group, request.user)
+
+        annotation = Annotation.objects.create(
+            startOffset=ranges[0]['startOffset'],
+            endOffset=ranges[0]['endOffset'],
+            quote=ann['quote'],
+            dataentry=entry,
+            entity=entity,
+            relationship=rel,
+            start=ranges[0]['start'],
+            end=ranges[0]['end'],
+            created_by=request.user,
+            last_edited_by=request.user,
+            group=group,
+            case=case
+        )
+        res['annotations'].append(annotation.serialize())
+
+        res['relationships'] += [rel.serialize()] if rel else []
+        res['relationships'] += [r.serialize() for r in new_rels]
+        res['entities'] += [entity.serialize()] if entity else []
+        res['entities'] += [e.serialize() for e in new_ents]
+
+        # save to activity log
+        serverlog({
+            'user': request.user,
+            'operation': 'created',
+            'item': 'annotation',
+            'tool': 'dataentry',
+            'data': {
+                'id': annotation.id,
+                'name': annotation.quote
+            },
+            'group': group,
+            'case': case
+        })
+
+    print res
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
 
 
 def update_annotations(request):

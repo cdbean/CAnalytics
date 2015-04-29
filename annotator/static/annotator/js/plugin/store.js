@@ -79,17 +79,16 @@ Annotator.Plugin.Store = (function(_super) {
         }
         this._apiRequest('createAll', to_create, function(data) {
             var annotations = data.annotations,
-                entity = data.entity;
+                entities = data.entities;
                 relationships = data.relationships
             ;
 
             for (var i = 0, len = annotations.length; i< len; i++) {
                 _this.updateAnnotation(to_create[i], annotations[i]); // assume the order of the sent annotations and returned annotations is the same
-                _this.annotator.setupAnnotation(to_create[i]);
             }
 
-            $.publish("/entity/change", entity);
-            $.publish("/relationship/add", [relationships]);
+            if (entities.length) $.publish("entity/created", entities);
+            if (relationships.length) $.publish("relationship/created", relationships);
             // Annotator.showNotification(Annotator._t("Added " + annotations.length + " new annotations!"), Annotator.Notification.SUCCESS);
             wb.utility.notify(annotations.length + ' annotations added!', 'success');
         });
