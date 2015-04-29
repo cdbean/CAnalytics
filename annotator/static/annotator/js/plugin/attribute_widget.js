@@ -124,6 +124,9 @@ $.widget('custom.attribute_widget', {
         // initialize as google place search
         var autocomplete = new google.maps.places.Autocomplete(input[0]);
         input.data('autocomplete', autocomplete);
+        if (!value) {
+          input.val($('.annotator-widget .entity_name').val()); // if address is empty, put the entity name as default
+        }
       } else if (attr === 'priority') {
         // initialize as select drop down
         input.val(5)

@@ -269,7 +269,6 @@ def post_annotations(request):
             'case': case
         })
 
-    print res
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
