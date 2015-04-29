@@ -250,12 +250,14 @@ Annotator.Plugin.Entity = (function(_super) {
         if ($(field).find(':checkbox').prop('checked')) {
             // Let annotator to deal with it
             // this.publish('/annotation/applyall', [annotation]);
-            if (window.find) {
-              while(window.find(annotation.quote)) {
-                var ann = this.annotator.setupAnnotation(this.annotator.createAnnotation());
-                console.dir(ann);
-              }
-            }
+            var root = this.annotator.wrapper[0];
+            var nodes = [];
+            Util.findNodesByText(nodes, root, annotation.quote, 'annotator-hl');
+            nodes.forEach(function(node, i) {
+              var relativeRoot = $(node).parents('tr.odd, tr.even');
+              xpath = Util.xpathFromNode(node, relativeRoot);
+            })
+
         }
     };
 

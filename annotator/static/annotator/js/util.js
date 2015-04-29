@@ -211,8 +211,41 @@ Util.preventEventDefault = function(event) {
 };
 
 
-Util.findNodeByText = function(node, re) {
-  if (node.nodeType === 3) {
-
+// look for nodes by text
+// @node: the root node, search under this element
+// words: the string to search
+// @className: the class that will be appended to the resulted node, to avoid
+// those that are already found
+Util.findNodesByText = function(res, node, words, className) {
+  if (words.constructor === String) {
+      words = [words];
   }
-}
+  words = jQuery.grep(words, function(word, i){
+    return word != '';
+  });
+  words = jQuery.map(words, function(word, i) {
+    return word.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  });
+  if (words.length == 0) { return this; };
+
+  var flag = "i"; // case insensitive
+  var pattern = "(" + words.join("|") + ")";
+  pattern = "\\b" + pattern + "\\b"; // match the whole word
+  var re = new RegExp(pattern, flag);
+
+  className = className || 'annotator-hl';
+  if (node.nodeType === 3) {
+    var match = node.data.match(re);
+    if (match) {
+      res.push(node);
+      return 1;
+    }
+  } else if ((node.nodeType === 1 && node.childNodes) && // only element nodes that have children
+          !/(script|style)/i.test(node.tagName) && // ignore script and style nodes
+          !(node.tagName === nodeName.toUpperCase() && node.className === className))  { // skip if already highlighted
+    for (var i = 0; i < node.childNodes.length; i++) {
+        i += Util.findNodeByText(res, node.childNodes[i], re, className);
+    }
+  }
+  return 0;
+};
