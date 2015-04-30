@@ -552,6 +552,7 @@ Annotator = (function(_super) {
         var deleteAnnotations = this.deleteAnnotations.bind(this);
         $(content).dialog({
             title: 'Delete annotations',
+            width: 'auto',
             buttons: {
                 'Cancel': function() {
                     $(this).dialog("destroy");

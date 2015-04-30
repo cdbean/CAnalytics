@@ -114,6 +114,13 @@ class DataEntry(models.Model):
         return attr
 
 
+    def __unicode__(self):
+        return self.name
+
+    class meta:
+        verbose_name_plural = 'Data Entries'
+
+
 class Entity(models.Model):
     name          = models.CharField(max_length=1000)
     priority      = models.FloatField(default=5, null=True, blank=True)  # ranging from 0-9

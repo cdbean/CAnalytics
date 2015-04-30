@@ -23,6 +23,7 @@ def cases(request):
     pass
 
 
+@login_required
 def case(request, case, group):
     case = get_object_or_404(Case, id=case)
     group = get_object_or_404(Group, id=group)

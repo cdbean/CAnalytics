@@ -87,6 +87,8 @@ Annotator.Plugin.Store = (function(_super) {
                 _this.updateAnnotation(to_create[i], annotations[i]); // assume the order of the sent annotations and returned annotations is the same
             }
 
+            $.publish('annotation/created', annotations);
+
             if (entities.length) $.publish("entity/created", entities);
             if (relationships.length) $.publish("relationship/created", relationships);
             // Annotator.showNotification(Annotator._t("Added " + annotations.length + " new annotations!"), Annotator.Notification.SUCCESS);
@@ -122,16 +124,16 @@ Annotator.Plugin.Store = (function(_super) {
         var _this = this;
 
         this._apiRequest('updateAll', annotations, function(data) { // just post one of the annotation, mainly to update entity
-            var entity = data.entity,
+            var entities = data.entities,
                 anns = data.annotations,
                 relationships = data.relationships
             ;
 
+            $.publish('annotation/updated', anns);
             if (relationships && relationships.length > 0) {
                 // if server responds with relationships, it means entity changes
                 // otherwise, there is no need to update relationships, thus the server will not send back relationships
-                $.publish('/entity/change', entity);
-                $.publish('/relationship/change', [relationships]);
+                $.publish('relationship/updated', relationships);
                 for (var i = 0; i < annotations.length; i++) {
                     // assume the order of the old and new annotations are the same
                     var annotation = annotations[i],
@@ -145,9 +147,10 @@ Annotator.Plugin.Store = (function(_super) {
                     }
                     _this.updateAnnotation(annotation, ann);
                 }
-            } else {
+            }
+            if (entities.length){
                 // if entity type does not change; only attributes change
-                $.publish('/entity/change', [entity]);
+                $.publish('entity/updated', entities);
             }
 
             // Annotator.showNotification(Annotator._t("Updated " + to_update.length + " annotations!"), Annotator.Notification.SUCCESS);
@@ -205,12 +208,16 @@ Annotator.Plugin.Store = (function(_super) {
 
         if (annotations.length > 0) {
             this._apiRequest('destroyAll', annotations, function(data) {
-                var relationships = data.relationships;
+                var annotations = data.annotations,
+                    entity = data.entity,
+                    relationship = data.relationship;
 
                 annotations.forEach(function(ann) {
                     _this.unregisterAnnotation(ann);
                 });
-                $.publish('/relationship/delete', [relationships]);
+                $.publish('annotation/deleted', annotations);
+                if (entity && entity.deleted) $.publish('entity/deleted', entity);
+                if (relationship && relationship.deleted) $.publish('relationship/deleted', relationship);
                 // Annotator.showNotification(Annotator._t("Deleted " + to_delete.length + " annotations!"), Annotator.Notification.SUCCESS);
                 wb.utility.notify(annotations.length + ' annotations deleted', 'success');
             });

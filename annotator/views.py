@@ -11,6 +11,95 @@ from annotator.models import Annotation
 
 
 # Create your views here.
+def create_ann(data, case, group, user):
+    """create an annotation
+    return:
+        the new annotation
+        the new entity
+        and the new relationship
+    """
+    ranges = data.get('ranges', '')
+    quote  = data.get('quote', '')
+    entry = DataEntry.objects.get(id=data['anchor'])
+
+    entity = data.get('entity', None)
+    rel = data.get('relationship', None)
+    if entity:
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
+    if rel:
+        rel, created, new_ents = get_or_create_relationship(rel, case, group, user)
+
+    annotation = Annotation.objects.create(
+        startOffset=ranges[0]['startOffset'],
+        endOffset=ranges[0]['endOffset'],
+        quote=quote,
+        dataentry=entry,
+        entity=entity,
+        relationship=rel,
+        start=ranges[0]['start'],
+        end=ranges[0]['end'],
+        created_by=user,
+        last_edited_by=user,
+        group=group,
+        case=case
+    )
+
+    return annotation, new_ents + [entity], new_rels + [rel]
+
+
+def update_ann(annotation, data, case, group, user):
+    """update an annotation
+    return:
+        the updated annotation
+        resulted entities
+        resulted relationships
+        to be deleted relationships
+    """
+    entity = data.get('entity', None)
+    rel = data.get('relationship', None)
+
+    if entity:
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
+    if rel:
+        rel, created, new_ents = get_or_create_relationship(rel, case, group, user)
+
+    annotation.last_edited_by = user
+    annotation.entity = entity
+    annotation.relationship = rel
+    annotation.save()
+
+    return annotation, new_ents + [entity], new_rels + [rel], del_rels
+
+
+def del_ann(annotation):
+    """delete an annotation and possibility related entities and relationships
+    return:
+        the deleted annotation (json)
+        deleted entity (json)
+        deleted relationship (json)
+    """
+    ann_info = {}
+    ent_info = {}
+    rel_info = {}
+    relationship = annotation.relationship
+    entity = annotation.entity
+    ann_info = annotation.serialize()
+    annotation.delete()
+    if entity:
+        entity_info = entity.serialize()
+        if entity.annotation_set.count() == 0:
+            entity.delete()
+            entity_info['deleted'] = True
+    elif relationship:
+        relationship_info = relationship.serialize()
+        if relationship.annotation_set.count() == 0:
+            relationship.delete()
+            relationship_info['deleted'] = True
+
+    return ann_info, ent_info, rel_info
+
+
+
 def annotation(request, id=0):
     if request.method == 'POST':
         return post_annotation(request)
@@ -39,46 +128,15 @@ def annotations(request):
 def post_annotation(request):
     res = {'annotation': {}, 'entity': [], 'relationship': []}
     data = json.loads(request.body)
-    ranges = data.get('ranges', '')
-    quote  = data.get('quote', '')
     case   = data.get('case', '')
     group   = data.get('group', '')
-    if not ranges or not case or not group:
-        return HttpResponseBadRequest()
-    try:
-        entry = DataEntry.objects.get(id=data['anchor'])
-        group = Group.objects.get(id=group)
-        case = Case.objects.get(id=case)
-    except:
-        return HttpResponseNotFound()
+    case = Case.objects.get(id=case)
+    group = Group.objects.get(id=group)
 
-    entity = data.get('entity', None)
-    rel = data.get('relationship', None)
-    if entity:
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, request.user)
-    if rel:
-        rel, created, new_ents = get_or_create_relationship(rel, case, group, request.user)
-
-    annotation = Annotation.objects.create(
-        startOffset=ranges[0]['startOffset'],
-        endOffset=ranges[0]['endOffset'],
-        quote=quote,
-        dataentry=entry,
-        entity=entity,
-        relationship=rel,
-        start=ranges[0]['start'],
-        end=ranges[0]['end'],
-        created_by=request.user,
-        last_edited_by=request.user,
-        group=group,
-        case=case
-    )
-
+    ann, ents, rels = create_ann(data, case, group, request.user)
     res['annotation'] = annotation.serialize()
-    res['relationship'] = [rel.serialize()] if rel else []
-    res['relationship'] += [r.serialize() for r in new_rels]
-    res['entity'] = [entity.serialize()] if entity else []
-    res['entity'] += [e.serialize() for e in new_ents]
+    res['relationship'] += [r.serialize() for r in rels if r is not None]
+    res['entity'] += [e.serialize() for e in ents if e is not None]
 
     # save to activity log
     serverlog({
@@ -100,6 +158,7 @@ def post_annotation(request):
 
 
 def update_annotation(request, id):
+    res = {'annotation': {}, 'entity': [], 'relationship': []}
     if not id:
         return HttpResponseBadRequest()
     try:
@@ -110,32 +169,31 @@ def update_annotation(request, id):
 
     group = annotation.group
     case = annotation.case
-    res = {'annotation': {}, 'entity': [], 'relationship': []}
     data = json.loads(request.body)
-    entity = data.get('entity', None)
-    rel = data.get('relationship', None)
 
-    if entity:
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, request.user)
-    if rel:
-        rel, created, new_ents = get_or_create_relationship(rel, case, group, request.user)
-
-    annotation.last_edited_by = request.user
-    annotation.entity = entity
-    annotation.relationship = rel
-    annotation.save()
+    ann, ents, rels, del_rels = update_ann(annotation, data, case, group, request.user)
 
     res['annotation'] = annotation.serialize()
-    res['relationship'] = [rel.serialize()] if rel else []
-    res['relationship'] += [r.serialize() for r in new_rels]
-    res['entity'] = [entity.serialize()] if entity else []
-    res['entity'] += [e.serialize() for e in new_ents]
+    res['relationship'] += [r.serialize() for r in rels if r is not None]
+    res['entity'] += [e.serialize() for e in ents if e is not None]
 
     for r in del_rels:
         r_info = r.serialize()
         r_info['deleted'] = True
         res['relationship'].append(r_info)
         r.delete()
+
+    serverlog({
+        'user': request.user,
+        'operation': 'updated',
+        'item': 'annotation',
+        'tool': 'dataentry',
+        'data': {
+            'id': annotation.id,
+            'name': annotation.quote
+        },
+        'group': group,
+    })
 
     sync_item('update', 'annotation', res, case, group, request.user)
 
@@ -152,29 +210,14 @@ def del_annotation(request, id):
         return HttpResponseNotFound()
 
     res = {'annotation': {}, 'entity': {}, 'relationship': {}}
-    entity_info = {}
-    relationship_info = {}
 
     group = annotation.group
     case = annotation.case
-    relationship = annotation.relationship
-    entity = annotation.entity
-    res['annotation'] = annotation.serialize()
-    annotation.delete()
-    if entity:
-        entity_info = entity.serialize()
-        if entity.annotation_set.count() == 0:
-            entity.delete()
-            entity_info['deleted'] = True
-    elif relationship:
-        relationship_info = relationship.serialize()
-        if relationship.annotation_set.count() == 0:
-            relationship.delete()
-            relationship_info['deleted'] = True
 
-    res['entity'] = entity_info
-    res['relationship'] = relationship_info
-    print res
+    ann_info, ent_info, rel_info = del_ann(annotation)
+    res['annotation'] = ann_info
+    res['entity'] = ent_info
+    res['relationship'] = rel_info
 
     serverlog({
         'user': request.user,
@@ -224,41 +267,67 @@ def post_annotations(request):
 
     group = Group.objects.get(id=group)
     case = Case.objects.get(id=case)
-    for ann in annotations:
-        entry = DataEntry.objects.get(id=ann['anchor'])
-        ranges = ann['ranges']
-        entity = ann.get('entity', None)
-        rel = ann.get('relationship', None)
-        if entity:
-            entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, request.user)
-        if rel:
-            rel, created, new_ents = get_or_create_relationship(rel, case, group, request.user)
 
-        annotation = Annotation.objects.create(
-            startOffset=ranges[0]['startOffset'],
-            endOffset=ranges[0]['endOffset'],
-            quote=ann['quote'],
-            dataentry=entry,
-            entity=entity,
-            relationship=rel,
-            start=ranges[0]['start'],
-            end=ranges[0]['end'],
-            created_by=request.user,
-            last_edited_by=request.user,
-            group=group,
-            case=case
-        )
-        res['annotations'].append(annotation.serialize())
+    for ann_data in annotations:
+        ann_data['group'] = group.id
+        ann_data['case'] = case.id
+        ann, ents, rels = create_ann(ann_data, case, group, request.user)
 
-        res['relationships'] += [rel.serialize()] if rel else []
-        res['relationships'] += [r.serialize() for r in new_rels]
-        res['entities'] += [entity.serialize()] if entity else []
-        res['entities'] += [e.serialize() for e in new_ents]
+        res['annotations'].append(ann.serialize())
+
+        res['relationships'] += [r.serialize() for r in rels if r is not None]
+        res['entities'] += [e.serialize() for e in ents if e is not None]
 
         # save to activity log
         serverlog({
             'user': request.user,
             'operation': 'created',
+            'item': 'annotation',
+            'tool': 'dataentry',
+            'data': {
+                'id': ann.id,
+                'name': ann.quote
+            },
+            'group': group,
+            'case': case
+        })
+
+    sync_item('create', 'annotation', res, case, group, request.user)
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+
+def update_annotations(request):
+    res = {'annotations': [], 'entities': [], 'relationships': []}
+    data = json.loads(request.body)
+
+    group = data.get('group', '')
+    case = data.get('case', '')
+    annotations = data.get('annotations', [])
+
+    if not group or not case or not annotations:
+        return HttpResponseBadRequest()
+
+    group = Group.objects.get(id=group)
+    case = Case.objects.get(id=case)
+
+    for ann_data in annotations:
+        annotation = Annotation.objects.get(id=ann_data['id'])
+        ann, ents, rels, del_rels = update_ann(annotation, ann_data, case, group, request.user)
+
+        res['annotations'].append(annotation.serialize())
+        res['relationships'] += [r.serialize() for r in rels if r is not None]
+        res['entities'] += [e.serialize() for e in ents if e is not None]
+
+        for r in del_rels:
+            r_info = r.serialize()
+            r_info['deleted'] = True
+            res['relationships'].append(r_info)
+            r.delete()
+
+        serverlog({
+            'user': request.user,
+            'operation': 'updated',
             'item': 'annotation',
             'tool': 'dataentry',
             'data': {
@@ -269,13 +338,50 @@ def post_annotations(request):
             'case': case
         })
 
+    sync_item('update', 'annotation', res, case, group, request.user)
+
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+def del_annotations(request):
+    res = {'annotations': [], 'entity': {}, 'relationship': {}}
+    data = json.loads(request.body)
+    group = data.get('group', '')
+    case = data.get('case', '')
+    annotations = data.get('annotations', [])
+
+    if not group or not case or not annotations:
+        return HttpResponseBadRequest()
+
+    group = Group.objects.get(id=group)
+    case = Case.objects.get(id=case)
+
+    for ann_data in annotations:
+        annotation = Annotation.objects.get(id=ann_data['id'])
+        ann_info, ent_info, rel_info = del_ann(annotation)
+
+        res['annotations'].append(ann_info)
+
+        serverlog({
+            'user': request.user,
+            'operation': 'deleted',
+            'item': 'annotation',
+            'tool': 'dataentry',
+            'data': {
+                'id': ann_info['id'],
+                'name': ann_info['quote']
+            },
+            'case': case,
+            'group': group
+        })
+
+    # entity and relationship are the same for all annotation
+    # record it for the last annotation
+    res['entity'] = ent_info
+    res['relationship'] = rel_info
+
+    sync_item('delete', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 
-def update_annotations(request):
-    pass
-
-
-def del_annotations(request):
-    pass
