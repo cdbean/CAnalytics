@@ -34,7 +34,7 @@
 .navbar #userlist {
   margin-right: 15px;
 }
-.navbar #userlist li span {
+.navbar #userlist li a {
   background-color: white;
 }
 

@@ -45,10 +45,19 @@
       var li = $('<li class="userlist-item dropdown"></li>')
         .appendTo($('.navbar #userlist'));
 
-      $('<span class="label label-primary"></span>').appendTo(li)
+      $('<a class="label label-primary"></a>').appendTo(li)
         .text(name)
+        .attr('id', 'user-' + id)
         .css('color', color)
+        .colorpicker()
+        .on('changeColor.colorpicker', function(e) {
+          var color = e.color.toHex();
+          this.style.color = color;
+          var id = this.id.split('-')[1];
+          wb.info.users[id].color = color;
+        })
       ;
+
     }
 
   }

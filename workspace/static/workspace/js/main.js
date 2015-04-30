@@ -36,6 +36,7 @@ $(function() {
 
   $('body').on('click', 'a.entity, span.entity', onClickEntity);
   $('body').on('click', onClickOutside);
+  $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
 
 
   function onClickOutside() {
@@ -107,5 +108,13 @@ $(function() {
     else str = ' unloaded'
     wb.utility.notify('Dataset ' + this.parentElement.textContent + str);
   }
+
+
+  function onChangeUserColor(e) {
+    var color = e.color.toHex();
+    $('a#username').css('color', color);
+    wb.info.users[wb.info.user].color = color;
+  }
+
 });
 
