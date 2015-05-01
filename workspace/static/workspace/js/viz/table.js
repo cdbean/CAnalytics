@@ -27,7 +27,7 @@ wb.viz.table = function() {
                     "sRowSelect": "multi", // for multi select with ctrl and shift
                     "sDom": "Rlfrtip", // enable column resizing
                 });
-                $(table).on('click', 'tr.even td:first-child, tr.odd td:first-child', onFilter);
+                $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
             }
 
             table.fnClearTable();

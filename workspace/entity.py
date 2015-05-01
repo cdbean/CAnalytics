@@ -37,7 +37,7 @@ def get_or_create_entity(data, case, group, user):
         'user': user,
         'operation': operation,
         'item': entity.entity_type,
-        'tool': 'dataentry_table',
+        'tool': entity.entity_type + '_table',
         'data': {
             'id': entity.id,
             'name': entity.name

@@ -131,8 +131,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
         }
 
         if (viz) {
-            viz.addClass('history');
-            viz.parent().addClass('history');
+            viz.addClass('historic');
+            viz.parent().addClass('historic');
             if (data.data && data.data.id) {
               viz.data('instance').highlight(data.data.id)
             }

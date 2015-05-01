@@ -578,7 +578,7 @@ Annotator = (function(_super) {
 
         var range = rangy.createRange();
         var searchScopeRange = rangy.createRange();
-        searchScopeRange.selectNodeContents(document.body);
+        searchScopeRange.selectNodeContents(this.wrapper[0]);
         var options = {
           caseSensitive: false,
           wholeWordsOnly: true,
