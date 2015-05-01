@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFou
 import json
 
 from django.contrib.auth.models import User, Group
-from workspace.entity import get_or_create_entity
+from workspace.entity import get_or_create_entity, get_or_create_relationship
 from workspace.models import DataEntry, Case
 from sync.views import sync_item
 from logger.views import serverlog
@@ -22,8 +22,12 @@ def create_ann(data, case, group, user):
     quote  = data.get('quote', '')
     entry = DataEntry.objects.get(id=data['anchor'])
 
+    # to be improved later
+    # entity here could also be a relationship
     entity = data.get('entity', None)
     rel = data.get('relationship', None)
+    if entity['entity_type'] == 'relationship':
+        rel = entity
     if entity:
         entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
     if rel:

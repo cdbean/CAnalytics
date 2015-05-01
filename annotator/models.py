@@ -31,11 +31,14 @@ class Annotation(models.Model):
         }]
         ann['anchor']   = self.dataentry.id
         ann['quote']   = self.quote
-        ann['entity'] = {'id': self.entity.id, 'entity_type': self.entity.entity_type}
         ann['created_at'] = self.created_at.strftime('%m/%d/%Y-%H:%M:%S')
         ann['created_by'] = self.created_by.id
         ann['last_edited_by'] = self.last_edited_by.id
         ann['last_edited_at'] = self.last_edited_at.strftime('%m/%d/%Y-%H:%M:%S')
+        if self.entity:
+            ann['entity'] = {'id': self.entity.id, 'entity_type': self.entity.entity_type}
+        elif self.relationship:
+            ann['entity'] = {'id': self.relationship.id, 'entity_type': 'relationship'}
 
         return ann
 

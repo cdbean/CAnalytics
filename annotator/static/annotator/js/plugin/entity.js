@@ -176,8 +176,9 @@ Annotator.Plugin.Entity = (function(_super) {
                     {value: 'resource', title: 'Resource'},
                     {value: 'location', title: 'Location'},
                     {value: 'event', title: 'Event'}
+                    {value: 'relationship', title: 'Relationship'}
                 ],
-                placeholder: 'Choose the entity type...',
+                placeholder: 'Mark the annotation as ...',
                 create: false,
                 onChange: function(value) {
                     self.publish('entity/type/update', [value]);
@@ -208,11 +209,11 @@ Annotator.Plugin.Entity = (function(_super) {
             annotation.entity = {};
         }
         var entity_type = $(field).find('.entity_type').val();
-        if (entity_type) {
-            annotation.entity.entity_type = entity_type;
-        } else {
+        if (!entity_type) {
             alert ('Entity type is required!'); // TODO: more elegant form validation
+            return;
         }
+        annotation.entity.entity_type = entity_type; // the type could be relationship
     };
 
 

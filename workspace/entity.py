@@ -5,7 +5,10 @@ from logger.views import serverlog
 from workspace.models import *
 
 def get_or_create_relationship(data, case, group, user):
-    passs
+    created = False
+    new_ent = []
+    id = data.get('id', 0)
+    attrs = data.get('attribute', [])
 
 
 def get_or_create_entity(data, case, group, user):

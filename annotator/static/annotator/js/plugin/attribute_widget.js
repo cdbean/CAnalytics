@@ -160,6 +160,18 @@ $.widget('custom.attribute_widget', {
             create: true,
             closeAfterSelect: true
         });
+      } else if (attr === 'source' || attr === 'target') {
+        var opts = this.prepareSelectOptions();
+        $(input).selectize({
+            options: opts.opts,
+            optgroups: opts.optgroups,
+            optgroupField: 'entity_type',
+            labelField: 'label',
+            valueField: 'value',
+            searchField: 'label',
+            create: true,
+            closeAfterSelect: true
+        });
       }
     },
 
