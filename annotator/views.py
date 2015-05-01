@@ -26,12 +26,15 @@ def create_ann(data, case, group, user):
     # entity here could also be a relationship
     entity = data.get('entity', None)
     rel = data.get('relationship', None)
+    new_rels = []
+    new_ents = []
     if entity['entity_type'] == 'relationship':
         rel = entity
-    if entity:
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
     if rel:
         rel, created, new_ents = get_or_create_relationship(rel, case, group, user)
+        entity = None
+    elif entity:
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
 
     annotation = Annotation.objects.create(
         startOffset=ranges[0]['startOffset'],
@@ -61,11 +64,16 @@ def update_ann(annotation, data, case, group, user):
     """
     entity = data.get('entity', None)
     rel = data.get('relationship', None)
+    new_rels = []
+    del_rels = []
 
-    if entity:
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
+    if entity['entity_type'] == 'relationship':
+        rel = entity
     if rel:
         rel, created, new_ents = get_or_create_relationship(rel, case, group, user)
+        entity = None
+    if entity:
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
 
     annotation.last_edited_by = user
     annotation.entity = entity
@@ -138,7 +146,7 @@ def post_annotation(request):
     group = Group.objects.get(id=group)
 
     ann, ents, rels = create_ann(data, case, group, request.user)
-    res['annotation'] = annotation.serialize()
+    res['annotation'] = ann.serialize()
     res['relationship'] += [r.serialize() for r in rels if r is not None]
     res['entity'] += [e.serialize() for e in ents if e is not None]
 
@@ -149,8 +157,8 @@ def post_annotation(request):
         'item': 'annotation',
         'tool': 'dataentry',
         'data': {
-            'id': annotation.id,
-            'name': annotation.quote
+            'id': ann.id,
+            'name': ann.quote
         },
         'group': group,
         'case': case
@@ -197,6 +205,7 @@ def update_annotation(request, id):
             'name': annotation.quote
         },
         'group': group,
+        'case': case
     })
 
     sync_item('update', 'annotation', res, case, group, request.user)

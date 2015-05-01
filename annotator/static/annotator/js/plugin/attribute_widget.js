@@ -169,7 +169,7 @@ $.widget('custom.attribute_widget', {
             labelField: 'label',
             valueField: 'value',
             searchField: 'label',
-            create: true,
+            create: false,
             closeAfterSelect: true
         });
       }

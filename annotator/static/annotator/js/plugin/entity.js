@@ -142,8 +142,12 @@ Annotator.Plugin.Entity = (function(_super) {
     Entity.prototype.updateEntityNameField = function(field, annotation) {
         var name;
         if (annotation.entity) {
-            var entity = wb.store.items.entities[annotation.entity.id];
-            name = entity.primary.name;
+            var entity;
+            if (annotation.entity.entity_type === 'relationship')
+              entity = wb.store.items.relationships[annotation.entity.id];
+            else
+              entity = wb.store.items.entities[annotation.entity.id];
+            name = entity.primary.name || entity.primary.relation;
         } else {
             name = annotation.quote;
         }
@@ -175,7 +179,7 @@ Annotator.Plugin.Entity = (function(_super) {
                     {value: 'organization', title: 'Organization'},
                     {value: 'resource', title: 'Resource'},
                     {value: 'location', title: 'Location'},
-                    {value: 'event', title: 'Event'}
+                    {value: 'event', title: 'Event'},
                     {value: 'relationship', title: 'Relationship'}
                 ],
                 placeholder: 'Mark the annotation as ...',
@@ -227,8 +231,12 @@ Annotator.Plugin.Entity = (function(_super) {
         var attribute_widget = $(field).find('.annotator-attribute-widget').data('instance');
         attribute_widget.reset();
         if (annotation.entity && annotation.entity.id) {
-            var entity = wb.store.items.entities[annotation.entity.id];
-            var attrs = wb.store.static[entity.primary.entity_type];
+            var entity;
+            if (annotation.entity.entity_type === 'relationship')
+              entity = wb.store.items.relationships[annotation.entity.id];
+            else
+              entity = wb.store.items.entities[annotation.entity.id];
+            var attrs = wb.store.static[entity.primary.entity_type || 'relationship'];
             for (var i = 0, len = attrs.length; i < len; i++) {
                 var attr = attrs[i];
                 attribute_widget.add(attr, entity.primary[attr], 'primary');
@@ -258,10 +266,14 @@ Annotator.Plugin.Entity = (function(_super) {
     Entity.prototype.updateViewer = function(field, annotation) {
         if (annotation.entity) {
             var table = '<table id="annotator-viewer-table">';
-            var entity = wb.store.items.entities[annotation.entity.id];
-            var primary = entity.primary;
-            table += '<tr><th>' + this.capitalizeFirstLetter(primary.entity_type) + ':</th><td>' + primary.name + '</td></tr>';
-            var attrs = wb.store.static[entity.primary.entity_type];
+            var entity;
+            if (annotation.entity.entity_type === 'relationship')
+              entity = wb.store.items.relationships[annotation.entity.id];
+            else
+              entity = wb.store.items.entities[annotation.entity.id];
+            var primary = entity.primary || entity;
+            table += '<tr><th>' + this.capitalizeFirstLetter(primary.entity_type || 'relationship') + ':</th><td>' + (primary.name || primary.relation) + '</td></tr>';
+            var attrs = wb.store.static[entity.primary.entity_type || 'relationship'];
             for (var i = 0, len = attrs.length; i < len; i++) {
               var attr = attrs[i];
               var value = wb.utility.parseEntityAttr(attr, primary[attr]);

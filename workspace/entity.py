@@ -6,9 +6,58 @@ from workspace.models import *
 
 def get_or_create_relationship(data, case, group, user):
     created = False
-    new_ent = []
+    new_ents = []
     id = data.get('id', 0)
-    attrs = data.get('attribute', [])
+
+    if id:
+        relationship = Relationship.objects.get(id=id)
+    else:
+        relationship, new_ents = create_relationship(data, case, group, user)
+        created = True
+
+    operation = 'created' if created else 'updated'
+    serverlog({
+        'user': user,
+        'operation': operation,
+        'item': 'relationship',
+        'tool': 'network',
+        'data': {
+            'id': relationship.id,
+            'name': relationship.relation,
+            'source': relationship.source.name,
+            'target': relationship.target.name,
+        },
+        'public': True,
+        'case': case,
+        'group': group
+    })
+
+    return relationship, created, new_ents
+
+
+def create_relationship(data, case, group, user):
+    new_ents = []
+    attrs = data['attribute']
+    source = attrs['source']
+    target = attrs['target']
+    relation = attrs.get('relation', '')
+    note = attrs.get('note', '')
+    priority = attrs.get('priority', 5)
+
+    if source.isdigit():
+        source = Entity.objects.get(id=source)
+    else:
+        source = create_entity(data, case, group, user)
+        new_ents.append(source)
+    if target.isdigit():
+        target = Entity.objects.get(id=target)
+    else:
+        target = create_entity(data, case, group, user)
+        new_ents.append(target)
+
+    relationship = Relationship.objects.create(source=source, target=target, relation=relation, note=note, priority=5, case=case, group=group, created_by=user)
+
+    return relationship, new_ents
 
 
 def get_or_create_entity(data, case, group, user):

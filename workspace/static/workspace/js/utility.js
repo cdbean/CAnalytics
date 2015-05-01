@@ -123,6 +123,11 @@ wb.utility.parseEntityAttr = function(attr, value) {
       var l = wb.store.items.entities[value];
       value = l.primary.name || l.primary.address;
     }
+  } else if (attr === 'source' || attr === 'target') {
+    if (value) {
+      var e = wb.store.items.entities[value];
+      value = e.primary.name;
+    }
   }
   return value || '';
 };
