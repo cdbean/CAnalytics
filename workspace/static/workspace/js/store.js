@@ -180,7 +180,7 @@ wb.store = {
     var _this = this;
 
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {
-      return _this.shelf_by.indexOf(d) > -1;
+      return _this.shelf_by.dataentries.indexOf(d) > -1;
     });
     if (shelf === 'dataentries') return;
 

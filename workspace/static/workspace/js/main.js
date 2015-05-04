@@ -92,6 +92,10 @@ $(function() {
         title: 'History',
         url: GLOBAL_URL.history
       });
+    } else if (viz_name === 'annotation') {
+      viz = $('<div>').vizannotationtable({
+        title: 'Annotations',
+      });
     }
   }
 

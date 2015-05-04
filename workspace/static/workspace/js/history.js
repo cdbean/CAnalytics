@@ -97,8 +97,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
                 entity: viz_name,
             });
         } else if (viz_name === 'dataentry') {
-            viz = $('<div>').vizdataentrytable({
-                title: 'Data Entry' + subtitle,
+            viz = $('<div>').vizannotationtable({
+                title: 'Annotations' + subtitle,
             });
         } else if (viz_name === 'timeline') {
             viz = $('<div>').viztimeline({

@@ -585,7 +585,7 @@ Annotator = (function(_super) {
           withinRange: searchScopeRange,
           direction: "forward" // This is redundant because "forward" is the default
         };
-        range.selectNodeContents(document.body);
+        range.selectNodeContents(this.wrapper[0]);
 
         var searchTerm = new RegExp(annotation.quote, 'gi');
 
