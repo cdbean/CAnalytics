@@ -120,7 +120,12 @@
   function onAnnotationsCreated() {
     var anns = [].slice.call(arguments, 1);
     wb.store.addItems(anns, 'annotations');
-
+    //
+    // render annotation--add annotation to annotator
+    $('.viz.dataentry').not('.history').each(function() {
+      var viz = $(this).data('instance');
+      if (viz) viz.addAnnotations(anns);
+    });
   }
 
   function onAnnotationsUpdated() {
@@ -130,11 +135,21 @@
       if (r.deleted) wb.store.removeItems(r, 'annotations');
       else wb.store.addItems(r, 'annotations');
     }
+    // render annotation--update annotation in dataentry table
+    $('.viz.dataentry').not('.history').each(function() {
+      var viz = $(this).data('instance');
+      if (viz) viz.updateAnnotations(anns);
+    });
   }
 
   function onAnnotationsDeleted() {
     var anns = [].slice.call(arguments, 1);
     wb.store.removeItems(anns, 'annotations');
+    // render annotation--update annotation in dataentry table
+    $('.viz.dataentry').not('.history').each(function() {
+      var viz = $(this).data('instance');
+      if (viz) viz.deleteAnnotations(anns);
+    });
   }
 
   function updateDataBut(except) {

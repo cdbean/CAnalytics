@@ -5,7 +5,7 @@ django-model-utils==2.0
 django-realtime==1.1
 django-user-sessions==1.0.0
 gunicorn==18.0
-psycopg2==2.5.2
+psycopg2
 python-dateutil==2.2
 redis==2.10.3
 six==1.5.2

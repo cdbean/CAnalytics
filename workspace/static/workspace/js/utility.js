@@ -47,6 +47,11 @@ wb.utility.uniqueArray = function(arr) {
     });
 };
 
+// a - b
+wb.utility.diffArray = function(a, b) {
+  return a.filter(function(i) {return b.indexOf(i) < 0;});
+};
+
 wb.utility.Date = function(date) {
     return date ? new Date(date) : null;
 };

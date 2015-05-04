@@ -70,6 +70,45 @@ wb.viz.table = function() {
     }
 
     function onFilter(e) {
+      if ( $(this.parentNode).hasClass('row_selected') ) {
+        $(this.parentNode).removeClass('row_selected');
+      } else {
+        if (! e.shiftKey) {
+          $('tr.row_selected', table).removeClass('row_selected');
+        }
+        document.getSelection().removeAllRanges(); // disable text selection when shift+clik
+        $(this.parentNode).addClass('row_selected');
+      }
+      var selected_rows = $('tr.row_selected', table);
+
+      if (selected_rows.length === 0) {
+        dispatch.filter([]);
+        wb.log({
+          operation: 'removed filter',
+          item: title,
+          tool: title,
+        });
+        return;
+      }
+
+      var records_id = [];
+      $('tr.row_selected', table).each(function(idx, row) {
+        var id = $(row).data('id');
+        records_id.push(id);
+      });
+      dispatch.filter(records_id);
+      wb.log({
+        operation: 'filtered',
+        item: title,
+        tool: title,
+        data: JSON.stringify({
+          'id': records_id.join(','),
+//         'name': selected_names.join(',')
+        })
+      });
+    }
+    /*
+    function onFilter(e) {
         if ( $(this.parentNode).hasClass('row_selected') ) {
             $(this.parentNode).removeClass('row_selected');
         } else {
@@ -83,17 +122,18 @@ wb.viz.table = function() {
         if (selected_rows.length == 0) {
           if (title === 'dataentry')
             wb.store.shelf_by.dataentries = [];
-          else
+          else {
             data.forEach(function(d) {
               var i = wb.store.shelf_by.entities.indexOf(d[0]);
               if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
             });
+          }
 
-            wb.log({
-                operation: 'removed filter in',
-                item: title,
-                tool: title,
-            });
+          wb.log({
+              operation: 'removed filter in',
+              item: title,
+              tool: title,
+          });
         } else {
             records_id = [];
             $('tr.row_selected', table).each(function(idx, row) {
@@ -127,6 +167,7 @@ wb.viz.table = function() {
 
         }
         dispatch.filter();
+        */
 
     }
 

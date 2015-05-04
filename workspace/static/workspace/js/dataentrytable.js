@@ -14,7 +14,8 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         .height(this.element.height() - 80)
         .title('dataentry')
         .columns(columns)
-        .on('filter', function() {
+        .on('filter', function(selected) {
+          wb.store.shelf_by.dataentries = selected;
           $.publish('data/filter', '#' + this.element.attr('id'));
         }.bind(this))
       ;

@@ -15,7 +15,13 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
             .on('edit', function(entity, attr) {
                 $.publish('/entity/attribute/update', [entity, attr]);
             })
-            .on('filter', function() {
+            .on('filter', function(selected) {
+              var shelf_by = wb.store.shelf_by.entities;
+              shelf_by.concat(selected);
+              var entities = this.table.data().map(function(d) {
+                return d[0];
+              });
+              shelf_by = wb.utility.diffArray(shelf_by, wb.utility.diffArray(entities, selected));
               $.publish('data/filter', '#' + this.element.attr('id'));
             }.bind(this))
         ;
