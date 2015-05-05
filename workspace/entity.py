@@ -173,7 +173,7 @@ def set_primary_attr(entity, attr, value, user, case, group):
         new_ents += new_people
         new_rels += new_people_rels
         del_rels += del_people_rels
-    elif attr == 'organization':
+    elif attr == 'organizations':
         new_org, new_org_rels, del_org_rels = set_attr_organization(entity, value, user, case, group)
 
         new_ents += new_org
@@ -327,6 +327,7 @@ def set_attr_organization(entity, value, user, case, group):
             group=group
         )
 
+    print entity, value
     if value and len(value):
         for p in value:
             if p:
