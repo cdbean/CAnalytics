@@ -81,7 +81,8 @@ $(function() {
         });
     } else if (viz_name === 'notepad') {
         viz = $('<div>').viznotepad({
-            title: 'Notepad'
+            title: 'Notepad',
+            url: GLOBAL_URL.notepad,
         });
     } else if (viz_name === 'message') {
       viz = $('<div>').vizmessage({

@@ -6,27 +6,35 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
         this.options.base.dragStop = this.resize.bind(this);
         this._super("_create");
         this.element.addClass("viznotepad");
-        this.element.data("viz", "vizViznotepad");
         var height = this.element.height();
 
-        var textarea = this.element.append('<textarea id="editor1" name="editor1" style="width:100%; height: 100%;">');
+        var id = this.element[0].id + '-container';
+        var editor = $('<div style="width:100%; height: 100%;">')
+        .attr('id', id)
+        .appendTo(this.element);
 
-        var getContent = this.getContent.bind(this);
-        CKEDITOR.config.height = height - 104; // the height refers to the height of the editing area, thus set it to the height of the container - the height of the toolbar and the bottom bar
-
-        this.editor = CKEDITOR.replace('editor1', {
-            on: {
-                'instanceReady': function(evt) {
-                    getContent();
-                }
-            },
+        var padId = wb.info.case + '-' + wb.info.group;
+        $('#' + id).pad({
+          'padId': padId,
+          'showChat': false,
+          'host': this.options.url,
+          'showControls': true,
+          'userName': wb.info.users[wb.info.user].name,
+          'userColor': wb.info.users[wb.info.user].color,
+          width: '100%',
+          height: '100%'
         });
-        setInterval(this.saveContent.bind(this), 5000);
     },
 
     resize: function() {
-        var height = this.element.height();
-        this.editor.resize('99%', height-10, false);
+        // var height = this.element.height();
+        // this.editor.resize('99%', height-10, false);
+        this._super('resize');
+        var id = '#' + this.element[0].id + '-container';
+        var width = $(id).width();
+        var height = $(id).height();
+        $(id + '>iframe').css('width', width - 5);
+        $(id + '>iframe').css('height', height - 5);
     },
 
     update: function() {
