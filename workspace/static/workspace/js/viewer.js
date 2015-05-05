@@ -80,16 +80,8 @@ $.widget('viz.vizviewer', {
         </ul> \
       </li> \
     ');
-    $element.find('.attr-key').text(attr.key + ': ');
-    if (key === 'people') {
-      value = value.map(function(d) {
-        return wb.store.items.entities[d].primary.name;
-      });
-    }
-    else if (key === 'created_by' || key === 'last_edited_by') {
-      value = wb.info.users[value].name;
-    }
-    $element.find('.attr-value').text(value);
+    $element.find('.attr-key').text(key + ': ');
+    $element.find('.attr-value').text(wb.utility.parseEntityAttr(key, value));
     this.element.find('.attr-list').append($element);
     return this;
   },
