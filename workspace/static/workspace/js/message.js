@@ -6,6 +6,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   _create: function() {
     this._super('_create');
     this.element.addClass('message');
+    this.options.extend.help = this.help;
 
     var message_html = ' \
       <div class="wrapper"> \
@@ -93,5 +94,9 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
 
   updateData: function() {
 
+  },
+
+  help: function() {
+    wb.help.message.run();
   }
 });

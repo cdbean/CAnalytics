@@ -3,6 +3,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
+        this.options.extend.help = this.help;
         this.element.addClass('network');
         this._super('_create');
 
@@ -953,6 +954,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     destroy: function() {
       this._super('destroy');
+    },
+
+    help: function() {
+      wb.help.network.run();
     }
 });
 

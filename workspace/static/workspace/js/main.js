@@ -37,6 +37,9 @@ $(function() {
   $('body').on('click', 'a.entity, span.entity', onClickEntity);
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
+  $('a#main_help').click(function() {
+    wb.help.main.run();
+  })
 
 
   function onClickOutside() {

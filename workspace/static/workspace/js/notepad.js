@@ -4,6 +4,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
         this.options.extend.restore = this.resize.bind(this);
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.base.dragStop = this.resize.bind(this);
+        this.options.extend.help = this.help;
         this._super("_create");
         this.element.addClass("viznotepad");
         var height = this.element.height();
@@ -78,5 +79,9 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
 
     hideMessage: function() {
         this.element.find('.cke_bottom span.custom_message').empty();
+    },
+
+    help: function() {
+      wb.help.notepad.run();
     }
 });

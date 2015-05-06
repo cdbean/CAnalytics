@@ -5,6 +5,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.options.base.resizeStop = this.resize.bind(this);
       this.options.extend.maximize = this.resize.bind(this);
       this.options.extend.restore  = this.resize.bind(this);
+      this.options.extend.help = this.help;
       this.element.addClass('timeline');
       this._super('_create');
 
@@ -77,6 +78,10 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
       this.timeline.width(width).height(height).redraw();
+    },
+
+    help: function() {
+      wb.help.timeline.run();
     }
 });
 

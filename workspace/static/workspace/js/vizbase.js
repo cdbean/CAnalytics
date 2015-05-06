@@ -15,6 +15,7 @@ $.widget('viz.vizbase', {
             minimizeLocation : "right",
             collapsable : true,
             dblclick : "collapse",
+            help: null,
         }
     },
     _create: function() {
@@ -28,8 +29,12 @@ $.widget('viz.vizbase', {
         this.options.base.height = this.options.height;
         this.options.base.title = this.options.title;
         this.element.dialog(this.options.base).dialogExtend(this.options.extend);
+        this.options.extend.help = this.help;
         this.element.addClass('viz');
         this.element.data('instance', this);
+
+        $('<a class="ui-dialog-titlebar-help ui-corner-all ui-state-default" style="width: 19px; height: 18px; cursor: pointer"><span class="ui-icon ui-icon-help">?</span></a>').appendTo(this.element.parent().find('.ui-dialog-titlebar-buttonpane'))
+        .click(this.options.extend.help);
     },
     resize: function() {
         this.element.css("width", "auto");
@@ -38,5 +43,8 @@ $.widget('viz.vizbase', {
     _destroy: function() {
         $.publish("viz/close", this.element.attr("id"));
         this.element.dialog('destroy').remove();
-    }
+    },
+    help: function() {
+
+    },
 })

@@ -6,6 +6,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
   _create: function() {
     this._super('_create');
     this.element.addClass('history');
+    this.options.extend.help = this.help;
 
     this._setupUI();
     this.loadData();
@@ -152,4 +153,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
   updateView: function() {
 
   },
+
+  help: function() {
+    wb.help.history.run();
+  }
 });
