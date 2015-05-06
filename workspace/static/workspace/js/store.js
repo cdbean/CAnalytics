@@ -226,8 +226,8 @@ wb.store = {
     this.shelf.annotations.forEach(function(d) {
       var ann = _this.items.annotations[d];
       selected_dataentries.push(ann.anchor);
-      selected_entities.push(ann.entity);
-      selected_relationships.push(ann.relationship);
+      selected_entities.push(ann.entity && ann.entity.id);
+      selected_relationships.push(ann.relationship && ann.relationship.id);
     });
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {
       return selected_dataentries.indexOf(d) > -1;

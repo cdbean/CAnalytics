@@ -108,6 +108,7 @@ class DataEntry(models.Model):
         attr['id'] = self.id
         attr['content'] = self.content
         attr['dataset'] = self.dataset.id
+        attr['name'] = self.name
         attr['date']    = ''
         if self.date != None:
             attr['date']  = self.date.strftime('%m/%d/%Y-%H:%M:%S')

@@ -55,6 +55,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     highlight: function(item) {
       // highlight annotation
+      // item: annotation id
       var ele = this.element.closest(".ui-dialog");
       var annotator = ele.data('annotator');
       if (annotator) {

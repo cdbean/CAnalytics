@@ -6,7 +6,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         this.element.addClass('annotation');
         this._super('_create');
 
-        var columns = ['ID', 'Quote', 'Annotation', 'Entity'];
+        var columns = ['ID', 'Quote', 'Data Entry', 'Annotation', 'Entity'];
         this.table = wb.viz.table()
             .columns(columns)
             .height(this.element.height() - 80)
@@ -14,6 +14,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
             .on('filter', function(selected) {
               wb.store.shelf_by.annotations = selected;
               $.publish('data/filter', '#' + this.element.attr('id'));
+              $('.viz.dataentry').data('instance').highlight(selected[selected.length - 1])
             }.bind(this))
         ;
         this.updateData();
@@ -23,9 +24,15 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
     updateData: function() {
         var data = [];
 
-        for (var d in wb.store.items.entities) {
-          var ann = wb.store.items.annotations;
-          var row = [ann.id, ann.quote, ann.entity.primary.name || ann.entity.primary.relation, ann.entity.entity_type];
+        for (var d in wb.store.items.annotations) {
+          var ann = wb.store.items.annotations[d];
+          var entity = ann.entity;
+          if (entity.entity_type === 'relationship')
+            entity = wb.store.items.relationships[entity.id];
+          else
+            entity = wb.store.items.entities[entity.id];
+          var entry = wb.store.items.dataentries[ann.anchor];
+          var row = [ann.id, ann.quote, entry.name || '', entity.primary.name || entity.primary.relation, ann.entity.entity_type];
           data.push(row);
         }
         this.table.data(data);
