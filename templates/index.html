@@ -27,6 +27,7 @@
 <script type="text/javascript" src="{% static 'lib/rangy/lib/rangy-core.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/rangy/lib/rangy-textrange.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/colorpicker/dist/js/bootstrap-colorpicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/etherpad-lite-jquery/js/etherpad.js' %}"></script>
 <!-- https://github.com/melanke/Watch.JS -->
 <script type="text/javascript" src="{% static 'lib/watch.min.js' %}"></script>
 <!-- for sync -->
@@ -119,6 +120,7 @@
           messages: "{% url 'sync:messages' %}",
           log: "{% url 'log:log' %}",
           entity_id: "{% url 'ws:entity_id' 0 %}",
+          notepad: '{{notepad_url}}'
         }
 
     </script>

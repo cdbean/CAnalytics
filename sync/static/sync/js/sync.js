@@ -90,45 +90,60 @@
 
   function onAnnotationCreated(data) {
     if (data.user === wb.info.user) return;
+    var annotation = data.annotation || data.annotations;
+    var entity = data.entity || data.entities;
+    var relationship = data.relationship || data.relationships;
 
-    $.publish('annotation/created', data.annotation);
-    if (data.entity)
-      $.publish('entity/created', data.entity);
-    if (data.relationship)
-      $.publish('relationship/created', data.relationship);
+    $.publish('annotation/created', annotation);
+    if (entity)
+      $.publish('entity/created', entity);
+    if (relationship)
+      $.publish('relationship/created', relationship);
 
+    var length = annotation.length || 1;
+    var quote = annotation.quote || annotation[0].quote;
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' created annotation on '
-                      + data.annotation.quote);
+                      + ' created ' + length + ' annotation on '
+                      + quote);
   }
 
   function onAnnotationUpdated(data) {
     if (data.user === wb.info.user) return;
+    var annotation = data.annotation || data.annotations;
+    var entity = data.entity || data.entities;
+    var relationship = data.relationship || data.relationships;
 
-    $.publish('annotation/updated', data.annotation);
-    if (data.entity)
-      $.publish('entity/updated', data.entity);
-    if (data.relationship)
-      $.publish('relationship/updated', data.relationship);
+    $.publish('annotation/updated', annotation);
+    if (entity)
+      $.publish('entity/updated', entity);
+    if (relationship)
+      $.publish('relationship/updated', relationship);
 
+    var length = annotation.length || 1;
+    var quote = annotation.quote || annotation[0].quote;
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' update annotation on '
-                      + data.annotation.quote
+                      + ' update ' + length + ' annotation on '
+                      + quote
                     );
   }
 
   function onAnnotationDeleted(data) {
     if (data.user === wb.info.user) return;
+    var annotation = data.annotation || data.annotations;
+    var entity = data.entity || data.entities;
+    var relationship = data.relationship || data.relationships;
 
-    $.publish('annotation/deleted', data.annotation);
-    if (data.entity)
-      $.publish('entity/deleted', data.entity);
-    if (data.relationship)
-      $.publish('relationship/deleted', data.relationship);
+    $.publish('annotation/deleted', annotation);
+    if (entity)
+      $.publish('entity/deleted', entity);
+    if (relationship)
+      $.publish('relationship/deleted', relationship);
 
+    var length = annotation.length || 1;
+    var quote = annotation.quote || annotation[0].quote;
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' delete annotation on '
-                      + data.annotation.quote
+                      + ' delete ' + length + ' annotation on '
+                      + quote
                     );
   }
 

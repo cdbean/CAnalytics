@@ -133,6 +133,8 @@ wb.utility.parseEntityAttr = function(attr, value) {
       var e = wb.store.items.entities[value];
       value = e.primary.name;
     }
+  } else if (attr === 'created_by' || attr === 'last_edited_by') {
+    if (value) value = wb.info.users[value].name;
   }
   return value || '';
 };

@@ -180,7 +180,7 @@ wb.store = {
     var _this = this;
 
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {
-      return _this.shelf_by.indexOf(d) > -1;
+      return _this.shelf_by.dataentries.indexOf(d) > -1;
     });
     if (shelf === 'dataentries') return;
 
@@ -254,9 +254,32 @@ wb.store = {
 
     this.shelf_by.entities.forEach(function(ent_id) {
       var ent = _this.items.entities[ent_id];
-      selected_relationships = selected_relationships.concat(ent.meta.relationships);
       selected_annotations = selected_annotations.concat(ent.meta.annotations);
+      // get directly related relationships
+      selected_relationships = selected_relationships.concat(ent.meta.relationships);
     });
+    selected_relationships.forEach(function(rel) {
+      // get directly related entities
+      var r = _this.items.relationships[rel];
+      selected_entities.push(r.primary.source);
+      selected_entities.push(r.primary.target);
+    });
+    selected_entities = wb.utility.uniqueArray(selected_entities);
+    selected_entities.forEach(function(ent) {
+      var e = _this.items.entities[ent];
+      e.meta.relationships.forEach(function(rel) {
+        var r = _this.items.relationships[rel];
+        if (r.primary.relation === 'involve') {
+          // get directed and indirected related relationships and entities
+          selected_entities.push(r.primary.source);
+          selected_entities.push(r.primary.target);
+          selected_relationships.push(rel);
+        }
+      });
+    });
+    selected_entities = wb.utility.uniqueArray(selected_entities);
+    selected_relationships = wb.utility.uniqueArray(selected_relationships);
+
     this.shelf.relationships = this.shelf.relationships.filter(function(d) {
       return selected_relationships.indexOf(d) > -1;
     });
@@ -267,11 +290,6 @@ wb.store = {
     });
     if (shelf === 'annotations') return;
 
-    this.shelf.relationships.forEach(function(d) {
-      var r = _this.items.relationships[d];
-      selected_entities.push(r.primary.source);
-      selected_entities.push(r.primary.target);
-    });
     this.shelf.entities = this.shelf.entities.filter(function(d) {
       return selected_entities.indexOf(d) > -1;
     });

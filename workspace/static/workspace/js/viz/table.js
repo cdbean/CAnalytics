@@ -167,9 +167,9 @@ wb.viz.table = function() {
 
         }
         dispatch.filter();
-        */
 
     }
+        */
 
     exports.filter = function(subset) {
       // filter table

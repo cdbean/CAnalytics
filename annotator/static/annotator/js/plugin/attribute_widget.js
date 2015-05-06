@@ -74,7 +74,7 @@ $.widget('custom.attribute_widget', {
                 res['geometry'] = {};
                 var autocomplete = $(row).find('.annotator-attribute-value').data('autocomplete');
                 var place = autocomplete.getPlace();
-                if (place) {
+                if (place && place.geometry) {
                   res['geometry']['geometry'] = [place.geometry.location.lng(), place.geometry.location.lat()];
                   res['geometry']['address'] = place.formatted_address;
                 } else {

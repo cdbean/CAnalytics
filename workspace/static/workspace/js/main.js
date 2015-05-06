@@ -81,7 +81,8 @@ $(function() {
         });
     } else if (viz_name === 'notepad') {
         viz = $('<div>').viznotepad({
-            title: 'Notepad'
+            title: 'Notepad',
+            url: GLOBAL_URL.notepad,
         });
     } else if (viz_name === 'message') {
       viz = $('<div>').vizmessage({
@@ -91,6 +92,10 @@ $(function() {
       viz = $('<div>').vizhistory({
         title: 'History',
         url: GLOBAL_URL.history
+      });
+    } else if (viz_name === 'annotation') {
+      viz = $('<div>').vizannotationtable({
+        title: 'Annotations',
       });
     }
   }

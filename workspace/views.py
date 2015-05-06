@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 import json
 
+from canalytics import settings
+
 from django.contrib.auth.models import Group
 from workspace.models import Case, DataEntry, Entity, Relationship
 from annotator.models import Annotation
@@ -35,7 +37,8 @@ def case(request, case, group):
         "case": case,
         "group": group,
         "datasets": datasets,
-        "users": users
+        "users": users,
+        "notepad_url": settings.NOTEPAD_URL
     })
 
 

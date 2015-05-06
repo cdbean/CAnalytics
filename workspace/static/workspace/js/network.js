@@ -163,10 +163,13 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         if ($(this).hasClass('selected')) {
           if ($(this).hasClass('filter'))
             _this.setMode('filter');
-          else if ($(this).hasClass('draw'))
+          else if ($(this).hasClass('draw')) {
+            alert ('The function has not been implemented yet!');
+            return;
             _this.setMode('draw');
+          }
         } else {
-          _this.setNormalMode();
+          _this.setMode('normal');
         }
       });
     },

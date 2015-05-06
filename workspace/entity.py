@@ -11,6 +11,7 @@ def get_or_create_relationship(data, case, group, user):
 
     if id:
         relationship = Relationship.objects.get(id=id)
+        relationship, new_ents = update_relationship(relationship, data, user)
     else:
         relationship, new_ents = create_relationship(data, case, group, user)
         created = True
@@ -35,6 +36,35 @@ def get_or_create_relationship(data, case, group, user):
     return relationship, created, new_ents
 
 
+def update_relationship(relationship, data, user):
+    new_ents = []
+    attrs = data['attribute']
+    source = attrs['source']
+    target = attrs['target']
+    relation = attrs.get('relation', '')
+    note = attrs.get('note', '')
+    priority = attrs.get('priority', 5)
+
+    if source.isdigit():
+        source = Entity.objects.get(id=source)
+    else:
+        source = create_entity(data, case, group, user)
+        new_ents.append(source)
+    if target.isdigit():
+        target = Entity.objects.get(id=target)
+    else:
+        target = create_entity(data, case, group, user)
+        new_ents.append(target)
+
+    relationship.source = source
+    relationship.target = target
+    relationship.relation = relation
+    relationship.priority = priority
+    relationship.note = note
+    relationship.save()
+    return relationship, new_ents
+
+
 def create_relationship(data, case, group, user):
     new_ents = []
     attrs = data['attribute']
@@ -55,7 +85,7 @@ def create_relationship(data, case, group, user):
         target = create_entity(data, case, group, user)
         new_ents.append(target)
 
-    relationship = Relationship.objects.create(source=source, target=target, relation=relation, note=note, priority=5, case=case, group=group, created_by=user)
+    relationship = Relationship.objects.create(source=source, target=target, relation=relation, note=note, priority=priority, case=case, group=group, created_by=user)
 
     return relationship, new_ents
 
@@ -173,7 +203,7 @@ def set_primary_attr(entity, attr, value, user, case, group):
         new_ents += new_people
         new_rels += new_people_rels
         del_rels += del_people_rels
-    elif attr == 'organization':
+    elif attr == 'organizations':
         new_org, new_org_rels, del_org_rels = set_attr_organization(entity, value, user, case, group)
 
         new_ents += new_org
@@ -327,6 +357,7 @@ def set_attr_organization(entity, value, user, case, group):
             group=group
         )
 
+    print entity, value
     if value and len(value):
         for p in value:
             if p:
