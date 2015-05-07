@@ -1,17 +1,7 @@
 //initialize instance
-wb.help = {};
+wb.help = {}; // help script
 
-wb.help.main = new EnjoyHint({});
-wb.help.dataentry = new EnjoyHint({});
-wb.help.table = new EnjoyHint({});
-wb.help.timeline = new EnjoyHint({});
-wb.help.map = new EnjoyHint({});
-wb.help.network = new EnjoyHint({});
-wb.help.notepad = new EnjoyHint({});
-wb.help.message = new EnjoyHint({});
-wb.help.history = new EnjoyHint({});
-
-wb.help.main.set([
+wb.help.main = [
   {
   'next body': 'Welcome to CAnalytics! I will walk you through its major tools'
   },
@@ -73,9 +63,9 @@ wb.help.main.set([
   {
     'click #case_btn': 'Click here to change to another case'
   },
-]);
+];
 
-wb.help.timeline.set([
+wb.help.timeline = [
   {
     'next .viz.timeline': 'Hover over an event item to view details'
   },
@@ -92,9 +82,9 @@ wb.help.timeline.set([
   {
     'next .viz.timeline': 'Click on any white space in the view and hold and drag your mouse to create a filter area. <br>Events within the area will be filtered<br>Click the filter icon again to deactivate it.'
   },
-]);
+];
 
-wb.help.table.set([
+wb.help.table = [
   {
     event: 'next',
     selector: '.viz.entity .dataTable>tbody>tr>td:first',
@@ -103,9 +93,9 @@ wb.help.table.set([
   {
     'next .viz.entity': 'Double click the cells to edit the attributes'
   },
-]);
+];
 
-wb.help.map.set([
+wb.help.map = [
   {
     'next .viz.map': 'Hover over the pins to view details'
   },
@@ -119,9 +109,9 @@ wb.help.map.set([
     'shape': 'circle',
     'radius': 50
   },
-]);
+];
 
-wb.help.network.set([
+wb.help.network = [
   {
     'next .viz.network': 'Click and drag on white space to drag the whole network'
   },
@@ -144,24 +134,24 @@ wb.help.network.set([
   {
     'next .network-filterbar': 'Check out and hide entities out of interest'
   },
-]);
+];
 
-wb.help.notepad.set([
+wb.help.notepad = [
   {
     'next .viz.notepad': 'The notepad is shared within the group. You can see your teammates typing. Text is color coded by author'
   }
-]);
+];
 
-wb.help.message.set([
+wb.help.message = [
   {
     'next .viz.message': 'You can message your group here'
   },
   {
-    'next .message_content': 'Type message here and press [Enter] to send'
+    'next #message_content': 'Type message here and press [Enter] to send'
   }
-]);
+];
 
-wb.help.history.set([
+wb.help.history = [
   {
     'next .viz.history': 'This view shows the history of your activity and your group\'s'
   },
@@ -171,12 +161,8 @@ wb.help.history.set([
   {
     'next .viz.history': 'Click on the entities to view detail'
   }
-]);
+];
 
 $(function() {
   //set script config
-  if (!$.cookie('hinted')) {
-    wb.help.main.run();
-    $.cookie('hinted', true);
-  }
 });

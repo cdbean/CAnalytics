@@ -957,7 +957,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     help: function() {
-      wb.help.network.run();
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.network);
+      hint.run();
     }
 });
 

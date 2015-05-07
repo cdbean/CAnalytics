@@ -155,6 +155,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
   },
 
   help: function() {
-    wb.help.history.run();
+    var hint = new EnjoyHint({});
+    hint.set(wb.help.history);
+    hint.run();
   }
 });

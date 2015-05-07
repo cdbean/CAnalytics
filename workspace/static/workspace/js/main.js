@@ -38,8 +38,17 @@ $(function() {
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
-    wb.help.main.run();
-  })
+    var hint = new EnjoyHint({});
+    hint.set(wb.help.main);
+    hint.run();
+  });
+
+  if (!$.cookie('hinted')) {
+    var hint = new EnjoyHint({});
+    hint.set(wb.help.main);
+    hint.run();
+    $.cookie('hinted', true);
+  }
 
 
   function onClickOutside() {

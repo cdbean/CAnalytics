@@ -8,17 +8,26 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     this.element.addClass('message');
     this.options.extend.help = this.help;
 
+    // var message_html = ' \
+    //   <div class="wrapper"> \
+    //     <ul class="messages"> \
+    //     </ul> \
+    //     <div class="push"> \
+    //       <div class="footer message_post"> \
+    //         <form style="display:inline;"> \
+    //           <div id="message_content" contentEditable=true data-placeholder="Type here..."> \
+    //           <input type="submit" style="display:none"> \
+    //         </form> \
+    //       </div> \
+    //     </div> \
+    //   </div> \
+    // ';
     var message_html = ' \
-      <div class="wrapper"> \
-        <ul class="messages"> \
-        </ul> \
-        <div class="push"> \
-        </div> \
-      </div> \
-      <div class="footer message_post"> \
-        <form style="display:inline;"> \
+      <div class="messageArea"> \
+        <ul class="messages"></ul> \
+        <form class="inputMessage"> \
           <div id="message_content" contentEditable=true data-placeholder="Type here..."> \
-          <input type="submit" style="display:none"> \
+          <input type="submit" style="display: none;"> \
         </form> \
       </div> \
     ';
@@ -97,6 +106,8 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   },
 
   help: function() {
-    wb.help.message.run();
+    var hint = new EnjoyHint({});
+    hint.set(wb.help.message);
+    hint.run();
   }
 });

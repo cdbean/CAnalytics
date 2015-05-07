@@ -2,6 +2,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     _create: function() {
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore = this.resize.bind(this);
+        this.options.extend.help = this.help;
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.base.dragStop = this.resize.bind(this);
         this._super("_create");
@@ -288,6 +289,12 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     destroy: function() {
         this.map.destroy();
         this._super("_destroy");
+    },
+
+    help: function() {
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.map);
+      hint.run();
     }
 });
 

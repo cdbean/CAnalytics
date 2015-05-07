@@ -77,7 +77,9 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     },
 
     help: function() {
-      wb.help.table.run();
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.table);
+      hint.run();
     }
 });
 
