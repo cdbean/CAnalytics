@@ -20,7 +20,9 @@ wb.help.main = [
     'radius': 80
   },
   {
-    'next .annotator-editor': 'This is the editor to help you organize your annotation. We are actively working on various utilities to help you input your annotations even faster'
+    selector: '.annotator-editor .annotator-widget',
+    event: 'next',
+    description: 'This is the editor to help you organize your annotation. <br>We are actively working on various utilities to help you input your annotations even faster'
   },
   {
   'next input.entity_name': 'The selected text is used as the default name of the entity. Change the name if necessary'
@@ -38,10 +40,13 @@ wb.help.main = [
   'next .annotator-checkbox': 'Check here if you want to mark the text as that entity over the whole documents'
   },
   {
-  'click .annotator-controls': 'Click to save or cancel the annotation'
+    selector: '.annotator-editor .annotator-widget .annotator-controls',
+    event: 'click',
+    description: 'Click to save or cancel the annotation'
   },
   {
-    'click #tool-nav': 'click to open the table of people and you will find the person you just annotated'
+    'click #tool-nav': 'click to open the table of people and you will find the person you just annotated',
+    'bottom': 100
   },
   {
     'next .viz.entity': 'This is a table of people. You can double click the cells to edit the attributes'
