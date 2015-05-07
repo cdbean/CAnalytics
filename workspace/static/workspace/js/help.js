@@ -3,13 +3,13 @@ wb.help = {}; // help script
 
 wb.help.main = [
   {
-  'next body': 'Welcome to CAnalytics! I will walk you through its major tools'
+  'next body': 'Welcome to CAnalytics! I will walk you through its major tools',
   },
   {
   'click #dataentry-btn': 'Start by clicking here to open the document view'
   },
   {
-  'next .dataTable>tbody>tr>td:nth-child(2)': 'As you read through the document, you can make annotations to critical text. <br>Let\'s say you come across a person\'s name and want to annotate it'
+  'next .dataTable>tbody>tr>td:nth-child(2)': 'As you read through the document, you can make annotations to critical text. <br>Let\'s say you come across a person\'s name and want to annotate it',
   },
   {
     'mouseup .dataTable>tbody>tr>td:nth-child(2)': 'First, select the text of the person\'s name'
@@ -21,7 +21,7 @@ wb.help.main = [
   },
   {
     selector: '.annotator-editor .annotator-widget',
-    event: 'next',
+    event_type: 'next',
     description: 'This is the editor to help you organize your annotation. <br>We are actively working on various utilities to help you input your annotations even faster'
   },
   {
@@ -45,22 +45,23 @@ wb.help.main = [
     description: 'Click to save or cancel the annotation'
   },
   {
-    'click #tool-nav': 'click to open the table of people and you will find the person you just annotated',
-    'bottom': 100
+    'next #table-dropdown': 'click to open the table of people and you will find the person you just annotated',
+    'bottom': -300
   },
   {
     'next .viz.entity': 'This is a table of people. You can double click the cells to edit the attributes'
   },
   {
-    'click #tool-nav': 'click to open the table of annotations and you will find the annotation you just made'
+    'next #table-dropdown': 'click to open the table of annotations and you will find the annotation you just made',
+    'bottom': -300
   },
   {
     event: 'click',
-    selector: '.viz.entity .dataTable>tbody>tr>td:first',
+    selector: '.viz.annotation .dataTable>tbody>tr>td:nth-child(1)',
     description: 'Click on any cell in the first column of the table to make a filter. Note the change in other views<br>Click on the cell again to remove the filter<br>Hold [shift] to filter on multiple cells'
   },
   {
-    'next': 'Try creating other types of entities and see how they will be displayed in different views (e.g. locations in map, relationships in network, events in timeline)'
+    'next body': 'Try creating other types of entities and see how they will be displayed in different views (e.g. locations in map, relationships in network, events in timeline)'
   },
   {
     'next #userlist': 'Here you will see who are joining you in this workspace. You may also change the user color by clicking it'
