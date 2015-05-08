@@ -1,4 +1,4 @@
-(function() {
+$(function() {
   if (wb.info.user) {
     ishout.init(function() {
 
@@ -151,4 +151,4 @@
   function onNewAction(data) {
     $.publish('action/new', data);
   }
-})();
+});

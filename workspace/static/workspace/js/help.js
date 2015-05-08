@@ -1,6 +1,7 @@
 //initialize instance
-wb.help = {};
+wb.help = {}; // help script
 
+<<<<<<< HEAD
 wb.help.main = new EnjoyHint({});
 wb.help.dataentry = new EnjoyHint({});
 wb.help.table = new EnjoyHint({});
@@ -12,14 +13,17 @@ wb.help.message = new EnjoyHint({});
 wb.help.history = new EnjoyHint({});
 
 wb.help.main.setScript([
+=======
+wb.help.main = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
-  'next body': 'Welcome to CAnalytics! I will walk you through its major tools'
+  'next body': 'Welcome to CAnalytics! I will walk you through its major tools',
   },
   {
   'click #dataentry-btn': 'Start by clicking here to open the document view'
   },
   {
-  'next .dataTable>tbody>tr>td:nth-child(2)': 'As you read through the document, you can make annotations to critical text. <br>Let\'s say you come across a person\'s name and want to annotate it'
+  'next .dataTable>tbody>tr>td:nth-child(2)': 'As you read through the document, you can make annotations to critical text. <br>Let\'s say you come across a person\'s name and want to annotate it',
   },
   {
     'mouseup .dataTable>tbody>tr>td:nth-child(2)': 'First, select the text of the person\'s name'
@@ -30,7 +34,9 @@ wb.help.main.setScript([
     'radius': 80
   },
   {
-    'next .annotator-editor': 'This is the editor to help you organize your annotation. We are actively working on various utilities to help you input your annotations even faster'
+    selector: '.annotator-editor .annotator-widget',
+    event_type: 'next',
+    description: 'This is the editor to help you organize your annotation. <br>We are actively working on various utilities to help you input your annotations even faster'
   },
   {
   'next input.entity_name': 'The selected text is used as the default name of the entity. Change the name if necessary'
@@ -48,24 +54,28 @@ wb.help.main.setScript([
   'next .annotator-checkbox': 'Check here if you want to mark the text as that entity over the whole documents'
   },
   {
-  'click .annotator-controls': 'Click to save or cancel the annotation'
+    selector: '.annotator-editor .annotator-widget .annotator-controls',
+    event: 'click',
+    description: 'Click to save or cancel the annotation'
   },
   {
-    'click #tool-nav': 'click to open the table of people and you will find the person you just annotated'
+    'next #table-dropdown': 'click to open the table of people and you will find the person you just annotated',
+    'bottom': -300
   },
   {
     'next .viz.entity': 'This is a table of people. You can double click the cells to edit the attributes'
   },
   {
-    'click #tool-nav': 'click to open the table of annotations and you will find the annotation you just made'
+    'next #table-dropdown': 'click to open the table of annotations and you will find the annotation you just made',
+    'bottom': -300
   },
   {
     event: 'click',
-    selector: '.viz.entity .dataTable>tbody>tr>td:first',
+    selector: '.viz.annotation .dataTable>tbody>tr>td:nth-child(1)',
     description: 'Click on any cell in the first column of the table to make a filter. Note the change in other views<br>Click on the cell again to remove the filter<br>Hold [shift] to filter on multiple cells'
   },
   {
-    'next': 'Try creating other types of entities and see how they will be displayed in different views (e.g. locations in map, relationships in network, events in timeline)'
+    'next body': 'Try creating other types of entities and see how they will be displayed in different views (e.g. locations in map, relationships in network, events in timeline)'
   },
   {
     'next #userlist': 'Here you will see who are joining you in this workspace. You may also change the user color by clicking it'
@@ -73,9 +83,13 @@ wb.help.main.setScript([
   {
     'click #case_btn': 'Click here to change to another case'
   },
-]);
+];
 
+<<<<<<< HEAD
 wb.help.timeline.setScript([
+=======
+wb.help.timeline = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.timeline': 'Hover over an event item to view details'
   },
@@ -92,9 +106,13 @@ wb.help.timeline.setScript([
   {
     'next .viz.timeline': 'Click on any white space in the view and hold and drag your mouse to create a filter area. <br>Events within the area will be filtered<br>Click the filter icon again to deactivate it.'
   },
-]);
+];
 
+<<<<<<< HEAD
 wb.help.table.setScript([
+=======
+wb.help.table = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     event: 'next',
     selector: '.viz.entity .dataTable>tbody>tr>td:first',
@@ -103,9 +121,13 @@ wb.help.table.setScript([
   {
     'next .viz.entity': 'Double click the cells to edit the attributes'
   },
-]);
+];
 
+<<<<<<< HEAD
 wb.help.map.setScript([
+=======
+wb.help.map = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.map': 'Hover over the pins to view details'
   },
@@ -119,9 +141,13 @@ wb.help.map.setScript([
     'shape': 'circle',
     'radius': 50
   },
-]);
+];
 
+<<<<<<< HEAD
 wb.help.network.setScript([
+=======
+wb.help.network = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.network': 'Click and drag on white space to drag the whole network'
   },
@@ -144,24 +170,36 @@ wb.help.network.setScript([
   {
     'next .network-filterbar': 'Check out and hide entities out of interest'
   },
-]);
+];
 
+<<<<<<< HEAD
 wb.help.notepad.setScript([
+=======
+wb.help.notepad = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.notepad': 'The notepad is shared within the group. You can see your teammates typing. Text is color coded by author'
   }
-]);
+];
 
+<<<<<<< HEAD
 wb.help.message.setScript([
+=======
+wb.help.message = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.message': 'You can message your group here'
   },
   {
-    'next .message_content': 'Type message here and press [Enter] to send'
+    'next #message_content': 'Type message here and press [Enter] to send'
   }
-]);
+];
 
+<<<<<<< HEAD
 wb.help.history.setScript([
+=======
+wb.help.history = [
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.history': 'This view shows the history of your activity and your group\'s'
   },
@@ -171,12 +209,15 @@ wb.help.history.setScript([
   {
     'next .viz.history': 'Click on the entities to view detail'
   }
-]);
+];
 
 $(function() {
   //set script config
+<<<<<<< HEAD
   if (!$.cookie('hinted')) {
     wb.help.main.runScript();
     $.cookie('hinted', true);
   }
+=======
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
 });

@@ -3,6 +3,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         this.options.base.resizeStop = this.resize.bind(this);
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
+        this.options.extend.help  = this.help;
         this.element.addClass('annotation');
         this._super('_create');
 
@@ -60,6 +61,12 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
           wb.utility.scrollTo(row, $(this).parents('.dataTables_scrollBody'));
         }
       });
+    },
+
+    help: function() {
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.table);
+      hint.run();
     }
 });
 

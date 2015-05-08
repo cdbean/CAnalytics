@@ -81,7 +81,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     },
 
     help: function() {
-      wb.help.timeline.run();
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.timeline);
+      hint.run();
     }
 });
 

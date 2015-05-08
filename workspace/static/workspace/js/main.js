@@ -38,8 +38,22 @@ $(function() {
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
+<<<<<<< HEAD
     wb.help.main.runScript();
   })
+=======
+    var hint = new EnjoyHint({});
+    hint.set(wb.help.main);
+    hint.run();
+  });
+
+  if (!$.cookie('hinted')) {
+    var hint = new EnjoyHint({});
+    hint.set(wb.help.main);
+    hint.run();
+    $.cookie('hinted', true);
+  }
+>>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
 
 
   function onClickOutside() {

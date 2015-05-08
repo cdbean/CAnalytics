@@ -6,7 +6,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
         this.options.base.dragStop = this.resize.bind(this);
         this.options.extend.help = this.help;
         this._super("_create");
-        this.element.addClass("viznotepad");
+        this.element.addClass("notepad");
         var height = this.element.height();
 
         var id = this.element[0].id + '-container';
@@ -82,6 +82,8 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
     },
 
     help: function() {
-      wb.help.notepad.run();
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.notepad);
+      hint.run();
     }
 });

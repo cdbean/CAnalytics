@@ -1,16 +1,17 @@
-.viz.message .wrapper {
+.viz.message .messageArea {
   margin: 0 auto -40px;
-  min-height: 100%;
-  height: auto !important;
+  height: 100%;
+  padding-bottom: 60px;
 }
 
-.viz.message .push, .viz.message .footer {
-  height: 40px;
-}
-
-.viz.message .message_post form #message_content {
+.viz.message .inputMessage #message_content {
   -moz-appearance: textfield;
   -webkit-appearance: textfield;
+  bottom: 0;
+  height: 60px;
+  left: 0;
+  right: 0;
+  position: absolute;
   background-color: white;
   background-color: -moz-field;
   border: 1px solid darkgray;
@@ -25,6 +26,8 @@
   margin: 0;
   padding: 10px 20px 10px 20px;
   list-style: none;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .viz.message li.message {
