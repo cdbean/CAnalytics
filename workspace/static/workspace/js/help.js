@@ -11,7 +11,7 @@ wb.help.notepad = new EnjoyHint({});
 wb.help.message = new EnjoyHint({});
 wb.help.history = new EnjoyHint({});
 
-wb.help.main.set([
+wb.help.main.setScript([
   {
   'next body': 'Welcome to CAnalytics! I will walk you through its major tools'
   },
@@ -75,7 +75,7 @@ wb.help.main.set([
   },
 ]);
 
-wb.help.timeline.set([
+wb.help.timeline.setScript([
   {
     'next .viz.timeline': 'Hover over an event item to view details'
   },
@@ -94,7 +94,7 @@ wb.help.timeline.set([
   },
 ]);
 
-wb.help.table.set([
+wb.help.table.setScript([
   {
     event: 'next',
     selector: '.viz.entity .dataTable>tbody>tr>td:first',
@@ -105,7 +105,7 @@ wb.help.table.set([
   },
 ]);
 
-wb.help.map.set([
+wb.help.map.setScript([
   {
     'next .viz.map': 'Hover over the pins to view details'
   },
@@ -121,7 +121,7 @@ wb.help.map.set([
   },
 ]);
 
-wb.help.network.set([
+wb.help.network.setScript([
   {
     'next .viz.network': 'Click and drag on white space to drag the whole network'
   },
@@ -146,13 +146,13 @@ wb.help.network.set([
   },
 ]);
 
-wb.help.notepad.set([
+wb.help.notepad.setScript([
   {
     'next .viz.notepad': 'The notepad is shared within the group. You can see your teammates typing. Text is color coded by author'
   }
 ]);
 
-wb.help.message.set([
+wb.help.message.setScript([
   {
     'next .viz.message': 'You can message your group here'
   },
@@ -161,7 +161,7 @@ wb.help.message.set([
   }
 ]);
 
-wb.help.history.set([
+wb.help.history.setScript([
   {
     'next .viz.history': 'This view shows the history of your activity and your group\'s'
   },
@@ -176,7 +176,7 @@ wb.help.history.set([
 $(function() {
   //set script config
   if (!$.cookie('hinted')) {
-    wb.help.main.run();
+    wb.help.main.runScript();
     $.cookie('hinted', true);
   }
 });

@@ -38,7 +38,7 @@ $(function() {
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
-    wb.help.main.run();
+    wb.help.main.runScript();
   })
 
 
