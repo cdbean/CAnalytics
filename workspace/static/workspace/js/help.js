@@ -1,7 +1,6 @@
 //initialize instance
 wb.help = {}; // help script
 
-<<<<<<< HEAD
 wb.help.main = new EnjoyHint({});
 wb.help.dataentry = new EnjoyHint({});
 wb.help.table = new EnjoyHint({});
@@ -12,10 +11,7 @@ wb.help.notepad = new EnjoyHint({});
 wb.help.message = new EnjoyHint({});
 wb.help.history = new EnjoyHint({});
 
-wb.help.main.setScript([
-=======
 wb.help.main = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
   'next body': 'Welcome to CAnalytics! I will walk you through its major tools',
   },
@@ -85,11 +81,7 @@ wb.help.main = [
   },
 ];
 
-<<<<<<< HEAD
-wb.help.timeline.setScript([
-=======
 wb.help.timeline = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.timeline': 'Hover over an event item to view details'
   },
@@ -108,11 +100,7 @@ wb.help.timeline = [
   },
 ];
 
-<<<<<<< HEAD
-wb.help.table.setScript([
-=======
 wb.help.table = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     event: 'next',
     selector: '.viz.entity .dataTable>tbody>tr>td:first',
@@ -123,11 +111,7 @@ wb.help.table = [
   },
 ];
 
-<<<<<<< HEAD
-wb.help.map.setScript([
-=======
 wb.help.map = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.map': 'Hover over the pins to view details'
   },
@@ -143,11 +127,7 @@ wb.help.map = [
   },
 ];
 
-<<<<<<< HEAD
-wb.help.network.setScript([
-=======
 wb.help.network = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.network': 'Click and drag on white space to drag the whole network'
   },
@@ -172,21 +152,13 @@ wb.help.network = [
   },
 ];
 
-<<<<<<< HEAD
-wb.help.notepad.setScript([
-=======
 wb.help.notepad = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.notepad': 'The notepad is shared within the group. You can see your teammates typing. Text is color coded by author'
   }
 ];
 
-<<<<<<< HEAD
-wb.help.message.setScript([
-=======
 wb.help.message = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.message': 'You can message your group here'
   },
@@ -195,11 +167,7 @@ wb.help.message = [
   }
 ];
 
-<<<<<<< HEAD
-wb.help.history.setScript([
-=======
 wb.help.history = [
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
   {
     'next .viz.history': 'This view shows the history of your activity and your group\'s'
   },
@@ -211,13 +179,3 @@ wb.help.history = [
   }
 ];
 
-$(function() {
-  //set script config
-<<<<<<< HEAD
-  if (!$.cookie('hinted')) {
-    wb.help.main.runScript();
-    $.cookie('hinted', true);
-  }
-=======
->>>>>>> b966902abbf5a6d538c8d5ffd1456b2e6b21dc14
-});
