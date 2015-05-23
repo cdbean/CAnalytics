@@ -538,7 +538,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             d.fixed = true;
         }
         function zoomed() {
-            _this.svg.attr("transform",
+            _this.chart.attr("transform",
                 "translate(" + d3.event.translate + ")"
                     + " scale(" + d3.event.scale + ")");
         }
