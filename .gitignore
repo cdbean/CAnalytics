@@ -34,3 +34,5 @@ run_gunicorn.sh
 
 dump.rdb
 /*/.ropeproject/
+
+nohup.out
