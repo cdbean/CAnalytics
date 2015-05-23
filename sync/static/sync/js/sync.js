@@ -1,11 +1,8 @@
 $(function() {
-  if (wb.info.user) {
-    ishout.init(function() {
+  ishout.init();
 
-    });
-
-    // join room
-    // TODO: avoid hard code group name
+  // join room
+  $.subscribe('users/loaded', function() {
     var room = wb.info.case + '-' + wb.info.group;
     room = room.replace(/\s/g, '');
     ishout.joinRoom(room, function(data) {
@@ -17,7 +14,7 @@ $(function() {
         'group': wb.info.group,
       });
     });
-  }
+  });
 
 
   ishout.on('message', onNewMessage);

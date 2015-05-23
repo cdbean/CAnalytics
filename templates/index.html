@@ -107,26 +107,27 @@
 {% endblock %}
 
 {% block page-body %}
-    <script language='javascript'>
-        USER    = {{ user.id }};
-        CASE = {{ case.id }};
-        GROUP = {{ group.id }};
-        GLOBAL_URL = {
-          users: "{% url 'account:users' %}",
-          data: "{% url 'ws:data' %}",
-          annotation: "{% url 'annotation:annotation' %}",
-          static: "{{STATIC_URL}}",
-          history: "{% url 'log:logs' %}",
-          message: "{% url 'sync:message' %}",
-          messages: "{% url 'sync:messages' %}",
-          log: "{% url 'log:log' %}",
-          entity_id: "{% url 'ws:entity_id' 0 %}",
-          notepad: '{{notepad_url}}'
-        }
+  <div class="filter-div"><ul class="filter-list"></ul></div>
+  <script language='javascript'>
+      USER    = {{ user.id }};
+      CASE = {{ case.id }};
+      GROUP = {{ group.id }};
+      GLOBAL_URL = {
+        users: "{% url 'account:users' %}",
+        data: "{% url 'ws:data' %}",
+        annotation: "{% url 'annotation:annotation' %}",
+        static: "{{STATIC_URL}}",
+        history: "{% url 'log:logs' %}",
+        message: "{% url 'sync:message' %}",
+        messages: "{% url 'sync:messages' %}",
+        log: "{% url 'log:log' %}",
+        entity_id: "{% url 'ws:entity_id' 0 %}",
+        notepad: '{{notepad_url}}'
+      }
 
-    </script>
+  </script>
 
-    <div id="progressbar" style="display:none;"><div class="progress-label">Updating Data...</div></div>
+  <div id="progressbar" style="display:none;"><div class="progress-label">Updating Data...</div></div>
 
 
 {% endblock %}

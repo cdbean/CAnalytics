@@ -26,6 +26,9 @@ $.get(GLOBAL_URL.users, {
   // change the color of the user name in nav bar
   var mycolor = wb.info.users[wb.info.user].color;
   $('.nav #username').css('color', mycolor);
+  
+  // after users are loaded, join room and fetch users online
+  $.publish('users/loaded');
 });
 
 
