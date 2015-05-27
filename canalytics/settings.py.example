@@ -36,7 +36,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'drealtime',
     'compressor',
+    'account',
     'workspace',
     'logger',
     'annotator',
@@ -64,10 +67,10 @@ WSGI_APPLICATION = 'canalytics.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'canalytics_v3',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'ca_pilot',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'canalytics',
+        'USER': 'postgres',
         'PASSWORD': 'asdf1234',
         'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
@@ -99,6 +102,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+STATIC_ROOT = ''
+
 
 # Compress js and css file
 # to install it, run 'pip install django_compressor'
@@ -106,3 +111,8 @@ COMPRESS_JS_FILTERS = [
     'compressor.filters.template.TemplateFilter',
 ]
 COMPRESS_ENABLED = False
+
+# URL and port of notepad, needs to match etherpad settings
+NOTEPAD_URL = 'http://127.0.0.1:9001'
+# URL and port of ishout, set it to whatever port that has not been used
+ISHOUT_CLIENT_ADDR = 'localhost:5500'
