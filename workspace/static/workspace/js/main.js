@@ -12,6 +12,7 @@ wb.store.loadItems(GLOBAL_URL.data, {
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 wb.editor = $('<div>').appendTo('body').vizeditor().data('instance');
 
+
 // get all users in this group
 $.get(GLOBAL_URL.users, {
   case: wb.info.case,
@@ -33,6 +34,7 @@ $.get(GLOBAL_URL.users, {
 
 
 $(function() {
+  $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
 
   $('.viz-opts').click(onVizSelect);
@@ -53,6 +55,12 @@ $(function() {
     $.cookie('hinted', true);
   }
 
+
+  function onRemoveFilter(e) {
+    var item = $(e.target).parent();
+    var data = item.find('a').data();
+    wb.filter.remove(item, data);
+  }
 
   function onClickOutside() {
     wb.viewer.hide();

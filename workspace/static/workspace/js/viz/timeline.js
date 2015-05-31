@@ -335,6 +335,15 @@ wb.viz.timeline = function() {
       shelf_by.push(d.id);
     });
     wb.store.shelf_by.entities = shelf_by;
+    var ext = brush.extent();
+    $('.filter-div .filter-item').filter(function(i, item) {
+      return $(item).find('a').data('item') === 'time';
+    }).remove();
+    if (!brush.empty()) {
+      wb.filter.add('time: ' + wb.utility.formatDateTime(ext[0]) + ' - ' + wb.utility.formatDateTime(ext[1]), {
+        item: 'time',
+      });
+    }
     dispatch.filter();
   }
 

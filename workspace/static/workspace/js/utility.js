@@ -7,17 +7,17 @@ OpenLayers.Feature.Vector.prototype.toString = function() {
 wb.utility = {};
 
 wb.utility.formatDate = function(d) {
-  if (d) return d3.time.format("%B %d, %Y");
+  if (d) return d3.time.format("%B %d, %Y")(d);
   return '';
 };
 
 wb.utility.formatTime = function(d) {
-  if (d) return d3.time.format("%I:%M:%p");
+  if (d) return d3.time.format("%I:%M:%p")(d);
   return '';
 };
 
 wb.utility.formatDateTime = function(d) {
-  if (d) d3.time.format("%B %d, %Y-%I:%M:%p");
+  if (d) return d3.time.format("%B %d, %Y-%I:%M %p")(d);
   return '';
 };
 

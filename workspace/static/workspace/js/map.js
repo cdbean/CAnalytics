@@ -253,6 +253,11 @@ $.widget("viz.vizmap", $.viz.vizbase, {
               var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
               if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
             });
+
+            $('.filter-div .filter-item').filter(function(i, item) {
+              return $(item).find('a').data('item') === 'map';
+            }).remove();
+
             wb.log({
                 operation: 'removed filter in',
                 item: 'map',
@@ -267,7 +272,13 @@ $.widget("viz.vizmap", $.viz.vizbase, {
 
             var selected_names = selectedFeas.map(function(id) {
               return wb.store.items.entities[id].primary.name;
-            })
+            });
+
+            $('.filter-div .filter-item').filter(function(i, item) {
+              return $(item).find('a').data('item') === 'map';
+            }).remove();
+
+            wb.filter.add('map filter', {'item': 'map'});
 
             wb.log({
                 operation: 'filtered in',

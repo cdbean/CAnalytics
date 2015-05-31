@@ -24,6 +24,16 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
               });
               shelf_by = wb.utility.diffArray(shelf_by, wb.utility.diffArray(entities, selected));
               wb.store.shelf_by.entities = shelf_by;
+              $('.filter-div .filter-item').filter(function(i, item) {
+                return wb.store.static.entity_types.indexOf($(item).find('a').data('item')) > -1;
+              }).remove();
+              shelf_by.forEach(function(d) {
+                var entity = wb.store.items.entities[d];
+                wb.filter.add(entity.primary.entity_type + ': ' + entity.primary.name, {
+                  item: entity.primary.entity_type,
+                  id: entity.meta.id
+                });
+              });
               $.publish('data/filter', '#' + this.element.attr('id'));
             }.bind(this))
         ;

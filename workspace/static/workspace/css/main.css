@@ -109,3 +109,19 @@ a.entity:hover:after {
 .active {
   background-color: #B0BED9 !important;
 }
+
+.filter-list {
+  list-style-type: none;
+}
+
+.filter-list li {
+  display: inline;
+  margin-right: 20px;
+  padding: 5px;
+  background-color: beige;
+}
+
+.filter-list .remove {
+  cursor: pointer;
+}
+

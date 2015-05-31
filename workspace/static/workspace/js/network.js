@@ -480,6 +480,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     return d.selected = false;
                 });
 
+                $('.filter-div .filter-item').filter(function(i, item) {
+                  return $(item).find('a').data('item') === 'relationship';
+                }).remove();
+
                 wb.log({
                     operation: 'removed filter in',
                     item: 'network',
@@ -495,6 +499,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     selected_names.push(r.primary.relation);
                 })
                 wb.store.shelf_by.relationships = rels_id;
+                
+                $('.filter-div .filter-item').filter(function(i, item) {
+                  return $(item).find('a').data('item') === 'relationship';
+                }).remove();
+                rels_id.forEach(function(d) {
+                  var rel = wb.store.items.relationships[d];
+                  wb.filter.add('relation: ' + rel.primary.relation, {
+                    item: 'relationship',
+                    id: d
+                  });
+                });
                 wb.log({
                     operation: 'filtered in',
                     item: 'network',
