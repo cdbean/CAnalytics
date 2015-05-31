@@ -506,7 +506,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 rels_id.forEach(function(d) {
                   var rel = wb.store.items.relationships[d];
                   wb.filter.add('relation: ' + rel.primary.relation, {
-                    item: 'relationship',
+                    item: 'relationships',
                     id: d
                   });
                 });
