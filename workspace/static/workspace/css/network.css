@@ -156,3 +156,21 @@ path.dragline {
   color: rgb(1, 4, 15);
 }
 
+.network .rel-list {
+  list-style-type: none;
+  position: absolute;
+  margin-top: 70px;
+  margin-left: 5px;
+  max-width: 100px;
+  height: 100%;
+  overflow: scroll;
+  padding:0;
+}
+
+.network .rel-item input[type=checkbox] {
+  margin-right: 2px;
+}
+
+.network .rel-item label {
+  font-weight: normal;
+}
