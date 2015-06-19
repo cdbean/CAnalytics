@@ -36,12 +36,26 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         var entity = wb.store.items.entities[d];
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
-            data.push({
-              start: entity.primary.start_date,
-              end: entity.primary.end_date,
-              label: entity.primary.name,
-              id: entity.meta.id
-            });
+            if (entity.primary.repeated) {
+              var repeated_until = wb.utility.Date(entity.primary.repeated_until);
+              var delta = entity.primary.end_date - entity.primary.start_date;
+              var date = wb.utility.Date(entity.primary.start_date);
+              while (date <= repeated_until) {
+                data.push({
+                  start: date, 
+                  end: date + delta,
+                  lavel: entity.primary.name,
+                  id: entity.meta.id
+                });
+              }
+            } else {
+              data.push({
+                start: entity.primary.start_date,
+                end: entity.primary.end_date,
+                label: entity.primary.name,
+                id: entity.meta.id
+              });
+            }
           }
         }
       }

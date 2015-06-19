@@ -210,7 +210,7 @@ def set_primary_attr(entity, attr, value, user, case, group):
         new_rels += new_org_rels
         del_rels += del_org_rels
 
-    elif 'date' in attr:
+    elif 'date' in attr or attr == 'repeated_until':
         if value == '':
             value = None
         else:

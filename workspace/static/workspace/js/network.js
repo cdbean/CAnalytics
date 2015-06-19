@@ -180,7 +180,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       ';
       $(list_html).appendTo(this.element)
         .on('click', 'input[type=checkbox]', this.onFilterRel.bind(this))
-        .on('mouseover', '.rel-item', this.onMouseOverRel.bind(this));
+        .on('mouseover', '.rel-item', this.onMouseOverRel.bind(this))
         .on('mouseout', '.rel-item', this.onMouseOutRel.bind(this));
     },
 

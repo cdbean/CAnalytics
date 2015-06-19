@@ -120,6 +120,20 @@ $.widget('custom.attribute_widget', {
             });
           }
         });
+      } else if (attr === 'repeated') {
+        var html = '<input type="checkbox" name="repeated">weekly';
+        input.replaceWith(html);
+
+      } else if (attr === 'repeated_until') {
+        input.datetimepicker({
+          onShow: function() {
+            var $input = $('.annotator-attribute-input[value=end_date]');
+            var date = $input.parent().next().children().val();
+            this.setOptions({
+              value: date
+            });
+          }
+        });
       } else if (attr === 'address') {
         // initialize as google place search
         var autocomplete = new google.maps.places.Autocomplete(input[0]);
