@@ -1,4 +1,6 @@
 $(function() {
+  if (! ("ishout" in window)) return;
+
   ishout.init();
 
   // join room
