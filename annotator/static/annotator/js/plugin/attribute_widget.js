@@ -89,6 +89,9 @@ $.widget('custom.attribute_widget', {
                 if (value) value = value.split(',');
                 else value = [];
                 res[attr] = value;
+              } else if (attr === 'repeated') {
+                value = $(row).find('.annotator-attribute-value')[0].checked;
+                res[attr] = value;
               } else {
                 attr = Annotator.Util.escape(attr);
                 value = Annotator.Util.escape(value);
@@ -121,7 +124,7 @@ $.widget('custom.attribute_widget', {
           }
         });
       } else if (attr === 'repeated') {
-        var html = '<input type="checkbox" name="repeated">weekly';
+        var html = '<input class="annotator-attribute-value" type="checkbox" name="repeated" value="true">weekly';
         input.replaceWith(html);
 
       } else if (attr === 'repeated_until') {

@@ -109,6 +109,29 @@
 
 {% block page-body %}
   <div class="filter-div"><ul class="filter-list"></ul></div>
+  <!-- Modal -->
+  <div class="modal fade" id="repeat-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Repeated events</h4>
+        </div>
+        <div class="modal-body">
+          <form id="repeat-form">
+            <div class="form-group">
+              <label for="repeat-days">Repeat every</label>
+              <input class="form-control" type="checkbox" id="repeat-days"> <span>Week</span>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script language='javascript'>
       USER    = {{ user.id }};
       CASE = {{ case.id }};

@@ -1,5 +1,8 @@
 $(function() {
-  if (! ("ishout" in window)) return;
+  if (! ("ishout" in window)) {
+    wb.utility.notify('Collaboration features unavailable at the moment');
+    return;
+  }
 
   ishout.init();
 

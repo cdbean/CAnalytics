@@ -37,16 +37,20 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
             if (entity.primary.repeated) {
+              var repeat_delta = 1000 * 3600 * 24 * 7; // hard code: repeat every week
               var repeated_until = wb.utility.Date(entity.primary.repeated_until);
-              var delta = entity.primary.end_date - entity.primary.start_date;
-              var date = wb.utility.Date(entity.primary.start_date);
+              var start_date = wb.utility.Date(entity.primary.start_date);
+              var end_date = wb.utility.Date(entity.primary.end_date);
+              var delta = end_date - start_date;
+              var date = start_date;
               while (date <= repeated_until) {
                 data.push({
                   start: date, 
-                  end: date + delta,
-                  lavel: entity.primary.name,
+                  end: new Date(date + delta),
+                  label: entity.primary.name,
                   id: entity.meta.id
                 });
+                date = new Date(date.getTime() + repeat_delta);
               }
             } else {
               data.push({

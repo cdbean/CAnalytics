@@ -15,6 +15,8 @@ wb.viz.timeline = function() {
 
   var dispatch = d3.dispatch('filter');
 
+  var formatDate = d3.time.format("%m/%d/%Y-%H:%M:%S");
+
   function exports(selection) {
 
     width = outwidth - margin.left - margin.right;
@@ -294,8 +296,8 @@ wb.viz.timeline = function() {
 
 
   function parseDate(d) {
-    var format = d3.time.format("%m/%d/%Y-%H:%M:%S");
-    return format.parse(d);
+    if (typeof d === 'string') return formatDate.parse(d);
+    return d;
   }
 
 
