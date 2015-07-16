@@ -80,7 +80,7 @@ wb.viz.timeline = function() {
 
       var items = chart.selectAll('svg')
         .data(data, function(d) {
-          return d.id;
+          return d.lid; // local id
       });
 
       items.exit().remove();

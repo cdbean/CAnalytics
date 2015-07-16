@@ -43,14 +43,17 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
               var end_date = wb.utility.Date(entity.primary.end_date);
               var delta = end_date - start_date;
               var date = start_date;
+              var index = 0;
               while (date <= repeated_until) {
                 data.push({
                   start: date, 
-                  end: new Date(date + delta),
+                  end: new Date(date.getTime() + delta),
                   label: entity.primary.name,
+                  lid: entity.meta.id + '-' + index, // local id, for viz only
                   id: entity.meta.id
                 });
                 date = new Date(date.getTime() + repeat_delta);
+                index ++;
               }
             } else {
               data.push({
