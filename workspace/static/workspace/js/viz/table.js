@@ -43,12 +43,12 @@ wb.viz.table = function() {
             });
 
             if (editable) {
-                $('td', table.fnGetNodes()).editable("entity/attributes", {
+                $('td', table.fnGetNodes()).editable(GLOBAL_URL.entity_attr, {
                     tooltip: "Double click to edit",
                     cancel: "Cancel",
                     submit: "Save",
                     event: "dblclick",
-                    indicator: '<img src="/static/dashboard/img/wait.gif">',
+                    indicator: '<img src="/static/lib/jEditable/img/indicator.gif">',
                     placeholder: "",
                     callback: function( sValue, y ) {
                         var aPos = table.fnGetPosition( this );
@@ -60,7 +60,9 @@ wb.viz.table = function() {
                         var attr = table.fnSettings().aoColumns[column].sTitle.toLowerCase();
                         return {
                             id: $(this.parentNode).data("id"),
-                            attribute: attr,
+                            attr: attr,
+                            group: GROUP,
+                            case: CASE,
                         };
                     }
                 });

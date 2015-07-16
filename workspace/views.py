@@ -8,8 +8,9 @@ from canalytics import settings
 from django.contrib.auth.models import Group
 from workspace.models import Case, DataEntry, Entity, Relationship
 from annotator.models import Annotation
-from workspace.entity import get_or_create_entity
+from workspace.entity import get_or_create_entity, set_primary_attr
 from sync.views import sync_item
+from logger.views import serverlog
 
 # Create your views here.
 @login_required
@@ -90,6 +91,43 @@ def entity(request, id):
         sync_item('update', 'entity', res, case, group, request.user)
 
         return HttpResponse(json.dumps(res), content_type='application/json')
+
+def entity_attr(request):
+    if request.method == 'POST':
+        id = request.POST['id']
+        case = request.POST['case']
+        group = request.POST['group']
+        attr = request.POST['attr']
+        value = request.POST['value']
+
+        case = Case.objects.get(id=case)
+        group = Group.objects.get(id=group)
+        entity = Entity.objects.filter(id=id).select_subclasses()[0]
+        fields = entity._meta.get_all_field_names()
+        if (attr in fields):
+            set_primary_attr(entity, attr, value, request.user, case, group)
+        else:
+            attribute, created = Attribute.objects.get_or_create(attr=attr, val=value)
+            entity.attributes.add(attribute)
+
+        entity.save()
+        serverlog({
+            'user': request.user,
+            'operation': 'update',
+            'item': 'entity attribute',
+            'tool': 'entity_table',
+            'data': {
+                'id': entity.id,
+                'name': entity.name,
+                'attribute': attr,
+                'value': value,
+            },
+            'public': True,
+            'case': case,
+            'group': group
+        })
+        return HttpResponse(value) # just return the value or return the whole entity?
+
 
 
 def entities(request):
