@@ -8,6 +8,7 @@ wb.viz.timeline = function() {
   var data = [];
   var tracks = [];
   var trackHeight, itemHeight, itemMinWidth = 100;
+  var ratio = .8; // the ratio of the height of the main view
 
   var scaleX, scaleY;
   var svg, chart, xAxis, xBrush;
@@ -18,7 +19,6 @@ wb.viz.timeline = function() {
   var formatDate = d3.time.format("%m/%d/%Y-%H:%M:%S");
 
   function exports(selection) {
-
     width = outwidth - margin.left - margin.right;
     height = outheight - margin.top - margin.bottom;
     var min = d3.min(data, function(d) { return d.start; })

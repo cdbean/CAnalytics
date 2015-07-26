@@ -13,7 +13,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
-      // this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
+      this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
+
       this.timeline = wb.viz.timeline()
         .width(width)
         .height(height)
@@ -21,6 +22,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
           $.publish('data/filter', '#' + this.element.attr('id'));
         }.bind(this))
       ;
+
       this.updateData();
       this.updateView();
       return this;
@@ -67,7 +69,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         }
       }
       this.timeline.data(data);
-      d3.select(this.element[0]).call(this.timeline);
+     d3.select(this.element[0]).call(this.timeline);
     },
 
     updateView: function() {
