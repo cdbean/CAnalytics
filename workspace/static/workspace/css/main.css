@@ -106,7 +106,7 @@ a.entity:hover:after {
   border-left: 4px solid transparent;
 }
 
-.active {
+.highlighed {
   background-color: yellow !important;
 }
 

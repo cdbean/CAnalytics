@@ -71,11 +71,11 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
               wb.utility.scrollTo(highlight, $('.dataTables_scrollBody', ele));
               // blink for 2 sec, and stop
               var si = setInterval(function() {
-                $(highlight).toggleClass('active');
+                $(highlight).toggleClass('highlighted');
               }, 300);
               setTimeout(function() {
                 clearInterval(si);
-                $(highlight).removeClass('active');
+                $(highlight).removeClass('highlighted');
               }, 2000);
               break;
             }
