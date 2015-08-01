@@ -67,8 +67,16 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           for (var i = 0, len = annotations.length; i < len; i++) {
             if (annotations[i].id == item) {
               var highlight = annotations[i].highlights[0];
-              $(highlight).addClass('active');
+              // scroll to the highlight
               wb.utility.scrollTo(highlight, $('.dataTables_scrollBody', ele));
+              // blink for 2 sec, and stop
+              var si = setInterval(function() {
+                $(highlight).toggleClass('active');
+              }, 300);
+              setTimeout(function() {
+                clearInterval(si);
+                $(highlight).removeClass('active');
+              }, 2000);
               break;
             }
           }

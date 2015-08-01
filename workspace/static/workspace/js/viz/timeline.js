@@ -42,7 +42,7 @@ wb.viz.timeline = function() {
           .attr('width', outwidth)
           .attr('height', outheight);
 
-        g = svg.append('g')
+        var g = svg.append('g')
           .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
           ;
         g.append('clipPath')

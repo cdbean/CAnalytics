@@ -107,7 +107,7 @@ a.entity:hover:after {
 }
 
 .active {
-  background-color: #B0BED9 !important;
+  background-color: yellow !important;
 }
 
 .filter-list {
