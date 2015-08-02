@@ -522,6 +522,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         function brushend() {
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
+            $('.filter-div .filter-item').filter(function(i, item) {
+              return $(item).find('a').data('item') === 'relationship';
+            }).remove();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
                 wb.store.shelf_by.relationships = [];
@@ -549,13 +552,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 })
                 wb.store.shelf_by.relationships = rels_id;
 
-                $('.filter-div .filter-item').filter(function(i, item) {
-                  return $(item).find('a').data('item') === 'relationship';
-                }).remove();
                 rels_id.forEach(function(d) {
                   var rel = wb.store.items.relationships[d];
                   wb.filter.add('relation: ' + rel.primary.relation, {
-                    item: 'relationships',
+                    item: 'relationship',
                     id: d
                   });
                 });

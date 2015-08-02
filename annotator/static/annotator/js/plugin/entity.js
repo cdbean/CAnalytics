@@ -252,6 +252,8 @@ Annotator.Plugin.Entity = (function(_super) {
             var attribute_widget = $(field).find('.annotator-attribute-widget').data('instance');
             var attribute = attribute_widget.serialize();
             annotation.entity.attribute = $.extend({}, attribute);
+            if (annotation.entity.entity_type === 'relationship')
+              annotation.entity.attribute.relation = annotation.entity.attribute.relation || annotation.entity.name;
         }
     };
 

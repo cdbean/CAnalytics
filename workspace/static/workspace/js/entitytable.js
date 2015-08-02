@@ -31,7 +31,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
               shelf_by.forEach(function(d) {
                 var entity = wb.store.items.entities[d];
                 wb.filter.add(entity.primary.entity_type + ': ' + entity.primary.name, {
-                  item: 'entities',
+                  item: entity.primary.entity_type,
                   id: entity.meta.id
                 });
               });
