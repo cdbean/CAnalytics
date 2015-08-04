@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 import json
@@ -13,17 +13,30 @@ from sync.views import sync_item
 from logger.views import serverlog
 
 # Create your views here.
-@login_required
-def home(request, case, group):
-    case = get_object_or_404(Case, id=case)
-    group = get_object_or_404(Group, id=group)
-    return render(request, 'index.html', {
-        "case": case,
-    })
-
-
 def cases(request):
-    pass
+    if request.method == 'GET':
+        casemap = {}
+        cases = []
+        groups = request.user.groups.all()
+        for group in groups:
+            cases = group.case_set.all()
+            for case in cases:
+                if case not in casemap:
+                    casemap[case] = []
+                if group.id not in [g.id for g in casemap[case]]:
+                    casemap[case].append(group)
+        return render(request, 'case.html', {
+            "cases": cases, 
+            "groups": groups,
+            "casemap": casemap
+        })
+    elif request.method == 'POST':
+        try:
+            group = request.user.groups.get(id=request.POST['group'])
+            case = group.case_set.get(id=request.POST['case'])
+        except:
+            return HttpResponse('Error: You are not a member of the group in this case')
+        return redirect('ws:case', case=case.id, group=group.id)
 
 
 @login_required

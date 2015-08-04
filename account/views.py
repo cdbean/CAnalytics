@@ -13,27 +13,19 @@ def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        case = request.POST.get('case')
-        group = request.POST.get('group')
 
         user = authenticate(username=username, password=password)
         if user:
             try:
-                group = user.groups.get(id=int(group))
-                case = group.case_set.get(id=int(case))
                 auth_login(request, user)
-                return redirect('ws:case', case=case.id, group=group.id)
-            except:
-                return HttpResponse('You have no permission to the case')
+                return redirect('home')
+            except Exception as e:
+                print e
+                return HttpResponse('User name and password do not match')
         else:
             return HttpResponse('User name and password do not match')
     else:
-        cases = Case.objects.all()
-        groups = Group.objects.all()
-        return render(request, 'account/login.html', {
-            "cases": cases,
-            "groups": groups
-        })
+        return render(request, 'account/login.html')
 
 
 def register(request):
