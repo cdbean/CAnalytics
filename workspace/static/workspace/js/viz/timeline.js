@@ -132,6 +132,51 @@ wb.viz.timeline = function() {
     });
   }
 
+  function addBand(y, height) {
+      var items = chart.selectAll('svg')
+        .data(data, function(d) {
+          return d.lid; // local id
+      });
+
+      items.exit().remove();
+
+      new_items = items.enter()
+        .append('svg')
+        .attr('x', function(d) { return scaleX(d.start); })
+        .attr('y', function(d) { return scaleY(d.track); })
+        .attr('width', function(d) {
+          var width = scaleX(d.end) - scaleX(d.start);
+          return Math.max(width, itemMinWidth);
+        })
+        .attr("height", itemHeight)
+        .attr("class", function (d) { return d.instant ? "item instant" : "item interval"; })
+        .on('mouseover', onMouseOver)
+        .on('mouseout', onMouseOut);
+
+      var intervals = new_items.filter('.interval')
+      intervals.append("rect")
+        .attr("width", "100%")
+        .attr("height", "100%");
+      intervals.append("text")
+        .attr("class", "intervalLabel")
+        .attr("x", 1)
+        .attr("y", 10)
+        .text(function (d) { return d.label; });
+
+      var instants = new_items.filter(".instant");
+      instants.append("circle")
+        .attr("r", 5);
+      instants.append("text")
+        .attr("class", "instantLabel")
+        .attr("x", 15)
+        .attr("y", 10)
+        .text(function (d) { return d.label; });
+
+      items.selectAll('.item.instant circle')
+        .attr("cx", itemHeight / 2)
+        .attr("cy", itemHeight / 2);
+  }
+
   exports.redraw = function() {
     tracks = calculateTracks(data);
     width = outwidth - margin.left - margin.right;
