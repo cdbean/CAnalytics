@@ -123,9 +123,56 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     },
 
     addAnnotations: function(annotations) {
+      // add annotations for the same data entries
       for (var i = 0, len = annotations.length; i < len; i++) {
         this.addAnnotation(annotations[i]);
       }
+      // add annotations to new data entries (ones that are unique to the current user)
+      this.applyAnnotation(annotations[0]);
+    },
+
+    applyAnnotation: functoion(annotation) {
+        var ele = this.element.closest(".ui-dialog");
+        var annotator = ele.data('annotator');
+        var existing_anns = this.plugins.Store.annotations;
+        var range = rangy.createRange();
+        var searchScopeRange = rangy.createRange();
+        searchScopeRange.selectNodeContents(this.wrapper[0]);
+        var options = {
+          caseSensitive: false,
+          wholeWordsOnly: true,
+          withinRange: searchScopeRange,
+          direction: "forward" // This is redundant because "forward" is the default
+        };
+        range.selectNodeContents(this.wrapper[0]);
+
+        var searchTerm = new RegExp(annotation.quote, 'gi');
+
+        var new_anns = [];
+        while(range.findText(searchTerm, options)) {
+          // skip text that has been annotated
+          var existed = false;
+          for (var i = 0; i < existing_anns.length; i++) {
+            var exist_ann = existing_anns[i];
+            if (range === exist_ann.ranges[0]) {
+                existed = true;
+                break;
+            }
+          }
+          if (existed) continue;
+
+          var new_ann = annotator.createAnnotation();
+          new_ann.ranges = [range];
+          new_ann.quote = annotation.quote;
+          new_ann.entity = annotation.entity;
+          new_ann = annotator.setupAnnotation(new_ann);
+          new_anns.push(new_ann);
+
+          range.collapse(false);
+        }
+
+        annotator.deleteAnnotation(annotation); // delete the temporary annotation
+        annotator.publish('/annotations/created', [new_anns]);
     },
 
     addAnnotation: function(annotation) {

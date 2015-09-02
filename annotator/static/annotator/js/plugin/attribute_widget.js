@@ -52,6 +52,13 @@ $.widget('custom.attribute_widget', {
 
         // this.sort();
     },
+
+    update: function(attr, value) {
+        var attr_input = this.content.find('.annotator-attribute-input[value="' + attr + '"]');
+        var value_input = attr_input.parent().find('.annotator-attribute-value');
+        this.styleInput(attr, value, value_input);
+    },
+
     reset: function() {
         this.element.empty();
         this._create();
@@ -81,11 +88,11 @@ $.widget('custom.attribute_widget', {
                   res['geometry']['geometry'] = null;
                   res['geometry']['address']= $(row).find('.annotator-attribute-value').val();
                 }
-              } else if (attr === 'people') {
+              } else if (attr === 'person') {
                 if (value) value = value.split(',');
                 else value = [];
                 res[attr] = value;
-              } else if (attr === 'organizations') {
+              } else if (attr === 'organization') {
                 if (value) value = value.split(',');
                 else value = [];
                 res[attr] = value;
@@ -147,7 +154,7 @@ $.widget('custom.attribute_widget', {
       } else if (attr === 'priority') {
         // initialize as select drop down
         input.val(5)
-      } else if (attr === 'people') {
+      } else if (attr === 'person') {
         var opts = this.prepareSelectOptions('person');
         $(input).selectize({
             options: opts.opts,
@@ -157,7 +164,7 @@ $.widget('custom.attribute_widget', {
             create: true,
             closeAfterSelect: true
           });
-      } else if (attr === 'organizations') {
+      } else if (attr === 'organization') {
         var opts = this.prepareSelectOptions('organization');
         $(input).selectize({
             options: opts.opts,
