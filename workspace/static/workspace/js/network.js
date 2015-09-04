@@ -214,6 +214,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
   // rels is a dictionary
   // { rel-label: number }
   showRelList: function(rels) {
+    var el = this.element.find('.rel-list');
+    el.empty();
     for (rel in rels) {
       var n = rels[rel];
       var html = '<li class="rel-item"><label><input type="checkbox" checked value="'
@@ -858,6 +860,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     onMouseOverNode: function(d) {
+      if (d3.event.defaultPrevented) return;
+
       // this.highlightNode(d);
 
       var pos = {top: d3.event.pageY, left: d3.event.pageX};
@@ -878,6 +882,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     onClickNode: function(d) {
+      if (d3.event.defaultPrevented) return;
       var highlighted;
       this.node.each(function(o) {
         if (o.id === d.id) {
