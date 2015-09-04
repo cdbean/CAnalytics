@@ -128,50 +128,62 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         this.addAnnotation(annotations[i]);
       }
       // add annotations to new data entries (ones that are unique to the current user)
-      this.applyAnnotation(annotations[0]);
+      // this.applyAnnotation(annotations[0]);
     },
 
-    applyAnnotation: functoion(annotation) {
-        var ele = this.element.closest(".ui-dialog");
+    applyAnnotation: function(annotation) {
+        var ele = this.element.findclosest(".ui-dialog");
         var annotator = ele.data('annotator');
-        var existing_anns = this.plugins.Store.annotations;
-        var range = rangy.createRange();
-        var searchScopeRange = rangy.createRange();
-        searchScopeRange.selectNodeContents(this.wrapper[0]);
-        var options = {
-          caseSensitive: false,
-          wholeWordsOnly: true,
-          withinRange: searchScopeRange,
-          direction: "forward" // This is redundant because "forward" is the default
-        };
-        range.selectNodeContents(this.wrapper[0]);
+        var existing_anns = annotator.plugins.Store.annotations;
 
+        // search text in the second column
         var searchTerm = new RegExp(annotation.quote, 'gi');
-
         var new_anns = [];
-        while(range.findText(searchTerm, options)) {
-          // skip text that has been annotated
-          var existed = false;
-          for (var i = 0; i < existing_anns.length; i++) {
-            var exist_ann = existing_anns[i];
-            if (range === exist_ann.ranges[0]) {
-                existed = true;
-                break;
+        this.element.find('table.dataTable>tbody>tr>td:nth-child(2)').each(function(i, el) {
+            var range = rangy.createRange();
+            var searchScopeRange = rangy.createRange();
+            searchScopeRange.selectNodeContents(el);
+            var options = {
+              caseSensitive: false,
+              wholeWordsOnly: true,
+              withinRange: searchScopeRange,
+              direction: "forward" // This is redundant because "forward" is the default
+            };
+            range.selectNodeContents(el);
+
+            while(range.findText(searchTerm, options)) {
+              // skip text that has been annotated
+              var existed = false;
+              for (var i = 0; i < existing_anns.length; i++) {
+                var exist_ann = existing_anns[i];
+                if (range.startOffset === exist_ann.ranges[0].startOffset 
+                  && range.endOffset === exist_ann.ranges[0].endOffset) {
+                    existed = true;
+                    break;
+                }
+              }
+              if (existed) {
+                range.collapse(false);
+                continue;
+              }
+              var new_ann = annotator.createAnnotation();
+              new_ann.ranges = [{
+                commonAncestorContainer: range.commonAncestorContainer,
+                startOffset: range.startOffset,
+                endOffset: range.endOffset
+              }];
+              $.extend(new_ann.ranges[0], range.nativeRange);
+              new_ann.quote = annotation.quote;
+              new_ann.entity = annotation.entity;
+              new_anns.push(new_ann);
+
+              range.collapse(false);
             }
-          }
-          if (existed) continue;
+        });
+        new_anns.forEach(function(ann) {
+          annotator.setupAnnotation(ann);
+        })
 
-          var new_ann = annotator.createAnnotation();
-          new_ann.ranges = [range];
-          new_ann.quote = annotation.quote;
-          new_ann.entity = annotation.entity;
-          new_ann = annotator.setupAnnotation(new_ann);
-          new_anns.push(new_ann);
-
-          range.collapse(false);
-        }
-
-        annotator.deleteAnnotation(annotation); // delete the temporary annotation
         annotator.publish('/annotations/created', [new_anns]);
     },
 

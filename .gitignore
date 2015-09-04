@@ -36,3 +36,5 @@ dump.rdb
 /*/.ropeproject/
 
 nohup.out
+/node_modules/*
+*.log

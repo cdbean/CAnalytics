@@ -109,7 +109,7 @@ def get_or_create_entity(data, case, group, user):
         entity = create_entity(data, user, case, group)
         created = True
 
-    entity.name = data['name']
+    if 'name' in data: entity.name = data['name']
     entity.last_edited_by = user
     new_ents, new_rels, del_rels = set_entity_attr(entity, attrs, user, case, group)
     entity.save()
