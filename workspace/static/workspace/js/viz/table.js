@@ -43,7 +43,7 @@ wb.viz.table = function() {
             });
 
             if (editable) {
-                $('td', table.fnGetNodes()).editable("entity/attributes", {
+                $('td', table.fnGetNodes()).editable("/ws/entity", {
                     tooltip: "Double click to edit",
                     cancel: "Cancel",
                     submit: "Save",
@@ -61,6 +61,8 @@ wb.viz.table = function() {
                         return {
                             id: $(this.parentNode).data("id"),
                             attribute: attr,
+                            group: wb.info.group,
+                            case: wb.info.case
                         };
                     }
                 });

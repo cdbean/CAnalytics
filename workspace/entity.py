@@ -98,8 +98,8 @@ def get_or_create_entity(data, case, group, user):
     entity_type = data.get('entity_type', '')
     attrs = data.get('attribute', [])
 
-    if id and entity_type:
-        entity = Entity.objects.filter(id=id, entity_type=entity_type).select_subclasses()
+    if id:
+        entity = Entity.objects.filter(id=id).select_subclasses()
         if len(entity) > 0:
             entity = entity[0]
         else:

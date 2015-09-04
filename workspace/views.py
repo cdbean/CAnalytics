@@ -70,10 +70,10 @@ def data(request):
 
 
 
-def entity(request, id):
+def entity(request, id=0):
     if request.method == 'POST':
         res = {'entity': [], 'relationship': []}
-        data = json.loads(request.POST['data'])
+        data = request.POST
         case = Case.objects.get(id=data['case'])
         group = Group.objects.get(id=data['group'])
         entity, created, new_ents, new_rels, del_rels = get_or_create_entity(data, case, group, request.user)
