@@ -10,5 +10,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ws/', include('workspace.urls', namespace='ws')),
     url(r'^sync/', include('sync.urls', namespace='sync')),
+    url(r'^tinymce/', include('tinymce.urls')),
+    url(r'^mce_filebrowser/', include('mce_filebrowser.urls')), 
     url(r'^$', 'canalytics.views.home', name='home'),
 )

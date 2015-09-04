@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from model_utils.managers import InheritanceManager
 from django.contrib.auth.models import User, Group
 from datetime import datetime
+from tinymce.models import HTMLField
 
 
 # Create your models here.
@@ -99,7 +100,7 @@ class Dataset(models.Model):
 
 class DataEntry(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
-    content = models.TextField()
+    content = HTMLField()
     date  = models.DateTimeField(null=True, blank=True)
     dataset = models.ForeignKey(Dataset, null=True, blank=True)
 
