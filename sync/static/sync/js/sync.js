@@ -1,13 +1,8 @@
 $(function() {
-  if (! ("ishout" in window)) {
-    wb.utility.notify('Collaboration features unavailable at the moment');
-    return;
-  }
-
-  ishout.init();
-
   // join room
   $.subscribe('users/loaded', function() {
+    if (! ('ishout' in window)) return;
+
     var room = wb.info.case + '-' + wb.info.group;
     room = room.replace(/\s/g, '');
     ishout.joinRoom(room, function(data) {
@@ -28,10 +23,9 @@ $(function() {
   }, function(users) {
     for (var i = 0, len = users.length; i < len; i++) {
       var user = users[i];
-      user.color = wb.utility.randomColor();
+      user.color = wb.utility.randomColor(i);
       wb.info.users[user.id] = user;
     }
-
     // change the color of the user name in nav bar
     var mycolor = wb.info.users[wb.info.user].color;
     $('.nav #username').css('color', mycolor);
@@ -39,6 +33,15 @@ $(function() {
     // after users are loaded, join room and fetch users online
     $.publish('users/loaded');
   });
+
+
+  if (! ("ishout" in window)) {
+    wb.utility.notify('Collaboration features unavailable at the moment');
+    return;
+  }
+
+  ishout.init();
+
 
   ishout.on('message', onNewMessage);
 

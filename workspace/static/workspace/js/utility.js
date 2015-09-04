@@ -5,6 +5,7 @@ OpenLayers.Feature.Vector.prototype.toString = function() {
 
 
 wb.utility = {};
+var d3_color = d3.scale.category20();
 
 wb.utility.formatDate = function(d) {
   if (d) return d3.time.format("%B %d, %Y")(d);
@@ -56,14 +57,15 @@ wb.utility.Date = function(date) {
     return date ? new Date(date) : null;
 };
 
-wb.utility.randomColor = function() {
+wb.utility.randomColor = function(d) {
+    return d3_color(d);
     // suggested by http://stackoverflow.com/questions/1484506/random-color-generator-in-javascript
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    // var letters = '0123456789ABCDEF'.split('');
+    // var color = '#';
+    // for (var i = 0; i < 6; i++ ) {
+    //     color += letters[Math.floor(Math.random() * 16)];
+    // }
+    // return color;
 }
 
 
