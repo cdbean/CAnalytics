@@ -13,23 +13,9 @@ from sync.views import sync_item
 from logger.views import serverlog
 
 # Create your views here.
-def cases(request):
+def cases_page(request):
     if request.method == 'GET':
-        casemap = {}
-        cases = []
-        groups = request.user.groups.all()
-        for group in groups:
-            cases = group.case_set.all()
-            for case in cases:
-                if case not in casemap:
-                    casemap[case] = []
-                if group.id not in [g.id for g in casemap[case]]:
-                    casemap[case].append(group)
-        return render(request, 'case.html', {
-            "cases": cases, 
-            "groups": groups,
-            "casemap": casemap
-        })
+        return render(request, 'cases.html')
     elif request.method == 'POST':
         try:
             group = request.user.groups.get(id=request.POST['group'])
@@ -37,6 +23,59 @@ def cases(request):
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
         return redirect('ws:case', case=case.id, group=group.id)
+
+"""to find if case is in the case list
+if found, return the location
+else return -1
+"""
+def find_case(case, case_list):
+    for i, c in enumerate(case_list):
+        if c['id'] == case.id:
+            return i
+    return -1
+
+
+def cases(request):
+    res = {'cases_other': [], 'cases_user': []}
+    if request.method == 'GET':
+        groups = request.user.groups.all()
+        for group in groups:
+            cases = group.case_set.all()
+            for case in cases:
+                loc = find_case(case, res['cases_user'])
+                if loc < 0:
+                    res['cases_user'].append({
+                        'id': case.id,
+                        'name': case.name,
+                        'description': case.description,
+                        'start_date': case.start_date,
+                        'end_date': case.end_date,
+                        'location': case.location,
+                        'groups': [{
+                            'id': group.id,
+                            'name': group.name
+                        }]
+                    })
+                else: 
+                    res['cases_user'][loc]['groups'].append({
+                        'id': group.id,
+                        'name': group.name
+                    })
+        cases = Case.objects.exclude(groups__in=groups)
+        for case in cases:
+            res['cases_other'].append({
+                'id': case.id,
+                'name': case.name,
+                'description': case.description,
+                'start_date': case.start_date,
+                'end_date': case.end_date,
+                'location': case.location,
+                'group': {
+                    'id': group.id,
+                    'name': group.name
+                }
+            })
+        return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 @login_required

@@ -4,7 +4,8 @@ from workspace import views
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^cases$', views.cases, name='cases'),
+    url(r'^cases$', views.cases_page, name='cases_page'),
+    url(r'^cases/all$', views.cases, name='cases'),
     url(r'^case/(?P<case>\d+)/group/(?P<group>\d+)$', views.case, name='case'),
     url(r'^data$', views.data, name='data'),
     # url(r'^data/upload$', upload_data),

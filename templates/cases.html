@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block extracss %}
+<link rel="stylesheet" type="text/css" href="{% static 'account/css/login.css' %}">
+{% endblock %}
+
+{% block page-header %}
+  {% include 'page_header.html' %}
+{% endblock %}
+
+{% block page-body %}
+
+  <div class="container">
+    <h2> Your cases </h2>
+    <div class="row" id="user_cases">
+    </div>
+    <h2> Other available cases </h2>
+    <div class="row" id="other_cases">
+    </div>
+  </div>
+
+  <div class="modal fade" id="user_case_diag" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Enter case: <span id="case_name"></span></h4>
+        </div>
+        <div class="modal-body">
+          <h5>Select a group:</h5>
+          <select id="group_selector"></select>
+          <button type="button" class="btn btn-primary enter">Enter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    CASES_URL = "{% url 'ws:cases' %}";
+  </script>
+{% endblock %}
+{% block extrajs %}
+  <script type="text/javascript" src="{% static 'js/cases.js' %}"></script>
+{% endblock %}
