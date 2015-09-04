@@ -43,12 +43,16 @@ wb.viz.table = function() {
             });
 
             if (editable) {
+<<<<<<< HEAD
                 $('td', table.fnGetNodes()).editable("/ws/entity", {
+=======
+                $('td', table.fnGetNodes()).editable(GLOBAL_URL.entity_attr, {
+>>>>>>> 5c77d1ef2b9d6a71a41e43654a6e782872ce6e75
                     tooltip: "Double click to edit",
                     cancel: "Cancel",
                     submit: "Save",
                     event: "dblclick",
-                    indicator: '<img src="/static/dashboard/img/wait.gif">',
+                    indicator: '<img src="/static/lib/jEditable/img/indicator.gif">',
                     placeholder: "",
                     callback: function( sValue, y ) {
                         var aPos = table.fnGetPosition( this );
@@ -60,9 +64,15 @@ wb.viz.table = function() {
                         var attr = table.fnSettings().aoColumns[column].sTitle.toLowerCase();
                         return {
                             id: $(this.parentNode).data("id"),
+<<<<<<< HEAD
                             attribute: attr,
                             group: wb.info.group,
                             case: wb.info.case
+=======
+                            attr: attr,
+                            group: GROUP,
+                            case: CASE,
+>>>>>>> 5c77d1ef2b9d6a71a41e43654a6e782872ce6e75
                         };
                     }
                 });

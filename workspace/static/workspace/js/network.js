@@ -173,7 +173,56 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           _this.setMode('normal');
         }
       });
+
+      var list_html = ' \
+                      <ul class="rel-list"> \
+                      </ul> \
+      ';
+      $(list_html).appendTo(this.element)
+        .on('click', 'input[type=checkbox]', this.onFilterRel.bind(this))
+        .on('mouseover', '.rel-item', this.onMouseOverRel.bind(this))
+        .on('mouseout', '.rel-item', this.onMouseOutRel.bind(this));
     },
+
+  onMouseOutRel: function(e) {
+    this.svg.selectAll('.link').transition().style('stroke', '#ccc');
+  },
+
+  onMouseOverRel: function(e) {
+    var tar = $(e.target).find(':checkbox');
+    var value = tar.val();
+    var isvisible = tar[0].checked;
+    var display = isvisible ? '' : 'none';
+    this.svg.selectAll('.link').transition().style('stroke', function(d) {
+      var rel = wb.store.items.relationships[d.id];
+      if (rel.primary.relation === value) return 'steelblue';
+      else return '#ccc';
+    });
+  },
+
+  onFilterRel: function(e) {
+    var tar = $(e.target);
+    var value = tar.val();
+    var isvisible = tar[0].checked;
+    var display = isvisible ? '' : 'none';
+    this.svg.selectAll('.link').transition().style('display', function(d) {
+      var rel = wb.store.items.relationships[d.id];
+      if (rel.primary.relation === value) return display;
+    });
+  },
+
+  // rels is a dictionary
+  // { rel-label: number }
+  showRelList: function(rels) {
+    for (rel in rels) {
+      var n = rels[rel];
+      var html = '<li class="rel-item"><label><input type="checkbox" checked value="'
+        + rel + '">'
+        + rel + ' (' + n + ')'
+        + '</label></li>';
+      $(html).appendTo(this.element.find('.rel-list'));
+    }
+  },
 
 
     _onSetFilter: function(e) {
@@ -473,12 +522,19 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         function brushend() {
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
+            $('.filter-div .filter-item').filter(function(i, item) {
+              return $(item).find('a').data('item') === 'relationship';
+            }).remove();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
                 wb.store.shelf_by.relationships = [];
                 d3.selectAll(".node").classed("selected", function(d) {
                     return d.selected = false;
                 });
+
+                $('.filter-div .filter-item').filter(function(i, item) {
+                  return $(item).find('a').data('item') === 'relationship';
+                }).remove();
 
                 wb.log({
                     operation: 'removed filter in',
@@ -495,6 +551,14 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     selected_names.push(r.primary.relation);
                 })
                 wb.store.shelf_by.relationships = rels_id;
+
+                rels_id.forEach(function(d) {
+                  var rel = wb.store.items.relationships[d];
+                  wb.filter.add('relation: ' + rel.primary.relation, {
+                    item: 'relationship',
+                    id: d
+                  });
+                });
                 wb.log({
                     operation: 'filtered in',
                     item: 'network',
@@ -538,7 +602,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             d.fixed = true;
         }
         function zoomed() {
-            _this.svg.attr("transform",
+            _this.chart.attr("transform",
                 "translate(" + d3.event.translate + ")"
                     + " scale(" + d3.event.scale + ")");
         }
@@ -695,10 +759,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     updateView: function() {
       var nodes = [];
+      var rels = {};
       this.svg.selectAll('.link').attr('display', function(d) {
         if (wb.store.shelf.relationships.indexOf(d.id) > -1) {
           nodes.push(d.source.id);
           nodes.push(d.target.id);
+
+          // calculate relations
+          var rel = wb.store.items.relationships[d.id];
+          if (rel.primary.relation in rels) rels[rel.primary.relation]++;
+          else rels[rel.primary.relation] = 1; 
+
           return '';
         }
         return 'none';
@@ -707,6 +778,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         if (nodes.indexOf(d.id) > -1) return '';
         return 'none';
       });
+
+      this.showRelList(rels);
     },
 
     reload: function() {

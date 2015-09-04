@@ -8,6 +8,7 @@ wb.viz.timeline = function() {
   var data = [];
   var tracks = [];
   var trackHeight, itemHeight, itemMinWidth = 100;
+  var ratio = .8; // the ratio of the height of the main view
 
   var scaleX, scaleY;
   var svg, chart, xAxis, xBrush;
@@ -15,8 +16,9 @@ wb.viz.timeline = function() {
 
   var dispatch = d3.dispatch('filter');
 
-  function exports(selection) {
+  var formatDate = d3.time.format("%m/%d/%Y-%H:%M:%S");
 
+  function exports(selection) {
     width = outwidth - margin.left - margin.right;
     height = outheight - margin.top - margin.bottom;
     var min = d3.min(data, function(d) { return d.start; })
@@ -40,7 +42,7 @@ wb.viz.timeline = function() {
           .attr('width', outwidth)
           .attr('height', outheight);
 
-        g = svg.append('g')
+        var g = svg.append('g')
           .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
           ;
         g.append('clipPath')
@@ -78,7 +80,7 @@ wb.viz.timeline = function() {
 
       var items = chart.selectAll('svg')
         .data(data, function(d) {
-          return d.id;
+          return d.lid; // local id
       });
 
       items.exit().remove();
@@ -294,8 +296,8 @@ wb.viz.timeline = function() {
 
 
   function parseDate(d) {
-    var format = d3.time.format("%m/%d/%Y-%H:%M:%S");
-    return format.parse(d);
+    if (typeof d === 'string') return formatDate.parse(d);
+    return d;
   }
 
 
@@ -335,6 +337,15 @@ wb.viz.timeline = function() {
       shelf_by.push(d.id);
     });
     wb.store.shelf_by.entities = shelf_by;
+    var ext = brush.extent();
+    $('.filter-div .filter-item').filter(function(i, item) {
+      return $(item).find('a').data('item') === 'time';
+    }).remove();
+    if (!brush.empty()) {
+      wb.filter.add('time: ' + wb.utility.formatDateTime(ext[0]) + ' - ' + wb.utility.formatDateTime(ext[1]), {
+        item: 'time',
+      });
+    }
     dispatch.filter();
   }
 

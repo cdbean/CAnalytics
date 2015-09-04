@@ -12,24 +12,11 @@ wb.store.loadItems(GLOBAL_URL.data, {
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 wb.editor = $('<div>').appendTo('body').vizeditor().data('instance');
 
-// get all users in this group
-$.get(GLOBAL_URL.users, {
-  case: wb.info.case,
-  group: wb.info.group
-}, function(users) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    user.color = wb.utility.randomColor();
-    wb.info.users[user.id] = user;
-  }
 
-  // change the color of the user name in nav bar
-  var mycolor = wb.info.users[wb.info.user].color;
-  $('.nav #username').css('color', mycolor);
-});
 
 
 $(function() {
+  $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
 
   $('.viz-opts').click(onVizSelect);
@@ -50,6 +37,12 @@ $(function() {
     $.cookie('hinted', true);
   }
 
+
+  function onRemoveFilter(e) {
+    var item = $(e.target).parent();
+    var data = item.find('a').data();
+    wb.filter.remove(item, data);
+  }
 
   function onClickOutside() {
     wb.viewer.hide();

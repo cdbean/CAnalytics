@@ -1,6 +1,16 @@
 //initialize instance
 wb.help = {}; // help script
 
+wb.help.main = new EnjoyHint({});
+wb.help.dataentry = new EnjoyHint({});
+wb.help.table = new EnjoyHint({});
+wb.help.timeline = new EnjoyHint({});
+wb.help.map = new EnjoyHint({});
+wb.help.network = new EnjoyHint({});
+wb.help.notepad = new EnjoyHint({});
+wb.help.message = new EnjoyHint({});
+wb.help.history = new EnjoyHint({});
+
 wb.help.main = [
   {
   'next body': 'Welcome to CAnalytics! I will walk you through its major tools',
@@ -169,6 +179,3 @@ wb.help.history = [
   }
 ];
 
-$(function() {
-  //set script config
-});

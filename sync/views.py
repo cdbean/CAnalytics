@@ -60,10 +60,16 @@ def sync_item(action, item, data, case, group, user):
     """
     name = group_name(case, group)
     data['user']= user.id
-    ishout_client.broadcast_group(name, '%s.%s' % (item, action), data)
+    try:
+        ishout_client.broadcast_group(name, '%s.%s' % (item, action), data)
+    except:
+        print '[warning] Sync failed. Is sync server running?'
 
 
 def broadcast_activity(data, case, group, user):
-    name = group_name(case, group)
-    ishout_client.broadcast_group(name, 'action', data)
+    try:
+        name = group_name(case, group)
+        ishout_client.broadcast_group(name, 'action', data)
+    except:
+        print '[warning] Sync failed. Is sync server running?'
 

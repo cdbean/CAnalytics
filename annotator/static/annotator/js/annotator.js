@@ -591,26 +591,32 @@ Annotator = (function(_super) {
 
         var new_anns = [];
         while(range.findText(searchTerm, options)) {
-          // skip text that has been annotated
-          var existed = false;
-          for (var i = 0; i < existing_anns.length; i++) {
-            var exist_ann = existing_anns[i];
-            if (range === exist_ann.ranges[0]) {
-              existed = true;
-              break;
-            }
-          }
-          if (existed) continue;
+          // TODO: skip text that has been annotated
+          // the flowing code does not work
+          // var existed = false;
+          // for (var i = 0; i < existing_anns.length; i++) {
+          //   var exist_ann = existing_anns[i];
+          //   if (range.startOffset === exist_ann.ranges[0].startOffset 
+          //       && range.endOffset === exist_ann.ranges[0].endOffset) {
+          //     existed = true;
+          //     break;
+          //   }
+          // }
+          // if (existed) continue;
 
           var new_ann = this.createAnnotation();
-          new_ann.ranges = [range];
+          new_ann.ranges = [{}];
+          $.extend(new_ann.ranges[0], range.nativeRange);
           new_ann.quote = annotation.quote;
           new_ann.entity = annotation.entity;
-          new_ann = this.setupAnnotation(new_ann);
+          // this.setupAnnotation(new_ann);
           new_anns.push(new_ann);
 
           range.collapse(false);
         }
+        new_anns.forEach(function(ann) {
+            this.setupAnnotation(ann);
+        }.bind(this));
 
         this.deleteAnnotation(annotation); // delete the temporary annotation
         this.publish('/annotations/created', [new_anns]);

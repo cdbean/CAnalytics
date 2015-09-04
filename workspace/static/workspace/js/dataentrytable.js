@@ -67,8 +67,16 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           for (var i = 0, len = annotations.length; i < len; i++) {
             if (annotations[i].id == item) {
               var highlight = annotations[i].highlights[0];
-              $(highlight).addClass('active');
+              // scroll to the highlight
               wb.utility.scrollTo(highlight, $('.dataTables_scrollBody', ele));
+              // blink for 2 sec, and stop
+              var si = setInterval(function() {
+                $(highlight).toggleClass('highlighted');
+              }, 300);
+              setTimeout(function() {
+                clearInterval(si);
+                $(highlight).removeClass('highlighted');
+              }, 2000);
               break;
             }
           }
@@ -115,9 +123,68 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     },
 
     addAnnotations: function(annotations) {
+      // add annotations for the same data entries
       for (var i = 0, len = annotations.length; i < len; i++) {
         this.addAnnotation(annotations[i]);
       }
+      // add annotations to new data entries (ones that are unique to the current user)
+      // this.applyAnnotation(annotations[0]);
+    },
+
+    applyAnnotation: function(annotation) {
+        var ele = this.element.findclosest(".ui-dialog");
+        var annotator = ele.data('annotator');
+        var existing_anns = annotator.plugins.Store.annotations;
+
+        // search text in the second column
+        var searchTerm = new RegExp(annotation.quote, 'gi');
+        var new_anns = [];
+        this.element.find('table.dataTable>tbody>tr>td:nth-child(2)').each(function(i, el) {
+            var range = rangy.createRange();
+            var searchScopeRange = rangy.createRange();
+            searchScopeRange.selectNodeContents(el);
+            var options = {
+              caseSensitive: false,
+              wholeWordsOnly: true,
+              withinRange: searchScopeRange,
+              direction: "forward" // This is redundant because "forward" is the default
+            };
+            range.selectNodeContents(el);
+
+            while(range.findText(searchTerm, options)) {
+              // skip text that has been annotated
+              var existed = false;
+              for (var i = 0; i < existing_anns.length; i++) {
+                var exist_ann = existing_anns[i];
+                if (range.startOffset === exist_ann.ranges[0].startOffset 
+                  && range.endOffset === exist_ann.ranges[0].endOffset) {
+                    existed = true;
+                    break;
+                }
+              }
+              if (existed) {
+                range.collapse(false);
+                continue;
+              }
+              var new_ann = annotator.createAnnotation();
+              new_ann.ranges = [{
+                commonAncestorContainer: range.commonAncestorContainer,
+                startOffset: range.startOffset,
+                endOffset: range.endOffset
+              }];
+              $.extend(new_ann.ranges[0], range.nativeRange);
+              new_ann.quote = annotation.quote;
+              new_ann.entity = annotation.entity;
+              new_anns.push(new_ann);
+
+              range.collapse(false);
+            }
+        });
+        new_anns.forEach(function(ann) {
+          annotator.setupAnnotation(ann);
+        })
+
+        annotator.publish('/annotations/created', [new_anns]);
     },
 
     addAnnotation: function(annotation) {

@@ -57,13 +57,17 @@ Annotator.Plugin.Entity = (function(_super) {
         this.subscribe('entity/type/update', function(value) {
           // do when the entity type is changed
           // put entity attributes in the list
+          var entity = self.annotation.entity;
+         
           var attribute_widget = $(self.attrField).find('.annotator-attribute-widget').data('instance');
           attribute_widget.reset();
           var attributes = wb.store.static[value];
           if (attributes) {
             for (var i = 0, len = attributes.length; i < len; i++) {
               var attr = attributes[i];
-              attribute_widget.add(attr, null, 'primary');
+              var val = null;
+              if (entity && entity.temp && attr in entity.temp) val = entity.temp[attr];
+              attribute_widget.add(attr, val, 'primary');
             }
           }
         });
@@ -244,6 +248,8 @@ Annotator.Plugin.Entity = (function(_super) {
             for (var attr in entity.other) {
                 attribute_widget.add(attr, entity.other[attr], 'other');
             }
+        } else {
+            this.detectEntity();
         }
     };
 
@@ -252,7 +258,10 @@ Annotator.Plugin.Entity = (function(_super) {
             var attribute_widget = $(field).find('.annotator-attribute-widget').data('instance');
             var attribute = attribute_widget.serialize();
             annotation.entity.attribute = $.extend({}, attribute);
+            if (annotation.entity.entity_type === 'relationship')
+              annotation.entity.attribute.relation = annotation.entity.attribute.relation || annotation.entity.name;
         }
+        delete annotation.entity.temp;
     };
 
     Entity.prototype.applyToAll = function(field, annotation) {
@@ -296,6 +305,37 @@ Annotator.Plugin.Entity = (function(_super) {
             $(field).append($(table));
         } else {
             return field.remove();
+        }
+    };
+
+    Entity.prototype.detectEntity = function() {
+        this.annotation.entity = this.annotation.entity || {};
+        this.annotation.entity.temp = this.annotation.entity.temp || {};
+        var entity_temp = this.annotation.entity.temp;
+        var highlights = this.annotation.highlights;
+        for (var i = 0, len = highlights.length; i < len; i++) {
+            var hl = highlights[i];
+            if ($(hl.parentElement).hasClass('annotator-hl')) {
+                var entities = findEntity($(hl.parentElement), []);
+
+                for (var j = 0; j < entities.length; j++) {
+                    var ent = entities[j];
+                    if (entity_temp[ent.entity_type]) entity_temp[ent.entity_type].push(ent.id)
+                    else entity_temp[ent.entity_type] = [ent.id];
+                }
+            }
+        }
+
+        function findEntity($el, entities) {
+            if ($el.hasClass('annotator-hl')) {
+               var ann = $el.data('annotation');
+               if (ann) {
+                    var ent = ann.entity;
+                    if (ent.id && ent.entity_type) entities.push(ent);
+                    return findEntity($el.parent(), entities);
+               }
+            }
+            else return entities;
         }
     };
 

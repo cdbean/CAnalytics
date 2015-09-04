@@ -154,6 +154,9 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
 
   },
 
+  update: function() {
+  },
+
   help: function() {
     var hint = new EnjoyHint({});
     hint.set(wb.help.history);

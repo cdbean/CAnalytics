@@ -13,7 +13,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
-      // this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
+      this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
+
       this.timeline = wb.viz.timeline()
         .width(width)
         .height(height)
@@ -21,6 +22,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
           $.publish('data/filter', '#' + this.element.attr('id'));
         }.bind(this))
       ;
+
       this.updateData();
       this.updateView();
       return this;
@@ -36,17 +38,38 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         var entity = wb.store.items.entities[d];
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
-            data.push({
-              start: entity.primary.start_date,
-              end: entity.primary.end_date,
-              label: entity.primary.name,
-              id: entity.meta.id
-            });
+            if (entity.primary.repeated) {
+              var repeat_delta = 1000 * 3600 * 24 * 7; // hard code: repeat every week
+              var repeated_until = wb.utility.Date(entity.primary.repeated_until);
+              var start_date = wb.utility.Date(entity.primary.start_date);
+              var end_date = wb.utility.Date(entity.primary.end_date);
+              var delta = end_date - start_date;
+              var date = start_date;
+              var index = 0;
+              while (date <= repeated_until) {
+                data.push({
+                  start: date, 
+                  end: new Date(date.getTime() + delta),
+                  label: entity.primary.name,
+                  lid: entity.meta.id + '-' + index, // local id, for viz only
+                  id: entity.meta.id
+                });
+                date = new Date(date.getTime() + repeat_delta);
+                index ++;
+              }
+            } else {
+              data.push({
+                start: entity.primary.start_date,
+                end: entity.primary.end_date,
+                label: entity.primary.name,
+                id: entity.meta.id
+              });
+            }
           }
         }
       }
       this.timeline.data(data);
-      d3.select(this.element[0]).call(this.timeline);
+     d3.select(this.element[0]).call(this.timeline);
     },
 
     updateView: function() {

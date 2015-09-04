@@ -193,7 +193,7 @@ class Person(Entity):
 
 
 class Organization(Entity):
-    people      = models.ManyToManyField(Person, null=True, blank=True)
+    person      = models.ManyToManyField(Person, null=True, blank=True)
     category    = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     nationality = models.CharField(max_length=50, blank=True, null=True)
     ethnicity   = models.CharField(max_length=50, null=True, blank=True)
@@ -207,13 +207,14 @@ class Organization(Entity):
 
 
 class Event(Entity):
-    people       = models.ManyToManyField(Person, null=True, blank=True)
-    organizations = models.ManyToManyField(Organization, null=True, blank=True)
+    person       = models.ManyToManyField(Person, null=True, blank=True)
+    organization = models.ManyToManyField(Organization, null=True, blank=True)
     location     = models.ForeignKey(Location, null=True, blank=True)
     category     = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     start_date   = models.DateTimeField(null=True, blank=True)
     end_date     = models.DateTimeField(null=True, blank=True)
-    repeat_days       = models.CommaSeparatedIntegerField(max_length=50, null=True, blank=True)  # 1 -7, stands for Mon - Sun
+    repeated       = models.NullBooleanField(default=False, null=True, blank=True)  # 1 -7, stands for Mon - Sun
+    repeated_until = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""

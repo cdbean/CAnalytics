@@ -1,11 +1,13 @@
 $(function() {
-  if (wb.info.user) {
-    ishout.init(function() {
+  if (! ("ishout" in window)) {
+    wb.utility.notify('Collaboration features unavailable at the moment');
+    return;
+  }
 
-    });
+  ishout.init();
 
-    // join room
-    // TODO: avoid hard code group name
+  // join room
+  $.subscribe('users/loaded', function() {
     var room = wb.info.case + '-' + wb.info.group;
     room = room.replace(/\s/g, '');
     ishout.joinRoom(room, function(data) {
@@ -17,8 +19,26 @@ $(function() {
         'group': wb.info.group,
       });
     });
-  }
+  });
 
+  // get all users in this group
+  $.get(GLOBAL_URL.users, {
+    case: wb.info.case,
+    group: wb.info.group
+  }, function(users) {
+    for (var i = 0, len = users.length; i < len; i++) {
+      var user = users[i];
+      user.color = wb.utility.randomColor();
+      wb.info.users[user.id] = user;
+    }
+
+    // change the color of the user name in nav bar
+    var mycolor = wb.info.users[wb.info.user].color;
+    $('.nav #username').css('color', mycolor);
+    
+    // after users are loaded, join room and fetch users online
+    $.publish('users/loaded');
+  });
 
   ishout.on('message', onNewMessage);
 
