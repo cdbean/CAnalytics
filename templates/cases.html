@@ -3,7 +3,8 @@
 {% load compress %}
 
 {% block extracss %}
-<link rel="stylesheet" type="text/css" href="{% static 'account/css/login.css' %}">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'account/css/login.css' %}"> -->
+<link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-select/bootstrap-select.min.css' %}"> 
 {% endblock %}
 
 {% block page-header %}
@@ -11,13 +12,20 @@
 {% endblock %}
 
 {% block page-body %}
+  <style>
+    .case .thumbnail {
+      background-color: #eee;
+    }
+  </style>
 
   <div class="container">
     <h2> Your cases </h2>
     <div class="row" id="user_cases">
+      <div class="col-sm-12 placeholder"><h3><small>Loading cases...</small></h3></div>
     </div>
     <h2> Other available cases </h2>
     <div class="row" id="other_cases">
+      <div class="col-sm-12 placeholder"><h3><small>Loading cases...</small></h3></div>
     </div>
   </div>
 
@@ -29,9 +37,65 @@
           <h4 class="modal-title">Enter case: <span id="case_name"></span></h4>
         </div>
         <div class="modal-body">
-          <h5>Select a group:</h5>
-          <select id="group_selector"></select>
-          <button type="button" class="btn btn-primary enter">Enter</button>
+          <form action="{% url 'ws:cases' %}" method="POST">
+            <label>Select a group:</label>
+            <select id="group_selector" name="group" class="selectpicker">
+            </select>
+            <button type="submit" class="btn btn-primary enter">Enter</button>
+            <input class="hidden" name="case" id="case">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="other_case_diag" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Enter case: <span id="case_name"></span></h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal" data-toggle="validator" action="{% url 'ws:cases' %}" method="POST">
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Join a group:</label>
+              <select id="group_selector" name="group" class="col-sm-10 selectpicker" title="select group" required>
+                <option value="0">Add new group</option>
+              </select>
+              <div class="help-block with-errors"></div>
+            </div>
+            <div class="form-group hidden" id="group_name_group">
+              <label for="group_name" class="col-sm-2 control-label">New group name: </label>
+              <div class="col-sm-10">
+                <input class="form-control" name="group_name" placeholder="Group name" required>
+                <span class="help-block" id="group_name_help">Name must be unique in this case.</span>
+                <div class="help-block with-errors"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="case_pin" class="col-sm-2 control-label">Case PIN: </label>
+              <div class="col-sm-10">
+                <input class="form-control" name="case_pin" placeholder="Four digit PIN" data-minlength="4" maxlength="4" required>
+                <span class="help-block" id="case_pin_help">You need the PIN to enter this case. Ask case creator if you do not know it.</span>
+                <div class="help-block with-errors"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="group_pin" class="col-sm-2">Group PIN: </label>
+              <div class="col-sm-10">
+                <input class="form-control" name="group_pin" placeholder="Four digit PIN" data-minlength="4" maxlength="4" required>
+                <span class="help-block" id="group_pin_help">You need the PIN to join this group. Ask group creator if you do not know it.</span>
+                <div class="help-block with-errors"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-10 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary enter">Enter</button>
+              </div>
+            </div>
+            <input class="hidden" name="case" id="case">
+          </form>
         </div>
       </div>
     </div>
@@ -42,5 +106,7 @@
   </script>
 {% endblock %}
 {% block extrajs %}
+  <script type="text/javascript" src="{% static 'lib/bootstrap-select/bootstrap-select.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'lib/bootstrap-validator/validator.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/cases.js' %}"></script>
 {% endblock %}

@@ -16,13 +16,7 @@ from logger.views import serverlog
 def cases_page(request):
     if request.method == 'GET':
         return render(request, 'cases.html')
-    elif request.method == 'POST':
-        try:
-            group = request.user.groups.get(id=request.POST['group'])
-            case = group.case_set.get(id=request.POST['case'])
-        except:
-            return HttpResponse('Error: You are not a member of the group in this case')
-        return redirect('ws:case', case=case.id, group=group.id)
+
 
 """to find if case is in the case list
 if found, return the location
@@ -70,12 +64,20 @@ def cases(request):
                 'start_date': case.start_date,
                 'end_date': case.end_date,
                 'location': case.location,
-                'group': {
+                'groups': {
                     'id': group.id,
                     'name': group.name
                 }
             })
         return HttpResponse(json.dumps(res), content_type='application/json')
+
+    elif request.method == 'POST':
+        try:
+            group = request.user.groups.get(id=request.POST['group'])
+            case = group.case_set.get(id=request.POST['case'])
+        except:
+            return HttpResponse('Error: You are not a member of the group in this case')
+        return redirect('ws:case', case=case.id, group=group.id)
 
 
 @login_required

@@ -2,7 +2,6 @@ $.get(CASES_URL, function(res) {
 	var cases_user = res.cases_user;
 	var cases_other = res.cases_other;
 
-	var placeholder = '<div class="col-sm-12"><h3><small>No case available</small</h3></div>';
 	var template = '<div class="col-sm-6 col-md-3 case">';
 	template += '<div class="thumbnail">';
 	template += '<h4 class="caption"></h4>';
@@ -12,12 +11,9 @@ $.get(CASES_URL, function(res) {
 
 	if (cases_user.length === 0) {
 		// if no cases available
-		$(placeholder).appendTo('#user_cases');
-		// var html = $(template).appendTo('#user_cases');
-		// html.find('h4.caption').text('No cases available').css('color', '#eee');
-		// html.find('a.enter').addClass('hidden');
-
+		$('#user_cases .placeholder').find('small').text('No case available');
 	} else {
+		$('#user_cases .placeholder').addClass('hidden');
 		cases_user.forEach(function(d) {
 			var case_html = $(template).appendTo('#user_cases');
 			case_html.find('h4.caption').text(d.name);
@@ -28,12 +24,9 @@ $.get(CASES_URL, function(res) {
 	}
 	if (cases_other.length === 0) {
 		// if no cases available
-		$(placeholder).appendTo('#other_cases');
-
-		// var html = $(template).appendTo('#other_cases');
-		// html.find('h4.caption').text('No cases available').css('color', '#eee');
-		// html.find('a.enter').addClass('hidden');
+		$('#other_cases .placeholder').find('small').text('No case available');
 	} else {
+		$('#other_cases .placeholder').addClass('hidden');
 		cases_other.forEach(function(d) {
 			var case_html = $(template).appendTo('#other_cases');
 			case_html.find('h4.caption').text(d.name);
@@ -44,17 +37,35 @@ $.get(CASES_URL, function(res) {
 	}
 });
 
-$('#user_case_diag').on('show.bs.modal', function(event) {
+$('.modal').on('show.bs.modal', function(event) {
 	var source = $(event.relatedTarget).parents('.case');
 	var case_d = source.data('case');
 	if (!case_d) return;
 	$(this).find('.modal-title #case_name').text(case_d.name);
 
 
-	var options = '';
-	case_d.groups.forEach(function(g) {
-		options += '<option value="' + g.id + '"">' + g.name + '</option>';
-	})
-	$(this).find('#group_selector').empty().append(options);
+	var options = '<option>Select a group</option>';
+	for (var i = 0; i < case_d.groups.length; i++) {
+		options += '<option value="' + case_d.groups[i].id + '">' + case_d.groups[i].name + '</option>';
+	}
+	options += '<option value="0">Create new group</option>';
+	$(this).find('#group_selector').empty().append(options).selectpicker('refresh');
 	$(this).data('case', case_d);
 });
+
+$('.modal').on('submit', 'form', function(event) {
+	var el = event.delegateTarget;
+	var case_d = $(el).data('case');
+	$(this).find('#case').val(case_d.id);
+});
+
+$('#other_case_diag #group_selector').change(function(e) {
+	if ($(this).val() == 0) {
+		$('#group_name_group').removeClass('hidden');
+		$('#group_pin_help').text('Invite group members to this case using this PIN.');
+	} else {
+		$('#group_name_group').addClass('hidden');
+		$('#group_pin_help').text('You need the PIN to join this group. Ask group creator if you do not know it.');
+	}
+});
+

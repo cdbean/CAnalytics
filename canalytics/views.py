@@ -8,7 +8,7 @@ from workspace.models import Case
 @login_required
 def home(request):
     if request.method == 'GET':
-        return redirect('ws:cases')
+        return redirect('ws:cases_page')
     elif request.method == 'POST':
         try:
             group = request.user.groups.get(id=request.POST['group'])
