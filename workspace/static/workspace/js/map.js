@@ -72,10 +72,18 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.layers.push(this.pointlayer, this.linelayer);
         map.addLayers([this.pointlayer, this.linelayer]);
 
-        map.setCenter(new OpenLayers.LonLat(-77.86000, 40.79339).transform(
-            new OpenLayers.Projection("EPSG:4326"),
-            map.getProjectionObject()
-        ), 15); // zoom level
+        var defaultloc = new OpenLayers.LonLat(-77.86000, 40.79339); // set default to State College
+        if (wb.info.case.location) {
+            var wktParser = new OpenLayers.Format.WKT();
+            var feature = wktParser.read(wb.info.case.location);
+            var origin_prj = new OpenLayers.Projection("EPSG:4326");
+            var dest_prj   = new OpenLayers.Projection("EPSG:900913");
+            if (feature) {
+                feature.geometry.transform(origin_prj, dest_prj); // projection of google map
+            }
+            defaultloc = feature.geometry;
+        }
+        map.setCenter(defaultloc, 15); // zoom level
 
         var controlPanel = new OpenLayers.Control.Panel();
         map.addControl(new OpenLayers.Control.LayerSwitcher());

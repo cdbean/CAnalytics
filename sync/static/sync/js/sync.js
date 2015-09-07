@@ -3,23 +3,23 @@ $(function() {
   $.subscribe('users/loaded', function() {
     if (! ('ishout' in window)) return;
 
-    var room = wb.info.case + '-' + wb.info.group;
+    var room = CASE + '-' + GROUP;
     room = room.replace(/\s/g, '');
     ishout.joinRoom(room, function(data) {
       // after joining room, server will return a list of users in the room:
       // {users: [user_id]}
       onUsersOnline(data.users);
       $.post('/sync/join', {
-        'case': wb.info.case,
-        'group': wb.info.group,
+        'case': CASE,
+        'group': GROUP,
       });
     });
   });
 
   // get all users in this group
   $.get(GLOBAL_URL.users, {
-    case: wb.info.case,
-    group: wb.info.group
+    case: CASE,
+    group: GROUP
   }, function(users) {
     for (var i = 0, len = users.length; i < len; i++) {
       var user = users[i];

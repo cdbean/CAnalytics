@@ -94,8 +94,8 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         ele.annotator('addPlugin', 'Store', {
             prefix: '/annotation',
             annotationData: {
-              'case': wb.info.case,
-              'group': wb.info.group
+              'case': CASE,
+              'group': GROUP
             },
             loadFromLocal: _.values(wb.store.items.annotations)
         });

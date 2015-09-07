@@ -26,8 +26,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     var _this = this;
 
     $.get(this.options.url, {
-      'case': wb.info.case,
-      group: wb.info.group
+      'case': CASE,
+      group: GROUP
     }, function(data) {
       for (var i = 0, len = data.length; i < len; i++) {
         _this.add(data[i]);

@@ -4,15 +4,18 @@ $('#progressbar').show().progressbar({ value: false });
 
 // load data
 wb.store.loadItems(GLOBAL_URL.data, {
-  case: wb.info.case,
-  group: wb.info.group
+  case: CASE,
+  group: GROUP
 });
 
 // initialize viewer
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 wb.editor = $('<div>').appendTo('body').vizeditor().data('instance');
 
-
+$.get(GLOBAL_URL.case, function(res) {
+  wb.info.case = res.case;
+  wb.info.group = res.group;
+});
 
 
 $(function() {

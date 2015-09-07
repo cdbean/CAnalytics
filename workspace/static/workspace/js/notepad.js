@@ -14,7 +14,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
         .attr('id', id)
         .appendTo(this.element);
 
-        var padId = wb.info.case + '-' + wb.info.group;
+        var padId = CASE + '-' + GROUP;
         $('#' + id).pad({
           'padId': padId,
           'showChat': false,

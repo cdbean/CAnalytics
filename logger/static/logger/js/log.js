@@ -4,8 +4,8 @@ if (!wb) {
 
 wb.log = function(act) {
   var action = {
-    group: wb.info.group,
-    'case': wb.info.case,
+    group: GROUP,
+    'case': CASE,
     operation: '',
     item: '',
     data: '{}',

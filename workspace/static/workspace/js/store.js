@@ -1,8 +1,7 @@
 // store: manager of all data
 //
 //
-if (!wb)
-  wb = {};
+if (!wb) wb = {};
 
 wb.store = {
   // all items are stored here

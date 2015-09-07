@@ -47,8 +47,8 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         var _this = this;
         $.post(GLOBAL_URL.message, {
           content: content,
-          case: wb.info.case,
-          group: wb.info.group
+          case: CASE.id,
+          group: GROUP.id
         }, function(res) {
           if (res === 'success') {
             $(_this).text('');
@@ -62,8 +62,8 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   loadMessages: function() {
     var _this = this;
     $.get(GLOBAL_URL.messages, {
-      case: wb.info.case,
-      group: wb.info.group
+      case: CASE.id,
+      group: GROUP.id
     }, function(msgs) {
       for (var i = 0, len = msgs.length; i < len; i++) {
         _this.loadMessage(msgs[i]);

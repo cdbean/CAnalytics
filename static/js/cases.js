@@ -59,6 +59,16 @@ $('.modal').on('submit', 'form', function(event) {
 	$(this).find('#case').val(case_d.id);
 });
 
+$('#user_case_diag #group_selector').change(function(e) {
+	if ($(this).val() == 0) {
+		$('#group_name_group').removeClass('hidden');
+		$('#group_pin_group').removeClass('hidden');
+	} else {
+		$('#group_name_group').addClass('hidden');
+		$('#group_pin_group').addClass('hidden');
+	}
+});
+
 $('#other_case_diag #group_selector').change(function(e) {
 	if ($(this).val() == 0) {
 		$('#group_name_group').removeClass('hidden');

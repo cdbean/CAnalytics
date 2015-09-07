@@ -73,15 +73,42 @@ def cases(request):
 
     elif request.method == 'POST':
         try:
-            group = request.user.groups.get(id=request.POST['group'])
-            case = group.case_set.get(id=request.POST['case'])
+            case = Case.objects.get(id=request.POST['case'])
+            g_id = int(request.POST['group'])
+            if g_id == 0:
+                group = Group.objects.create(name=request.POST['group_name'], pin=request.POST['group_pin'])
+                group.user_set.add(request.user)
+                case.groups.add(group)
+            else:
+                group = request.user.groups.get(id=g_id)
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
         return redirect('ws:case', case=case.id, group=group.id)
 
+def join_case(request):
+    if request.method == 'POST':
+        try:
+            case = Case.objects.get(id=request.POST['case'], pin=request.POST['case_pin'])
+        except Case.DoesNotExist:
+            return HttpResponse('Case PIN incorrect')
+
+        g_id = int(request.POST['group'])
+        if g_id == 0:
+            group = Group.objects.create(name=request.POST['group_name'], pin=request.POST['group_pin'])
+        else:
+            try:
+                group = Group.objects.get(id=g_id, pin=request.POST['group_pin'])
+            except Group.DoesNotExist:
+                return HttpResponse('Group PIN incorrect')
+
+        group.user_set.add(request.user)
+        case.groups.add(group)
+
+        return redirect('ws:case', case=case.id, group=group.id)
+
 
 @login_required
-def case(request, case, group):
+def case_page(request, case, group):
     case = get_object_or_404(Case, id=case)
     group = get_object_or_404(Group, id=group)
     datasets = case.dataset_set.all()
@@ -95,6 +122,33 @@ def case(request, case, group):
         "users": users,
         "notepad_url": settings.NOTEPAD_URL
     })
+
+
+@login_required
+def case_info(request):
+    res = {}
+    if request.method == 'GET': 
+        try:
+            group = request.user.groups.get(id=request.GET['group'])
+            case = group.case_set.get(id=request.GET['case'])
+        except:
+            return HttpResponse('Query failed')
+
+        res['group'] = {
+            'id': group.id,
+            'name': group.name,
+            'pin': group.pin
+        }
+        res['case'] = {
+            'description': case.description,
+            'id': case.id,
+            'name': case.name,
+            'pin': case.pin,
+            'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
+            'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
+            'location': case.location.wkt
+        }
+        return HttpResponse(json.dumps(res). content_type='application/json')
 
 
 def data(request):

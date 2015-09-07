@@ -205,8 +205,8 @@ $.widget('viz.vizeditor', {
     var url;
     data.id = this.item.meta && this.item.meta.id;
     data.name = this.element.find('.title').val();
-    data.case = wb.info.case;
-    data.group = wb.info.group;
+    data.case = CASE;
+    data.group = GROUP;
     if (this.item_type === 'entity') {
       url = GLOBAL_URL.entity_id.replace(/\/0/, data.id ? '': '/' + data.id);
       data.entity_type = this.item.primary.entity_type;
