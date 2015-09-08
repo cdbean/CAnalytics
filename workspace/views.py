@@ -42,9 +42,9 @@ def cases(request):
                         'id': case.id,
                         'name': case.name,
                         'description': case.description,
-                        'start_date': case.start_date,
-                        'end_date': case.end_date,
-                        'location': case.location,
+                        'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
+                        'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
+                        'location': case.location.wkt if case.location else None,
                         'groups': [{
                             'id': group.id,
                             'name': group.name
@@ -61,9 +61,9 @@ def cases(request):
                 'id': case.id,
                 'name': case.name,
                 'description': case.description,
-                'start_date': case.start_date,
-                'end_date': case.end_date,
-                'location': case.location,
+                'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
+                'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
+                'location': case.location.wkt if case.location else None,
                 'groups': {
                     'id': group.id,
                     'name': group.name
@@ -83,7 +83,7 @@ def cases(request):
                 group = request.user.groups.get(id=g_id)
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
-        return redirect('ws:case', case=case.id, group=group.id)
+        return redirect('ws:case_page', case=case.id, group=group.id)
 
 def join_case(request):
     if request.method == 'POST':
@@ -104,7 +104,7 @@ def join_case(request):
         group.user_set.add(request.user)
         case.groups.add(group)
 
-        return redirect('ws:case', case=case.id, group=group.id)
+        return redirect('ws:case_page', case=case.id, group=group.id)
 
 
 @login_required
@@ -146,9 +146,9 @@ def case_info(request):
             'pin': case.pin,
             'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
             'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
-            'location': case.location.wkt
+            'location': case.location.wkt if case.location else None,
         }
-        return HttpResponse(json.dumps(res). content_type='application/json')
+        return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 def data(request):

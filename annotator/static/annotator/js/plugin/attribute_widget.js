@@ -114,7 +114,7 @@ $.widget('custom.attribute_widget', {
         input.datetimepicker({
           onShow: function() {
             var $input = $('.annotator-attribute-input[value=end_date]');
-            var date = $input.parent().next().children().val();
+            var date = $input.parent().next().children().val() || wb.info.case.start_date;
             this.setOptions({
               value: date
             });
@@ -124,7 +124,7 @@ $.widget('custom.attribute_widget', {
         input.datetimepicker({
           onShow: function() {
             var $input = $('.annotator-attribute-input[value=start_date]');
-            var date = $input.parent().next().children().val();
+            var date = $input.parent().next().children().val() || wb.info.case.end_date;
             this.setOptions({
               value: date
             });

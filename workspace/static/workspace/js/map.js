@@ -81,7 +81,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             if (feature) {
                 feature.geometry.transform(origin_prj, dest_prj); // projection of google map
             }
-            defaultloc = feature.geometry;
+            defaultloc = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
         }
         map.setCenter(defaultloc, 15); // zoom level
 

@@ -12,7 +12,12 @@ wb.store.loadItems(GLOBAL_URL.data, {
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 wb.editor = $('<div>').appendTo('body').vizeditor().data('instance');
 
-$.get(GLOBAL_URL.case, function(res) {
+$.get(GLOBAL_URL.case_info, {
+  case: CASE,
+  group: GROUP
+}, function(res) {
+  res.case.start_date = wb.utility.Date(res.case.start_date);
+  res.case.end_date = wb.utility.Date(res.case.end_date);
   wb.info.case = res.case;
   wb.info.group = res.group;
 });
