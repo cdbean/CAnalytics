@@ -57,6 +57,8 @@ def cases(request):
                     })
         cases = Case.objects.exclude(groups__in=groups)
         for case in cases:
+            g_list = [{'id': g.id, 'name': g.name} for g in case.groups.all()]
+
             res['cases_other'].append({
                 'id': case.id,
                 'name': case.name,
@@ -64,11 +66,8 @@ def cases(request):
                 'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
                 'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
                 'location': case.location.wkt if case.location else None,
-                'groups': {
-                    'id': group.id,
-                    'name': group.name
-                }
-            })
+                'groups': g_list
+           })
         return HttpResponse(json.dumps(res), content_type='application/json')
 
     elif request.method == 'POST':

@@ -44,6 +44,9 @@ INSTALLED_APPS = (
     'logger',
     'annotator',
     'sync',
+    'tinymce',
+    'sorl.thumbnail',
+    'mce_filebrowser'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -68,7 +71,7 @@ WSGI_APPLICATION = 'canalytics.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'ca_pilot',                      # Or path to database file if using sqlite3.
+        'NAME': 'ca',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'postgres',
         'PASSWORD': 'asdf1234',
@@ -116,3 +119,26 @@ COMPRESS_ENABLED = False
 NOTEPAD_URL = 'http://127.0.0.1:9001'
 # URL and port of ishout, set it to whatever port that has not been used
 ISHOUT_CLIENT_ADDR = 'localhost:5500'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
+
+# for html editor and field
+TINYMCE_DEFAULT_CONFIG = {
+    'file_browser_callback': 'mce_filebrowser',
+    'theme_advanced_resizing': 'true',
+}

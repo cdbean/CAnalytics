@@ -29,25 +29,29 @@ def login(request):
 
 
 def register(request):
+    if request.method == 'GET':
+        return render(request, 'account/register.html')
+
     if request.method == 'POST':
         username = request.POST.get('username', '')
         email = request.POST.get('email', '')
         psd   = request.POST.get('password', '')
-    if username and email and psd:
-        if User.objects.filter(username=username).exists():
-            user = authenticate(username=username, password=psd)
-            if user:
-                auth_login(request, user)
-                return redirect('workspace.views.home')
+        fname = request.POST.get('fname')
+        lname = request.POST.get('lname')
+        if username and email and psd:
+            if User.objects.filter(username=username).exists():
+                user = authenticate(username=username, password=psd)
+                if user:
+                    auth_login(request, user)
+                    return redirect('home')
+                else:
+                    return HttpResponse('User name exists')
             else:
-                return HttpResponse('Error: username and password do not match')
-        else:
-            User.objects.create_user(username=username, email=email, password=psd)
-            user = authenticate(username=username, password=psd)
-            auth_login(request, user)
-            return redirect('workspace.views.home')
+                User.objects.create_user(username=username, email=email, password=psd)
+                user = authenticate(username=username, password=psd)
+                auth_login(request, user)
+                return redirect('home')
 
-    return
 
 def logout(request):
     auth_logout(request)
