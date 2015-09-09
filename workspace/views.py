@@ -108,8 +108,12 @@ def join_case(request):
 
 @login_required
 def case_page(request, case, group):
-    case = get_object_or_404(Case, id=case)
-    group = get_object_or_404(Group, id=group)
+    try:
+        group = request.user.groups.get(id=group)
+        case = group.case_set.get(id=case)
+    except:
+        return HttpResponse('Sorry, access restricted')
+        
     datasets = case.dataset_set.all()
     for ds in datasets:
         ds.entries = ds.dataentry_set.count()
