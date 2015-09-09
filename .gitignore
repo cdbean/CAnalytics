@@ -39,3 +39,5 @@ nohup.out
 /node_modules/*
 *.log
 /etherpad-lite/*
+
+/media/
