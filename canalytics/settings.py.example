@@ -25,7 +25,7 @@ THUMBNAIL_DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -106,7 +106,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-STATIC_ROOT = ''
+STATIC_ROOT = '/Users/dong/Projects/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
@@ -118,10 +118,10 @@ STATICFILES_FINDERS = (
 
 # Compress js and css file
 # to install it, run 'pip install django_compressor'
-COMPRESS_JS_FILTERS = [
-    'compressor.filters.template.TemplateFilter',
-]
-COMPRESS_ENABLED = False
+# COMPRESS_JS_FILTERS = [
+#     'compressor.filters.template.TemplateFilter',
+# ]
+COMPRESS_ENABLED = True
 
 # URL and port of notepad, needs to match etherpad settings
 NOTEPAD_URL = 'http://127.0.0.1:9001'
