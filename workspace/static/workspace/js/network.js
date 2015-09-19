@@ -525,17 +525,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
             $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('item') === 'relationship';
+              return $(item).find('a').data('from') === 'network';
             }).remove();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
-                wb.store.shelf_by.relationships = [];
+                wb.store.shelf_by.entities = [];
                 d3.selectAll(".node").classed("selected", function(d) {
                     return d.selected = false;
                 });
 
                 $('.filter-div .filter-item').filter(function(i, item) {
-                  return $(item).find('a').data('item') === 'relationship';
+                  return $(item).find('a').data('from') === 'network';
                 }).remove();
 
                 wb.log({
@@ -545,20 +545,21 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 });
             }
             else {
-                var rels_id = [];
+                var ents_id = [];
                 var selected_names = [];
-                d3.selectAll('.link.selected').each(function(d) {
-                    var r = wb.store.items.relationships[d.id];
-                    rels_id.push(d.id);
-                    selected_names.push(r.primary.relation);
+                d3.selectAll('.node.selected').each(function(d) {
+                    var r = wb.store.items.entities[d.id];
+                    ents_id.push(d.id);
+                    selected_names.push(r.primary.name);
                 })
-                wb.store.shelf_by.relationships = rels_id;
+                wb.store.shelf_by.entities = ents_id;
 
-                rels_id.forEach(function(d) {
-                  var rel = wb.store.items.relationships[d];
-                  wb.filter.add('relation: ' + rel.primary.relation, {
-                    item: 'relationship',
-                    id: d
+                ents_id.forEach(function(d) {
+                  var entity = wb.store.items.entities[d];
+                  wb.filter.add(entity.primary.entity_type + ': ' + entity.primary.name, {
+                    item: entity.primary.entity_type,
+                    id: entity.meta.id,
+                    from: 'network'
                   });
                 });
                 wb.log({
@@ -566,7 +567,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     item: 'network',
                     tool: 'network',
                     data: {
-                      'id': rels_id.join(','),
+                      'id': ents_id.join(','),
                       'name': selected_names.join(',')
                     }
                 });
@@ -750,6 +751,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var _this = this;
 
         this.links = [];
+        for (var d in wb.store.items.entities) {
+          var ent = wb.store.items.entities[d];
+          _this.addNode(d);
+        }
 
         for (var d in wb.store.items.relationships) {
           var rel = wb.store.items.relationships[d];
@@ -762,6 +767,16 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     updateView: function() {
       var nodes = [];
       var rels = {};
+
+      if (this.nodes.length === 0) {
+        return d3.select(this.element[0]).append('div')
+          .attr('class', 'center-block placeholder')
+          .attr('width', '200px')
+          .style('text-align', 'center')
+          .html('No entities created yet');
+      } 
+      else d3.select(this.element[0]).selectAll('.placeholder').remove(); 
+
       this.svg.selectAll('.link').attr('display', function(d) {
         if (wb.store.shelf.relationships.indexOf(d.id) > -1) {
           nodes.push(d.source.id);
@@ -777,7 +792,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         return 'none';
       });
       this.svg.selectAll('.node').attr('display', function(d) {
-        if (nodes.indexOf(d.id) > -1) return '';
+        // either relationship is selected or entities are selected
+        if (nodes.indexOf(d.id) > -1 || wb.store.shelf.entities.indexOf(d.id)) return '';
         return 'none';
       });
 

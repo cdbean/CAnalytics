@@ -40,7 +40,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
         );
 
-        map.addLayers([gmap, ghyb, gphy, gsat]);
+        map.addLayers([ghyb, gmap, gphy, gsat]);
 
         this.pointlayer = new OpenLayers.Layer.Vector("Points", {
             styleMap: new OpenLayers.StyleMap({

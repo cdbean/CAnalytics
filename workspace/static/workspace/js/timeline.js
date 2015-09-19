@@ -68,8 +68,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
           }
         }
       }
+
       this.timeline.data(data);
-     d3.select(this.element[0]).call(this.timeline);
+      d3.select(this.element[0]).call(this.timeline);
     },
 
     updateView: function() {

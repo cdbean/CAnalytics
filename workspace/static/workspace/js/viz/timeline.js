@@ -37,6 +37,15 @@ wb.viz.timeline = function() {
     itemHeight = trackHeight * .8;
 
     selection.each(function() {
+      if (data.length === 0) {
+        return d3.select(this).append('div')
+          .attr('class', 'center-block placeholder')
+          .attr('width', '200px')
+          .style('text-align', 'center')
+          .html('No events created yet');
+      } 
+      else d3.select(this).selectAll('.placeholder').remove();
+
       if (!svg)  {
         svg = d3.select(this).append('svg')
           .attr('width', outwidth)
@@ -45,6 +54,7 @@ wb.viz.timeline = function() {
         var g = svg.append('g')
           .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
           ;
+
         g.append('clipPath')
           .attr('id', 'clip')
           .append('rect')
@@ -166,11 +176,12 @@ wb.viz.timeline = function() {
   };
 
   exports.filter = function(subset) {
-    svg.selectAll('.item')
-      .attr('display', function(d) {
-        if (subset.indexOf(d.id) > -1) return '';
-        else return 'none';
-      });
+    if (svg)
+      svg.selectAll('.item')
+        .attr('display', function(d) {
+          if (subset.indexOf(d.id) > -1) return '';
+          else return 'none';
+        });
   };
 
   exports.setBrushMode = function() {

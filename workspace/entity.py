@@ -138,16 +138,19 @@ def create_entity(json, user, case, group):
     if name:
         entity_type = json['entity_type']
         if entity_type == 'person':
-            obj, created = Person.objects.get_or_create(name=name, created_by=user, case=case, group=group)
+            obj, created = Person.objects.get_or_create(name=name, case=case, group=group)
         if entity_type == 'location':
-            obj, created = Location.objects.get_or_create(name=name, created_by=user, case=case, group=group)
+            obj, created = Location.objects.get_or_create(name=name, case=case, group=group)
         if entity_type == 'event':
-            obj, created = Event.objects.get_or_create(name=name, created_by=user, case=case, group=group)
+            obj, created = Event.objects.get_or_create(name=name, case=case, group=group)
         if entity_type == 'resource':
-            obj, created = Resource.objects.get_or_create(name=name, created_by=user, case=case, group=group)
+            obj, created = Resource.objects.get_or_create(name=name, case=case, group=group)
         if entity_type == 'organization':
-            obj, created = Organization.objects.get_or_create(name=name, created_by=user, case=case, group=group)
+            obj, created = Organization.objects.get_or_create(name=name, case=case, group=group)
 
+        if created: 
+            obj.created_by = user
+            obj.save()
         return obj
 
     else:

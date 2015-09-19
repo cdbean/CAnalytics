@@ -47,6 +47,10 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
 
     },
 
+    updateView: function() {
+
+    },
+
     getContent: function() {
         var _this = this;
         $.get('notepad/note', function(res) {

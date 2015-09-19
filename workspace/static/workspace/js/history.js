@@ -9,29 +9,53 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     this.options.extend.help = this.help;
 
     this._setupUI();
-    this.loadData();
+    this.loadData(0);
   },
 
   _setupUI: function() {
     var html = '\
       <ul class="history-list"></ul> \
+      <nav> \
+        <ul class="pager"> \
+          <li><a class="prev" href="#">Previous</a></li> \
+          <li><a class="next" href="#">Next</a></li> \
+        </ul> \
+      </nav> \
     ';
     this.element.append(html);
 
+    var _this = this;
+    $('.pager>li>a', this.element).click(function(e) {
+      var page = $(this).data('page');
+      _this.loadData(+page);
+    });
     // click on timestamp, jump to context
     this.element.on('click', 'li.history-item .timestamp', this.jumpToContext.bind(this));
   },
 
-  loadData: function() {
+  loadData: function(page) {
     var _this = this;
+    $('#history-list', this.element).empty();
 
     $.get(this.options.url, {
       'case': CASE,
-      group: GROUP
+      group: GROUP,
+      page: page
     }, function(data) {
-      for (var i = 0, len = data.length; i < len; i++) {
-        _this.add(data[i]);
+      for (var i = 0, len = data.items.length; i < len; i++) {
+        _this.add(data.items[i]);
       }
+      if (data.has_previous) 
+        $('.pager .prev', this.element).removeClass('hidden')
+          .data('page', data.previous_page);
+      else 
+        $('.pager .prev', this.element).addClass('hidden');
+
+      if (data.has_next) 
+        $('.pager .next', this.element).removeClass('hidden')
+          .data('page', data.next_page);
+      else 
+        $('.pager .next', this.element).addClass('hidden');
     });
 
   },

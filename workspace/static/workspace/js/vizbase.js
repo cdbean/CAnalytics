@@ -25,8 +25,10 @@ $.widget('viz.vizbase', {
         if (!this.options.base.resizeStop) {
             this.options.base.resizeStop = this.resize.bind(this);
         }
-        this.options.base.width = this.options.width;
-        this.options.base.height = this.options.height;
+        // this.options.base.width = this.options.width;
+        // this.options.base.height = this.options.height;
+        this.options.base.width = $(window).width() / 2 - 20;
+        this.options.base.height = $(window).height() / 2 - 20;
         this.options.base.title = this.options.title;
         this.element.dialog(this.options.base).dialogExtend(this.options.extend);
         this.options.extend.help = this.help;
