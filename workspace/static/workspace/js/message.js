@@ -24,6 +24,12 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     // ';
     var message_html = ' \
       <div class="messageArea"> \
+        <nav> \
+          <ul class="pager"> \
+            <li><a class="prev" href="#">Previous</a></li> \
+            <li><a class="next" href="#">Next</a></li> \
+          </ul> \
+        </nav> \
         <ul class="messages"></ul> \
         <form class="inputMessage"> \
           <div id="message_content" contentEditable=true data-placeholder="Type here..."> \
@@ -59,16 +65,30 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     })
   },
 
-  loadMessages: function() {
+  loadMessages: function(page) {
     var _this = this;
+     $('ul.messages', this.element).empty();
+
     $.get(GLOBAL_URL.messages, {
-      case: CASE,
-      group: GROUP
-    }, function(msgs) {
-      for (var i = 0, len = msgs.length; i < len; i++) {
-        _this.loadMessage(msgs[i]);
+      'case': CASE,
+      group: GROUP,
+      page: page
+    }, function(data) {
+      for (var i = 0, len = data.items.length; i < len; i++) {
+        _this.loadMessage(data.items[i]);
       }
-    })
+      if (data.has_previous) 
+        $('.pager .prev', this.element).removeClass('hidden')
+          .data('page', data.previous_page);
+      else 
+        $('.pager .prev', this.element).addClass('hidden');
+
+      if (data.has_next) 
+        $('.pager .next', this.element).removeClass('hidden')
+          .data('page', data.next_page);
+      else 
+        $('.pager .next', this.element).addClass('hidden');
+    });
   },
 
   loadMessage: function(msg) {

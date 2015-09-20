@@ -53,7 +53,11 @@ wb.viz.table = function() {
                     callback: function( sValue, y ) {
                         var aPos = table.fnGetPosition( this );
                         table.fnUpdate( sValue, aPos[0], aPos[2] );
-                        dispatch.edit();
+                        var column = table.fnGetPosition( this )[2];
+                        var attr = table.fnSettings().aoColumns[column].sTitle.toLowerCase();
+                        var ent = wb.store.items.entities[$(this.parentNode).data('id')];
+                        ent.primary[attr] = sValue;
+                        dispatch.edit(ent, attr);
                     },
                     submitdata: function ( value, settings ) {
                         var column = table.fnGetPosition( this )[2];

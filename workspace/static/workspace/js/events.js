@@ -13,6 +13,7 @@
   $.subscribe('entity/created', onEntitiesCreated);
   $.subscribe('entity/updated', onEntitiesUpdated);
   $.subscribe('entity/deleted', onEntitiesDeleted);
+  $.subscribe('entity/attribute/update', onEntityAttrUpdated);
 
   $.subscribe('relationship/created', onRelationshipsCreated);
   $.subscribe('relationship/updated', onRelationshipsUpdated);
@@ -95,6 +96,10 @@
   function onEntitiesDeleted() {
     var entities = [].slice.call(arguments, 1);
     wb.store.removeItems(entities, 'entities');
+  }
+
+  function onEntityAttrUpdated(ent, attr) {
+
   }
 
   function onRelationshipsCreated() {

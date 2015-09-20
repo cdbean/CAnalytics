@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from drealtime import iShoutClient
 import json
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import Group, User
 from workspace.models import Case
@@ -28,10 +29,30 @@ def join_group(request):
 
 def messages(request):
     if request.method == 'GET':
+        res = {'items': []}
         group = request.GET['group']
         case  = request.GET['case']
         msgs = Message.objects.filter(group=group, case=case).order_by('sent_at')
-        res = [msg.serialize() for msg in msgs]
+        paginator = Paginator(msgs, 50) # Show 50 items per page
+        page = request.GET.get('page')
+
+        try:
+            msgs = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            msgs = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            msgs = paginator.page(paginator.num_pages)
+        for msg in msgs:
+            res['items'].append(msg.serialize())
+
+        res['has_next'] = msgs.has_next()
+        res['has_previous'] = msgs.has_previous()
+        if (res['has_next']): res['next_page'] = msgs.next_page_number()
+        if (res['has_previous']): res['previous_page'] = msgs.previous_page_number()
+        res['number'] = msgs.number
+        res['num_pages'] = msgs.paginator.num_pages 
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
