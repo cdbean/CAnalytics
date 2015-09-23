@@ -47,7 +47,7 @@ def register(request):
                 else:
                     return HttpResponse('User name exists')
             else:
-                User.objects.create_user(username=username, email=email, password=psd)
+                User.objects.create_user(username=username, email=email, password=psd, first_name=fname, last_name=lname)
                 user = authenticate(username=username, password=psd)
                 auth_login(request, user)
                 return redirect('home')

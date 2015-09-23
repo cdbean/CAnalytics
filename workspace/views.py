@@ -10,6 +10,7 @@ from workspace.models import Case, DataEntry, Entity, Relationship
 from annotator.models import Annotation
 from workspace.entity import get_or_create_entity, set_primary_attr
 from sync.views import sync_item
+import sync.views as sync
 from logger.views import serverlog
 
 # Create your views here.
@@ -118,6 +119,8 @@ def case_page(request, case, group):
     for ds in datasets:
         ds.entries = ds.dataentry_set.count()
     users = group.user_set.all()
+
+
     return render(request, 'index.html', {
         "case": case,
         "group": group,

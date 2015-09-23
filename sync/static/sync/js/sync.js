@@ -1,38 +1,38 @@
 $(function() {
   // join room
-  $.subscribe('users/loaded', function() {
-    if (! ('ishout' in window)) return;
+  // $.subscribe('users/loaded', function() {
+  //   if (! ('ishout' in window)) return;
 
-    var room = CASE + '-' + GROUP;
-    room = room.replace(/\s/g, '');
-    ishout.joinRoom(room, function(data) {
-      // after joining room, server will return a list of users in the room:
-      // {users: [user_id]}
-      onUsersOnline(data.users);
-      $.post('/sync/join', {
-        'case': CASE,
-        'group': GROUP,
-      });
-    });
-  });
+  //   var room = CASE + '-' + GROUP;
+  //   room = room.replace(/\s/g, '');
+  //   ishout.joinRoom(room, function(data) {
+  //     // after joining room, server will return a list of users in the room:
+  //     // {users: [user_id]}
+  //     onUsersOnline(data.users);
+  //     $.post('/sync/join', {
+  //       'case': CASE,
+  //       'group': GROUP,
+  //     });
+  //   });
+  // });
 
-  // get all users in this group
-  $.get(GLOBAL_URL.users, {
-    case: CASE,
-    group: GROUP
-  }, function(users) {
-    for (var i = 0, len = users.length; i < len; i++) {
-      var user = users[i];
-      user.color = wb.utility.randomColor(i);
-      wb.info.users[user.id] = user;
-    }
-    // change the color of the user name in nav bar
-    var mycolor = wb.info.users[wb.info.user].color;
-    $('.nav #username').css('color', mycolor);
+  // // get all users in this group
+  // $.get(GLOBAL_URL.users, {
+  //   case: CASE,
+  //   group: GROUP
+  // }, function(users) {
+  //   for (var i = 0, len = users.length; i < len; i++) {
+  //     var user = users[i];
+  //     user.color = wb.utility.randomColor(i);
+  //     wb.info.users[user.id] = user;
+  //   }
+  //   // change the color of the user name in nav bar
+  //   var mycolor = wb.info.users[wb.info.user].color;
+  //   $('.nav #username').css('color', mycolor);
     
-    // after users are loaded, join room and fetch users online
-    $.publish('users/loaded');
-  });
+  //   // after users are loaded, join room and fetch users online
+  //   $.publish('users/loaded');
+  // });
 
 
   if (! ("ishout" in window)) {
@@ -41,7 +41,15 @@ $(function() {
   }
 
   ishout.init();
-
+  var room = CASE + '-' + GROUP;
+  ishout.joinRoom(room, function(d) {
+    // inform the server that it has joined the room
+    // the server will broadcast and update the list of online users
+    $.post('/sync/join', {
+      'case': CASE,
+      'group': GROUP,
+    });
+  })
 
   ishout.on('message', onNewMessage);
 
@@ -63,7 +71,20 @@ $(function() {
 
 
   function onUsersOnline(data) {
-    $.publish('user/online', data);
+    var users = data.users;
+    var online_users = data.online_users;
+    for (var i = 0, len = users.length; i < len; i++) {
+      var user = users[i];
+      // if already exists, do nothing
+      if (user.id in wb.info.users) continue;
+      // else add to wb.info.users
+      user.color = wb.utility.randomColor(user.username);
+      wb.info.users[user.id] = user;
+    }
+    // update the color of the user name in nav bar
+    var mycolor = wb.info.users[wb.info.user].color;
+    $('.nav #username').css('color', mycolor);
+    $.publish('user/online', online_users);
   }
 
   function onNewMessage(data) {

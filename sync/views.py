@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from drealtime import iShoutClient
 import json
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import Group, User
@@ -15,15 +16,41 @@ ishout_client = iShoutClient()
 def group_name(case, group):
     """generate group name for sync
     """
-    return (case.name + '-' + group.name).replace(' ', '')
+    return str(case.id) + '-' + str(group.id)
 
 
+@login_required
 def join_group(request):
-    case = Case.objects.get(id=int(request.POST['case']))
-    group = Group.objects.get(id=int(request.POST['group']))
+    try:
+        case = Case.objects.get(id=request.POST['case'])
+        group = Group.objects.get(id=request.POST['group'])
+    except:
+        return
     name = group_name(case, group)
     ishout_client.register_group(request.user.id, name)
-    return HttpResponse('success')
+    broadcast_users_status(request.user, case, group)
+    return HttpResponse()
+
+
+def broadcast_users_status(user, case, group):
+    data = {'users': [], 'online_users': []}
+    name = group_name(case, group)
+
+    users = group.user_set.all()
+    for u in users:
+        data['users'].append({
+            'id': u.id,
+            'name': u.username,
+            'fname': u.first_name,
+            'lname': u.last_name
+        })
+
+    status = ishout_client.get_room_status(name)
+    print '*****************************'
+    print status
+    data['online_users'] = status['members']
+
+    ishout_client.broadcast_group(name, 'usersonline', data)
 
 
 
