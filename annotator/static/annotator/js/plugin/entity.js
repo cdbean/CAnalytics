@@ -151,7 +151,13 @@ Annotator.Plugin.Entity = (function(_super) {
               entity = wb.store.items.relationships[annotation.entity.id];
             else
               entity = wb.store.items.entities[annotation.entity.id];
-            name = entity.primary.name || entity.primary.relation;
+            if (!entity) {
+                // entity does not exist
+                // delete this outdated entity
+                name = annotation.quote;
+                delete annotation.entity;
+            }
+            else name = entity.primary.name || entity.primary.relation;
         } else {
             name = annotation.quote;
         }
@@ -273,6 +279,7 @@ Annotator.Plugin.Entity = (function(_super) {
     };
 
     Entity.prototype.updateViewer = function(field, annotation) {
+        $(field).empty();
         if (annotation.entity) {
             var table = '<table id="annotator-viewer-table">';
             var entity;
@@ -280,6 +287,10 @@ Annotator.Plugin.Entity = (function(_super) {
               entity = wb.store.items.relationships[annotation.entity.id];
             else
               entity = wb.store.items.entities[annotation.entity.id];
+            if (!entity) {
+                // if entity does not exist
+                return $(field).append('<span>No entity exists (It might be deleted)</span>');
+            }
             var primary = entity.primary || entity;
             table += '<tr><th>' + this.capitalizeFirstLetter(primary.entity_type || 'relationship') + ':</th><td>' + (primary.name || primary.relation) + '</td></tr>';
             var attrs = wb.store.static[entity.primary.entity_type || 'relationship'];
@@ -304,7 +315,7 @@ Annotator.Plugin.Entity = (function(_super) {
             table += '</table>';
             $(field).append($(table));
         } else {
-            return field.remove();
+            return $(field).append('<span>No entity exists (It might be deleted)</span>');
         }
     };
 

@@ -5,8 +5,11 @@
 .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand, .navbar-default .navbar-brand:focus {
   color: white;
 }
-.navbar-default .navbar-nav>li>a {
+.navbar-default .navbar-nav>li>a{
   color: white;
+}
+#page_header a#username{
+  background-color: white;
 }
 .navbar-default .navbar-nav label {
   margin-right: 4px;

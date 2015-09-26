@@ -124,6 +124,26 @@ $.widget('viz.vizviewer', {
   },
 
   _onClickDelete: function() {
+    var item = this.item;
+    var item_type = this.item_type;
+    if (this.item_type === 'relationship') {
 
+    } else { // if it is an entity
+      $.ajax({
+        url: GLOBAL_URL.entity_id.replace('0', this.item.meta.id),
+        data: {
+          case: CASE,
+          group: GROUP
+        },
+        type: 'DELETE',
+        success: function() {
+          $.publish('entity/deleted', item);
+        },
+        error: function(e) {
+          console.log(e);
+          wb.utility.notify('Sorry, failed to delete the entity');
+        }
+      })
+    }
   },
 });

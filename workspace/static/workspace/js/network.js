@@ -4,6 +4,15 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
         this.options.extend.help = this.help;
+
+        // track the position of node in this.nodes
+        this.nodeMap = {};
+        // store nodes data, refed by this.force and node svgs
+        this.nodes = [];
+        // similar to node
+        this.linkMap = {};
+        this.links = [];
+
         this.element.addClass('network');
         this._super('_create');
 
@@ -19,9 +28,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.margin = {top: 35, bottom: 5, left: 13, right: 5};
         this.width  = this.element.width() - this.margin.left - this.margin.right;
         this.height = this.element.height() - this.margin.top - this.margin.bottom;
-        this.nodeMap = {};
-        this.nodes = [];
-        this.links = [];
         // mouse event vars
         this.selected_node = null,
         this.selected_link = null;
@@ -734,32 +740,74 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     addLink: function(rel) {
-        var source = this.addNode(rel.primary.source);
-        var target = this.addNode(rel.primary.target);
-        var link = {
-            source: source,
-            target: target,
-            id: rel.meta.id,
-        };
-        var i = this.findLink(link);
-        if (i < 0) {
-          this.links.push(link);
+        var source = this.findNode(rel.primary.source);
+        var target = this.findNode(rel.primary.target);
+        // only add a link when both source and target exist
+        if (source && target) {
+          var link = {
+              source: source,
+              target: target,
+              id: rel.meta.id,
+          };
+          var i = this.findLink(link);
+          if (i < 0) {
+            this.links.push(link);
+          }
         }
     },
 
     updateData: function() {
         var _this = this;
 
-        this.links = [];
+        // first add all entities as nodes 
         for (var d in wb.store.items.entities) {
           var ent = wb.store.items.entities[d];
-          _this.addNode(d);
+          if (ent.meta.id in this.nodeMap) {
+            this.nodes[this.nodeMap[ent.meta.id]].temp_exist = true;
+          } else {
+            this.nodes.push({ id: ent.meta.id, temp_exist: true });
+            this.nodeMap[ent.meta.id] = this.nodes.length - 1;
+          }
+        }
+        // remove items that is not in wb.store
+        // iterate backward
+        for (var i = this.nodes.length - 1; i >= 0; i--) {
+          if (!this.nodes[i].temp_exist) {
+            delete this.nodeMap[this.nodes[i].id];
+            this.nodes.splice(i, 1);
+          } else {
+            delete this.nodes[i].temp_exist;
+          } 
         }
 
+        // add relationships as links
         for (var d in wb.store.items.relationships) {
           var rel = wb.store.items.relationships[d];
-          _this.addLink(rel)
+          if (rel.meta.id in this.linkMap) {
+            this.links[this.linkMap[rel.meta.id]].temp_exist = true;
+          } else {
+            var source = this.nodeMap[rel.primary.source];
+            var target = this.nodeMap[rel.primary.target];
+            if (source && target) {
+              this.links.push({
+                source: source,
+                target: target,
+                id: rel.meta.id,
+                temp_exist: true
+              });
+              this.linkMap[rel.meta.id] = this.links.length - 1;
+            }
+          }
         }
+        for (var i = this.links.length - 1; i >= 0; i--) {
+          if (!this.links[i].temp_exist) {
+            delete this.linkMap[this.links[i].id];
+            this.links.splice(i, 1);
+          } else {
+            delete this.links[i].temp_exist;
+          } 
+        }
+
         this.restart();
         this.setMode('normal');
     },
@@ -793,7 +841,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       });
       this.svg.selectAll('.node').attr('display', function(d) {
         // either relationship is selected or entities are selected
-        if (nodes.indexOf(d.id) > -1 || wb.store.shelf.entities.indexOf(d.id)) return '';
+        if (nodes.indexOf(d.id) > -1 || wb.store.shelf.entities.indexOf(d.id) > -1) return '';
         return 'none';
       });
 

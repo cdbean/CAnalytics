@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 import json
+from django.http import QueryDict
 
 from canalytics import settings
 
@@ -84,6 +85,7 @@ def cases(request):
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
         return redirect('ws:case_page', case=case.id, group=group.id)
+
 
 def join_case(request):
     if request.method == 'POST':
@@ -185,6 +187,7 @@ def data(request):
 
 
 
+@login_required
 def entity(request, id=0):
     if request.method == 'POST':
         res = {'entity': [], 'relationship': []}
@@ -205,6 +208,21 @@ def entity(request, id=0):
         sync_item('update', 'entity', res, case, group, request.user)
 
         return HttpResponse(json.dumps(res), content_type='application/json')
+    # delete an entity    
+    if request.method == 'DELETE':
+        res = {}
+        data = QueryDict(request.body)
+        case = Case.objects.get(id=data['case'])
+        group = Group.objects.get(id=data['group'])
+        try:
+            entity = Entity.objects.get(id=int(id), case=case, group=group)
+        except:
+            return HttpResponse('Error: entity not found')
+        res['entity'] = entity.serialize()
+        entity.delete()
+        sync_item('delete', 'entity', res, case, group, request.user)
+        return HttpResponse(json.dumps(res), content_type='application/json')
+
 
 def entity_attr(request):
     if request.method == 'POST':

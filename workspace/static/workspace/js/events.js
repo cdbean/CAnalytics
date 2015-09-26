@@ -68,8 +68,16 @@
   }
 
   function onDataUpdated() {
-    updateDataBut(['.dataentry']);
-    updateViewsBut(['.dataentry']);
+    var datatype = [].slice.call(arguments, 1)
+    // if annotations are updated, we do not need to update other views
+    // only update views when entities or relationships are updated
+    if (datatype.indexOf('annotations') < 0) {
+      updateDataBut(['.dataentry']);
+      updateViewsBut(['.dataentry']);
+    } else { // update annotation table
+      var viz = $('.viz.annotation').data('instance');
+      if (viz) viz.updateData().updateView();
+    }
   }
 
   function onDataFiltered() {

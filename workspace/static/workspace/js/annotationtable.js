@@ -20,6 +20,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         ;
         this.updateData();
         this.updateView();
+        return this;
     },
 
     updateData: function() {
@@ -38,10 +39,12 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         }
         this.table.data(data);
         d3.select(this.element[0]).call(this.table);
+        return this;
     },
 
     updateView: function() {
       this.table.filter(wb.store.shelf.annotations);
+      return this;
     },
 
     reload: function() {

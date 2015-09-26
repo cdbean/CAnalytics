@@ -19,8 +19,13 @@ wb.filter.remove = function(item, data) {
   if (data.id) {
     // if the item has id, it is an entity/relationship/annotation
     // remove from the store shelf
-    var i = wb.store.shelf_by[data.item].indexOf(data.id);
-    wb.store.shelf_by[data.item].split(i, 1);
+    if (data.item ===  'relationship') {
+      var i = wb.store.shelf_by.relationships.indexOf(data.id);
+      wb.store.shelf_by.relationships.splice(i, 1);
+    } else {
+      var i = wb.store.shelf_by.entities.indexOf(data.id);
+      wb.store.shelf_by.entities.splice(i, 1);
+    }
   } else {
     if (data.item === 'time') {
       // if time filter is removed

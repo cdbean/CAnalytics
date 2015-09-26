@@ -117,7 +117,9 @@ $(function() {
   }
 
   function onEntityDeleted(data) {
+    if (data.user === wb.info.user) return;
 
+    $.publish('entity/deleted', data.entity);
   }
 
   function onRelationshipCreated(data) {
