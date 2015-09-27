@@ -127,6 +127,24 @@ $.widget('viz.vizviewer', {
     var item = this.item;
     var item_type = this.item_type;
     if (this.item_type === 'relationship') {
+      $.ajax({
+        url: GLOBAL_URL.relationship.replace('0', this.item.meta.id),
+        data: {
+          case: CASE,
+          group: GROUP
+        },
+        type: 'DELETE',
+        success: function(res) {
+          wb.utility.notify('Deleted a relationship', 'success');
+          $.publish('relationship/deleted', res.relationship);
+          // if res includes entity, it means an entity has been updated due to the deletion of the relationship
+          if (res.entity) $.publish('entity/updated', res.entity);
+        },
+        error: function(e) {
+          console.log(e);
+          wb.utility.notify('Sorry, failed to delete the relationship', 'error');
+        }
+      });
 
     } else { // if it is an entity
       $.ajax({
@@ -137,13 +155,14 @@ $.widget('viz.vizviewer', {
         },
         type: 'DELETE',
         success: function() {
+          wb.utility.notify('Deleted an entity', 'success');
           $.publish('entity/deleted', item);
         },
         error: function(e) {
           console.log(e);
           wb.utility.notify('Sorry, failed to delete the entity');
         }
-      })
+      });
     }
   },
 });

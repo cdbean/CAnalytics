@@ -120,6 +120,11 @@ $(function() {
     if (data.user === wb.info.user) return;
 
     $.publish('entity/deleted', data.entity);
+    wb.utility.notify(wb.info.users[data.user].name
+                      + ' deleted  '
+                      + data.entity.primary.entity_type
+                      + ' '
+                      + data.entity.primary.name);
   }
 
   function onRelationshipCreated(data) {
@@ -131,7 +136,18 @@ $(function() {
   }
 
   function onRelationshipDeleted(data) {
-
+    if (data.user === wb.info.user) return;
+    $.publish('relationship/deleted', data.relationship);
+    // if data includes entity, it means that entity has been updated due to the deletion of the relationship
+    if (data.entity) $.publish('entity/updated', data.entity);
+    
+    wb.utility.notify(wb.info.users[data.user].name
+                      + ' deleted relationship '
+                      + data.primary.relation
+                      + ' between '
+                      + wb.store.items.entities[data.primary.source]
+                      + ' and '
+                      + wb.store.items.entities[data.primary.target]);
   }
 
   function onAnnotationCreated(data) {

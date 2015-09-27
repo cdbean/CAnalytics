@@ -266,13 +266,14 @@ def entities(request):
     pass
 
 
+@login_required
 def relationship(request, id):
     if request.method == 'POST':
-        create_relationship(request)
+        return create_relationship(request)
     elif request.method == 'PUT':
-        update_relationship(request, id)
+        return update_relationship(request, id)
     elif request.method == 'DELETE':
-        delete_relationship(request, id)
+        return delete_relationship(request, id)
 
 
 def relationships(request):
@@ -286,5 +287,28 @@ def create_relationship(request):
 def update_relationship(request):
     pass
 
-def delete_relationship(request):
-    pass
+def delete_relationship(request, id):
+    res = {}
+    data = QueryDict(request.body)
+    case = Case.objects.get(id=data['case'])
+    group = Group.objects.get(id=data['group'])
+    try:
+        rel = Relationship.objects.get(id=int(id), case=case, group=group)
+    except:
+        return HttpResponse('Error: relationship not found')
+    res['relationship'] = rel.serialize()
+    if rel.relation == 'involve':
+        source = Entity.objects.filter(id=rel.source.id).select_subclasses()[0]
+        target = Entity.objects.filter(id=rel.target.id).select_subclasses()[0]
+        if source.entity_type == 'event':
+            if target.entity_type == 'person': source.person.remove(target)
+            if target.entity_type == 'location': source.location = None
+            if target.entity_type == 'organization': source.organization.remove(target)
+        elif source.entity_type == 'organization':
+            if target.entity_type == 'person': source.person.remove(target)
+        res['entity'] = source.serialize()
+
+    rel.delete()
+    sync_item('delete', 'relationship', res, case, group, request.user)
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
