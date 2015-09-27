@@ -192,9 +192,17 @@
   }
 
   function onNewMessage(e, msg) {
+    wb.utility.notify(wb.info.users[msg.sender].name + ' sent a message');
+    var num = $('#message-btn .unread').text();
+    if (!num) num = 1;
+    else num = +num + 1;
+    $('#message-btn .unread').text(num);
     $('.viz.message').each(function(i, viz) {
-      viz = $(viz).data('instance');
-      viz.loadMessage(msg);
+      var $viz = $(viz).data('instance');
+      $viz.loadMessage(msg);
+      var ele = $('ul.messages', viz);
+      wb.utility.scrollTo($('span.messagebody:last', ele), ele);
+      if (msg.sender !== wb.info.user) $(viz).parent().addClass('highlighted');
     });
   }
 

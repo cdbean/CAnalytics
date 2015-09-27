@@ -7,6 +7,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     this._super('_create');
     this.element.addClass('history');
     this.options.extend.help = this.help;
+    this._timeformat = d3.time.format('%b %d %Y, %H:%M:%S');
+    this._servertimeformat = d3.time.format('%m/%d/%Y-%H:%M:%S');
 
     this._setupUI();
     this.loadData(0);
@@ -14,13 +16,13 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
 
   _setupUI: function() {
     var html = '\
-      <ul class="history-list"></ul> \
       <nav> \
         <ul class="pager"> \
           <li><a class="prev" href="#">Previous</a></li> \
           <li><a class="next" href="#">Next</a></li> \
         </ul> \
       </nav> \
+      <ul class="history-list"></ul> \
     ';
     this.element.append(html);
 
@@ -57,36 +59,42 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       else 
         $('.pager .next', this.element).addClass('hidden');
     });
-
   },
 
   add: function(item) {
     // item structure:
     // {'user': user_id, 'operation': '', 'time': '', 'data': ''}
+    var lastrow = $('ul.history-list li.history-item:last', this.element);
     var row = $('<li class="history-item">').prependTo(this.element.find('ul.history-list'));
     var user = wb.info.users[item.user];
-    $('<span class="timestamp">').appendTo(row)
-      .text(item.time);
-    $('<span class="username">').appendTo(row)
-      .text(user.name)
-      .css('color', user.color);
+    var usertag = $('<span class="username">').appendTo(row).text(user.name).css('color', user.color);
+    var timetag = $('<span class="timestamp">').appendTo(row).text(this._timeformat(this._servertimeformat.parse(item.time)));
 
     var action = item.operation + ' ' + item.item;
     var entity;
     if (item.data) {
       if (item.data.name) {
-        action += ' <a class="item">' + item.data.name + '</span>';
+        action += ' <a class="wb-item">' + item.data.name + '</span>';
       }
-
     }
     $('<span class="content">').appendTo(row)
       .html(action)
     ;
     if (wb.store.static.entity_types.indexOf(item.item) > -1) {
-      row.find('.item').addClass('entity').addClass(item.item).data('entity', {id: item.data.id});
+      row.find('.wb-item').addClass('wb-entity').addClass(item.item).data('entity', {id: item.data.id});
     }
 
-    if (item.user === wb.info.user) {
+    // hide user and time tag when it's the same user and within 60s
+    if (lastrow.find('.username').text() === usertag.text()) {
+      var lasttime = this._timeformat.parse(lastrow.find('.timestamp').text());
+      var thistime = this._timeformat.parse(row.find('.timestamp').text());
+      if (Math.floor((thistime - lasttime) / 1000) < 60) {
+        usertag.addClass('hidden');
+        timetag.addClass('hidden');
+      }
+    }
+
+    if (item.user !== wb.info.user) {
       row.css('background-color', '#eee')
     }
 

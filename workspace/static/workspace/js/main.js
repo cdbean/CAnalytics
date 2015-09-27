@@ -101,6 +101,7 @@ $(function() {
       viz = $('<div>').vizmessage({
         title: 'Message'
       });
+      $(this).find('.unread').text('');
     } else if (viz_name === 'history') {
       viz = $('<div>').vizhistory({
         title: 'History',

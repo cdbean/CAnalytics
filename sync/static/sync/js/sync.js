@@ -78,7 +78,7 @@ $(function() {
       // if already exists, do nothing
       if (user.id in wb.info.users) continue;
       // else add to wb.info.users
-      user.color = wb.utility.randomColor(user.username);
+      user.color = wb.utility.randomColor(user.name);
       wb.info.users[user.id] = user;
     }
     // update the color of the user name in nav bar
@@ -140,7 +140,7 @@ $(function() {
     $.publish('relationship/deleted', data.relationship);
     // if data includes entity, it means that entity has been updated due to the deletion of the relationship
     if (data.entity) $.publish('entity/updated', data.entity);
-    
+
     wb.utility.notify(wb.info.users[data.user].name
                       + ' deleted relationship '
                       + data.primary.relation

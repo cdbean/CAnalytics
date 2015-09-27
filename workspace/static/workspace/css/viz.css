@@ -21,6 +21,13 @@
     overflow: scroll;
 }
 
+.ui-dialog.highlighted .ui-dialog-titlebar {
+    background-color: rgb(53, 179, 42);
+}
+.ui-dialog.highlighted {
+  border: 2px solid #06B13E;
+}
+
 .viz .controls {
   position: absolute;
   list-style-type: none;
