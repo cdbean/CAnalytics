@@ -54,6 +54,7 @@ viz.message .inputMessage #message_content:focus {
   padding-left: 15px;
 }
 .viz.message [contentEditable=true]:empty:before{
-  content:attr(data-placeholder)
+  content:attr(data-placeholder);
+  color: #aaa;
 }
 

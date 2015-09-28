@@ -62,7 +62,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
                 start: entity.primary.start_date,
                 end: entity.primary.end_date,
                 label: entity.primary.name,
-                id: entity.meta.id
+                id: entity.meta.id,
+                lid: entity.meta.id
               });
             }
           }

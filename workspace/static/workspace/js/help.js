@@ -163,7 +163,7 @@ wb.help.message = [
     'next .viz.message': 'You can message your group here'
   },
   {
-    'next #message_content': 'Type message here and press [Enter] to send'
+    'next #message_content': 'Type message here and hit [Ctrl+Enter] to send'
   }
 ];
 

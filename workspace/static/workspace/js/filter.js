@@ -22,6 +22,9 @@ wb.filter.remove = function(item, data) {
     if (data.item ===  'relationship') {
       var i = wb.store.shelf_by.relationships.indexOf(data.id);
       wb.store.shelf_by.relationships.splice(i, 1);
+    } else if (data.item === 'annotation') {
+      var i = wb.store.shelf_by.annotations.indexOf(data.id);
+      wb.store.shelf_by.annotations.splice(i, 1);
     } else {
       var i = wb.store.shelf_by.entities.indexOf(data.id);
       wb.store.shelf_by.entities.splice(i, 1);

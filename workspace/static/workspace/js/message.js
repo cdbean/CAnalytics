@@ -21,7 +21,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         <ul class="messages"></ul> \
       </div> \
       <form class="inputMessage"> \
-        <div id="message_content" contentEditable=true data-placeholder="Type here..."></div> \
+        <div id="message_content" contentEditable=true data-placeholder="Hit [Ctrl+Enter] to send message.."></div> \
         <input type="submit" style="display: none;"> \
       </form> \
     ';
@@ -36,10 +36,10 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   _initialize: function() {
     var _this = this;
     // initialize events listeners for components
-    this.element.find('#message_content').keydown(function(e) {
-      if (e.which == 13) { // press enter
-        var content = $(this).text();
-        $(this).text('');
+    var input = this.element.find('#message_content').keydown(function(e) {
+      if (e.which == 13 && e.ctrlKey) { // press enter
+        var content = $(this).html();
+        $(this).html('');
         _this.element.parent().removeClass('highlighted');
 
         $.post(GLOBAL_URL.message, {
@@ -52,6 +52,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         });
       }
     });
+
     var _this = this;
     $('.pager>li>a', this.element).click(function(e) {
       var page = $(this).data('page');
@@ -60,7 +61,22 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     this.element.parent().click(function() {
       $(this).removeClass('highlighted');
       $('#message-btn .unread').text('');
-    })
+    });
+
+    var sources = d3.values(wb.store.items.entities).map(function(d) {
+      return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
+    });
+    this.element.find('#message_content').autocomplete(sources, {
+      matchContains: true,
+      scroll: true,
+      hotkeymode:true,
+      noresultsmsg: 'No matches',
+      jsonterm: 'name',
+      formatResult: function(row) {
+        return '<a contenteditable="false" class="wb-entity ' + row['entity_type'] 
+        + '" data-entity="' + row['id'] + '" href="#" tabindex="-1">' + row['name'] + '</a> ';
+      }
+    });
   },
 
   loadMessages: function(page) {
@@ -108,7 +124,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     var timetag = $('<span class="timestamp"></span>').appendTo(row)
       .text(this._timeformat(this._servertimeformat.parse(msg.sent_at)));
     $('<span class="messagebody"></span>').appendTo(row)
-      .text(msg.content);
+      .html(msg.content);
 
     // do not add the user and time tag if the same user posted within 60s
     if (lastrow.find('.username').text() === usertag.text()) {
@@ -118,7 +134,6 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         usertag.addClass('hidden');
         timetag.addClass('hidden');
       }
-
     }
 
     if (msg.sender !== wb.info.user) {
@@ -135,7 +150,10 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   },
 
   updateData: function() {
-
+    var sources = d3.values(wb.store.items.entities).map(function(d) {
+      return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
+    });
+    this.element.find('#message_content').setOptions({data: sources});
   },
 
   update: function() {

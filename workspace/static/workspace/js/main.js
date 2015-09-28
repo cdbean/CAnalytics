@@ -29,7 +29,7 @@ $(function() {
 
   $('.viz-opts').click(onVizSelect);
 
-  $('body').on('click', 'a.entity, span.entity', onClickEntity);
+  $('body').on('click', 'a.wb-entity, span.wb-entity', onClickEntity);
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
@@ -59,7 +59,7 @@ $(function() {
   function onClickEntity(e) {
     var ent = $(e.target).data('entity');
     if (ent) {
-      var entity = wb.store.items.entities[ent.id];
+      var entity = wb.store.items.entities[ent.id || ent]; // ent could be an object or an id only
       wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'));
     }
     e.stopPropagation();

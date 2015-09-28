@@ -48,19 +48,22 @@
 }
 
 .annotator-hl-event {
-    background: rgba(250, 250, 30, 0.5);
+    background: #17becf;
 }
 .annotator-hl-location {
-    background: rgba(15, 236, 15, 0.3);
+    background: #e377c2;
 }
 .annotator-hl-person {
-    background: rgba(250, 21, 21, 0.3);
+    background: #9467bd;
 }
 .annotator-hl-organization {
-    background: rgba(37, 7, 192, 0.3);
+    background: #ff9896;
 }
 .annotator-hl-resource {
-    background: rgba(243, 105, 6, 0.3);
+    background: #2ca02c;
+}
+.annotator-hl-relationship {
+	background: #ff7f0e;
 }
 
 .annotator-hl-temporary {
@@ -70,8 +73,8 @@
 .annotator-hl-uncertain {
     background: rgba(255, 255, 115, 0.2)
 }
-.annotator-hl.active {
-    background: #B0BED9;
+.annotator-hl.highlighted {
+    background: yellow;
 }
 
 /* Annotator Wrapper

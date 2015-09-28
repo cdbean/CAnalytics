@@ -23,7 +23,8 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
           'userName': wb.info.users[wb.info.user].name,
           'userColor': wb.info.users[wb.info.user].color,
           width: '100%',
-          height: '100%'
+          height: '100%',
+          plugins: {'autocomp': 'true', 'copy_paste_images': 'true', 'tables2': 'false'}
         });
     },
 

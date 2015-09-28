@@ -85,7 +85,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     highlight: function(item) {
       this.element.find('tr.odd, tr.even').each(function(i, row) {
         if ($(row).data('id') ==  item) {
-          $(row).addClass('active');
+          $(row).addClass('highlighted');
           wb.utility.scrollTo(row, $(this).parents('.dataTables_scrollBody'));
         }
       });

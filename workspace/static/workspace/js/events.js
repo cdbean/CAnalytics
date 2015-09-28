@@ -192,11 +192,13 @@
   }
 
   function onNewMessage(e, msg) {
-    wb.utility.notify(wb.info.users[msg.sender].name + ' sent a message');
-    var num = $('#message-btn .unread').text();
-    if (!num) num = 1;
-    else num = +num + 1;
-    $('#message-btn .unread').text(num);
+    if (msg.sender !== wb.info.user) {
+      wb.utility.notify(wb.info.users[msg.sender].name + ' sent a message');
+      var num = $('#message-btn .unread').text();
+      if (!num) num = 1;
+      else num = +num + 1;
+      $('#message-btn .unread').text(num);
+    }
     $('.viz.message').each(function(i, viz) {
       var $viz = $(viz).data('instance');
       $viz.loadMessage(msg);

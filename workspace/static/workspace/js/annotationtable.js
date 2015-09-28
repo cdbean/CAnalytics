@@ -15,7 +15,19 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
             .on('filter', function(selected) {
               wb.store.shelf_by.annotations = selected;
               $.publish('data/filter', '#' + this.element.attr('id'));
-              $('.viz.dataentry').data('instance').highlight(selected[selected.length - 1])
+              var viz = $('.viz.dataentry').data('instance');
+              if (viz) viz.highlight(selected[selected.length - 1])
+
+              $('.filter-div .filter-item').filter(function(i, item) {
+                return $(item).find('a').data('item') === 'annotation';
+              }).remove();
+              wb.store.shelf_by.annotations.forEach(function(d) {
+                var ann = wb.store.items.annotations[d];
+                wb.filter.add('annotation: ' + ann.quote,  {
+                  item: 'annotation',
+                  id: d
+                });
+              });
             }.bind(this))
         ;
         this.updateData();
