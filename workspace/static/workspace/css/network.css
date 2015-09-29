@@ -45,7 +45,9 @@ path.dragline {
     width: 100%;
     background-color: #ECEDF7;
 }
-
+.network-filterbar ul {
+  padding: 0;
+}
 .network-filterbar li {
     display: inline;
     margin: 20px 10px;

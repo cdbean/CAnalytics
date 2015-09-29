@@ -23,6 +23,7 @@ $.widget('viz.vizeditor', {
     ';
     this.element.append(html);
 
+
     this.element.on('click', '.attr-add-btn', this._onClickAdd.bind(this));
     this.element.on('click', '.attr-remove-btn', this._onClickRemove.bind(this));
     this.element.on('click', '.save', this._onClickSave.bind(this));
@@ -51,6 +52,10 @@ $.widget('viz.vizeditor', {
       var value = others[attr];
       this.addField(attr, value, 'other');
     }
+
+    // for relationship, no need to show title, 
+    if (type === 'relationship') $('.title', this.element).addClass('hidden');
+
     return this;
   },
 
@@ -62,15 +67,12 @@ $.widget('viz.vizeditor', {
       var row = '<li><ul class="attr-item ' + primary + '">';
       row += '<li><input class="attr-key" placeholder="Attribute..." value="' + attr + '"/></li>';
       row += '<li><input class="attr-value" placeholder="Unknown" value="' + value + '"/></li>';
+      row += '<li><button type="button" class="btn btn-default attr-remove-btn"><span class="glyphicon glyphicon-minus"></span></button></li></ul></li>';
+      var $row = $(row).appendTo(this.element.find('.attr-list'));
 
-      var lastrow = this.element.find('.attr-item:last');
-      if (lastrow.length) { // if there is already an attribute row
-          row += '<li><button type="button" class="btn btn-default attr-remove-btn"><span class="glyphicon glyphicon-minus"></span></button></li></ul></li>';
-          var $row = $(row).insertBefore(lastrow.parent()); // lastrow is <ul>, lastrow's parent is <li>
-      } else { // if it is the first attribute row
-          row += '<li><button type="button" class="btn btn-default attr-add-btn"><span class="glyphicon glyphicon-plus"></span></button></li></ul></li>';
-          var $row = $(row).appendTo(this.element.find('.attr-list'));
-      }
+      var lastrow = $('.attr-item:last', this.element);
+      lastrow.find('button').removeClass('attr-remove-btn').addClass('attr-add-btn');
+      lastrow.find('span.glyphicon').removeClass('glyphicon-minus').addClass('glyphicon-plus');
 
       this._styleInput(attr, value, $row.find('.attr-value'));
 
@@ -200,24 +202,36 @@ $.widget('viz.vizeditor', {
   },
 
   _onClickSave: function() {
-    var data = {};
-    data.attribute = this.serialize();
     var url;
-    data.id = this.item.meta && this.item.meta.id;
-    data.name = this.element.find('.title').val();
-    data.case = CASE;
-    data.group = GROUP;
+    var opt = {data: {}, case: CASE, group: GROUP};
+    opt.data.attribute = this.serialize();
+    opt.data.id = this.item.meta && this.item.meta.id;
+    opt.data.name = this.element.find('.title').val();
+
     if (this.item_type === 'entity') {
-      url = GLOBAL_URL.entity_id.replace(/\/0/, data.id ? '': '/' + data.id);
-      data.entity_type = this.item.primary.entity_type;
+      url = GLOBAL_URL.entity_id.replace(/\/0/, opt.data.id ? '/' + opt.data.id : '');
+      opt.data.entity_type = this.item.primary.entity_type;
     } else if (this.item_type === 'relationship') {
-      url = GLOBAL_URL.relationship_id.replace(/\/0/, data.id ? '': '/' + data.id);
+      url = GLOBAL_URL.relationship_id.replace(/\/0/, opt.data.id ? '/' + opt.data.id : '');
     }
-    $.post(url, {data: JSON.stringify(data)}, function(d) {
-      $.publish('entity/updated', d.entity);
-      if (d.relationship)
-        $.publish('relationship/updated', d.relationship);
-      wb.utility.notify('Entity successfully updated!', 'success');
+    $.ajax({
+      url: url,
+      data: JSON.stringify(opt),
+      dataType: 'json',
+      type: opt.data.id ? 'PUT' : 'POST',
+      success: function(d) {
+        if (d.entity) {
+          $.publish('entity/updated', d.entity);
+          wb.utility.notify('Entity updated!', 'success');
+        }
+        if (d.relationship) {
+          $.publish('relationship/updated', d.relationship);
+          wb.utility.notify('relationship updated!', 'success');
+        }
+      },
+      error: function(d) {
+        wb.utility.notify('Operation failed', 'error');
+      }
     });
 
     this.hide();

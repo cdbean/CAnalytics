@@ -16,5 +16,6 @@ urlpatterns = patterns('',
     url(r'^entity/(\d+)$', views.entity, name='entity_id'),
     url(r'^entity$', views.entity, name='entity'),
     url(r'^relationships$', views.relationships, name='relationships'),
-    url(r'^relationship/(\d+)$', views.relationship, name='relationship'),
+    url(r'^relationship/(\d+)$', views.relationship, name='relationship_id'),
+    url(r'^relationship$', views.relationship, name='relationship'),
 )

@@ -9,7 +9,7 @@ from canalytics import settings
 from django.contrib.auth.models import Group
 from workspace.models import Case, DataEntry, Entity, Relationship
 from annotator.models import Annotation
-from workspace.entity import get_or_create_entity, set_primary_attr
+from workspace.entity import get_or_create_entity, set_primary_attr, get_or_create_relationship
 from sync.views import sync_item
 import sync.views as sync
 from logger.views import serverlog
@@ -267,7 +267,7 @@ def entities(request):
 
 
 @login_required
-def relationship(request, id):
+def relationship(request, id=0):
     if request.method == 'POST':
         return create_relationship(request)
     elif request.method == 'PUT':
@@ -281,10 +281,33 @@ def relationships(request):
 
 
 def create_relationship(request):
-    pass
+    res = {}
+    data = json.loads(request.body)
+    case = Case.objects.get(id=data['case'])
+    group = Group.objects.get(id=data['group'])
+    rel, created, new_ents = get_or_create_relationship(data['data'], case, group, request.user)
+    res['relationship'] = rel.serialize()
+    sync_item('create', 'relationship', res, case, group, request.user)
+    serverlog({
+        'user': request.user,
+        'operation': 'create',
+        'item': 'relationship',
+        'tool': 'network',
+        'data': {
+            'id': rel.id,
+            'relation': rel.relation,
+            'source': rel.source.name,
+            'target': rel.target.name,
+        },
+        'public': True,
+        'case': case,
+        'group': group
+    })
+    return HttpResponse(json.dumps(res), content_type='application/json')
 
 
-def update_relationship(request):
+
+def update_relationship(request, id):
     pass
 
 def delete_relationship(request, id):

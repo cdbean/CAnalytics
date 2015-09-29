@@ -128,7 +128,7 @@ $.widget('viz.vizviewer', {
     var item_type = this.item_type;
     if (this.item_type === 'relationship') {
       $.ajax({
-        url: GLOBAL_URL.relationship.replace('0', this.item.meta.id),
+        url: GLOBAL_URL.relationship_id.replace('0', this.item.meta.id),
         data: {
           case: CASE,
           group: GROUP

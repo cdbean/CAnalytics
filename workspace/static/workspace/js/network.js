@@ -47,7 +47,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var entity_type = wb.store.static.entity_types[i];
             this.svg.append('svg:defs')
                 .append('svg:pattern').attr('id', 'img-'+entity_type).attr('patternUnits', 'userSpaceOnUse').attr('x', '12').attr('y', '12').attr('height','24').attr('width','24')
-                .append('image').attr('x', '0').attr('y', '0').attr('width', 24).attr('height', 24).attr('xlink:href', GLOBAL_URL.static + 'workspace/img/entity/' + entity_type + '.png')
+                .append('image').attr('x', '0').attr('y', '0').attr('width', 24).attr('height', 24).attr('xlink:href', GLOBAL_URL.static + 'workspace/img/entity/' + entity_type + '.svg')
             ;
         }
 
@@ -85,7 +85,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         ;
 
         // d3 behaviors
-        this.zoom = d3.behavior.zoom();
+        var scaleX = d3.scale.linear().range([0, this.width]).domain([0, this.width]),
+            scaleY = d3.scale.linear().range([0, this.height]).domain([0, this.height]);
+        this.zoom = d3.behavior.zoom().x(scaleX).y(scaleY);
         this.brush = d3.svg.brush();
         this.drag = this.force.drag();
 
@@ -171,8 +173,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           if ($(this).hasClass('filter'))
             _this.setMode('filter');
           else if ($(this).hasClass('draw')) {
-            alert ('The function has not been implemented yet!');
-            return;
             _this.setMode('draw');
           }
         } else {
@@ -491,16 +491,14 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     setFilterMode: function() {
         var _this = this;
-        var brushX=d3.scale.linear().range([0, this.width]),
-            brushY=d3.scale.linear().range([0, this.height]);
 
-        this.chart.append('g')
+        this.svg.append('g')
             .attr('class', 'brush')
             .call(this.brush
                 .on("brush", brushing)
                 .on("brushend", brushend)
-                .x(brushX)
-                .y(brushY)
+                .x(this.zoom.x())
+                .y(this.zoom.y())
             )
         ;
 
@@ -512,18 +510,18 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var e = _this.brush.extent();
             var selected_nodes = [], selected_relationships = [];
             d3.selectAll(".node").classed("selected", function(d) {
-                return  e[0][0] <= brushX.invert(d.x) && brushX.invert(d.x) <= e[1][0]
-                    && e[0][1] <= brushY.invert(d.y) && brushY.invert(d.y) <= e[1][1];
+                return  e[0][0] <= d.x && d.x <= e[1][0]
+                    && e[0][1] <= d.y && d.y <= e[1][1];
             });
             d3.selectAll(".link").classed("selected", function(d) {
-                return  (e[0][0] <= brushX.invert(d.source.x)
-                    && brushX.invert(d.source.x) <= e[1][0]
-                    && e[0][1] <= brushY.invert(d.source.y)
-                    && brushY.invert(d.source.y) <= e[1][1])
-                    || (e[0][0] <= brushX.invert(d.target.x)
-                    && brushX.invert(d.target.x) <= e[1][0]
-                    && e[0][1] <= brushY.invert(d.target.y)
-                    && brushY.invert(d.target.y) <= e[1][1]);
+                return  (e[0][0] <= d.source.x
+                    && d.source.x <= e[1][0]
+                    && e[0][1] <= d.source.y
+                    && d.source.y <= e[1][1])
+                    || (e[0][0] <= d.target.x
+                    && d.target.x <= e[1][0]
+                    && e[0][1] <= d.target.y
+                    && d.target.y <= e[1][1]);
             });
         }
 
@@ -932,7 +930,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       this.showNodeInfoTimer = setTimeout(function() {
         var entity = wb.store.items.entities[d.id];
         wb.viewer.data(entity, 'entity').show(pos);
-      }, 500);
+      }, 1000);
     },
 
     onMouseOutNode: function(d) {
