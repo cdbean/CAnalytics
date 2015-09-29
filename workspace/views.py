@@ -288,27 +288,20 @@ def create_relationship(request):
     rel, created, new_ents = get_or_create_relationship(data['data'], case, group, request.user)
     res['relationship'] = rel.serialize()
     sync_item('create', 'relationship', res, case, group, request.user)
-    serverlog({
-        'user': request.user,
-        'operation': 'create',
-        'item': 'relationship',
-        'tool': 'network',
-        'data': {
-            'id': rel.id,
-            'relation': rel.relation,
-            'source': rel.source.name,
-            'target': rel.target.name,
-        },
-        'public': True,
-        'case': case,
-        'group': group
-    })
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 
 def update_relationship(request, id):
-    pass
+    res = {}
+    data = json.loads(request.body)
+    case = Case.objects.get(id=data['case'])
+    group = Group.objects.get(id=data['group'])
+    rel, created, new_ents = get_or_create_relationship(data['data'], case, group, request.user)
+    res['relationship'] = rel.serialize()
+    sync_item('update', 'relationship', res, case, group, request.user)
+    return HttpResponse(json.dumps(res), content_type='application/json')
+    
 
 def delete_relationship(request, id):
     res = {}
@@ -331,6 +324,21 @@ def delete_relationship(request, id):
             if target.entity_type == 'person': source.person.remove(target)
         res['entity'] = source.serialize()
 
+    serverlog({
+        'user': request.user,
+        'operation': 'delete',
+        'item': 'relationship',
+        'tool': 'network',
+        'data': {
+            'id': rel.id,
+            'name': rel.relation,
+            'source': relationship.source.name,
+            'target': relationship.target.name,
+        },
+        'public': True,
+        'case': case,
+        'group': group
+    })
     rel.delete()
     sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')

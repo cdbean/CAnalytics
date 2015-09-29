@@ -221,12 +221,22 @@ $.widget('viz.vizeditor', {
       type: opt.data.id ? 'PUT' : 'POST',
       success: function(d) {
         if (d.entity) {
-          $.publish('entity/updated', d.entity);
-          wb.utility.notify('Entity updated!', 'success');
+          if (opt.data.id) {
+            $.publish('entity/updated', d.entity);
+            wb.utility.notify('Entity updated!', 'success');
+          } else {
+            $.publish('entity/created', d.entity);
+            wb.utility.notify('Entity created!', 'success');
+          }
         }
         if (d.relationship) {
-          $.publish('relationship/updated', d.relationship);
-          wb.utility.notify('relationship updated!', 'success');
+          if (opt.data.id) {
+            $.publish('relationship/updated', d.relationship);
+            wb.utility.notify('relationship updated!', 'success');
+          } else {
+            $.publish('relationship/created', d.relationship);
+            wb.utility.notify('relationship created!', 'success');
+          }
         }
       },
       error: function(d) {
