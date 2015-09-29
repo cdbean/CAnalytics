@@ -32,11 +32,17 @@ $.widget('viz.vizbase', {
         this.options.base.title = this.options.title;
         this.element.dialog(this.options.base).dialogExtend(this.options.extend);
         this.options.extend.help = this.help;
+        this.options.extend.arrange_window = this.arrange_window;
         this.element.addClass('viz');
         this.element.data('instance', this);
 
-        $('<a class="ui-dialog-titlebar-help ui-corner-all ui-state-default" style="width: 19px; height: 18px; cursor: pointer"><span class="ui-icon ui-icon-help">?</span></a>').appendTo(this.element.parent().find('.ui-dialog-titlebar-buttonpane'))
-        .click(this.options.extend.help);
+        var titlebar = this.element.parent().find('.ui-dialog-titlebar-buttonpane')
+        $('<a class="ui-dialog-titlebar-pin ui-corner-all ui-state-default" title="auto arrange windows" style="width: 19px; height: 18px; cursor: pointer"><span class="ui-icon ui-icon-pin-w"></span></a>')
+            .appendTo(titlebar)
+            .click(this.options.extend.arrange_window);
+        $('<a class="ui-dialog-titlebar-help ui-corner-all ui-state-default" title="help" style="width: 19px; height: 18px; cursor: pointer"><span class="ui-icon ui-icon-help">?</span></a>')
+            .appendTo(titlebar)
+            .click(this.options.extend.help);
     },
     resize: function() {
         this.element.css("width", "auto");
@@ -49,4 +55,47 @@ $.widget('viz.vizbase', {
     help: function() {
 
     },
+
+    arrange_window: function() {
+        // auto arrange all opened windows
+        var width = $(window).width(),
+            height = $(window).height();
+
+        var viz = $('.viz').parent(),
+            n = viz.length;
+        if (n < 4 && n > 1) { // one row
+            $(viz).each(function(i, el) {
+                $(el).css({
+                    position: 'fixed',
+                    top: '60px',
+                    left: width / n * i,
+                    width: width / n
+                });
+            });
+            $('.viz').css('height', height - 100);
+        } else if (n >=4 && n < 7) { // two rows
+            var row = 2;
+            var col = Math.ceil(n / 2);
+            $(viz).each(function(i, el) {
+                if (i < n/2) 
+                    $(el).css({
+                        position: 'fixed', 
+                        top: '60px',
+                        left: width / col * (i % col),
+                        width: width / col,
+                        height: (height - 100)/2
+                    });
+                else
+                    $(el).css({
+                        position: 'fixed',
+                        bottom: '0px',
+                        left: width / col * (i % col),
+                        width: width / col,
+                        height: (height - 100)/2
+                    });
+            });
+            $('.viz').css('height', (height - 60)/2);
+        }
+        $('.viz').data('instance').resize();
+    }
 })
