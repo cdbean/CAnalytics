@@ -120,7 +120,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
                     normX = deltaX / dist,
                     normY = deltaY / dist,
-                    dr = dist / d.linknum,
+                    dr = dist / (d.linknum || 1),
                     sourcePadding = d.left ? 17 : 12,
                     targetPadding = d.right ? 17 : 12,
                     sourceX = d.source.x + (sourcePadding * normX),

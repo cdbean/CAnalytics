@@ -52,6 +52,9 @@ $.widget('viz.vizeditor', {
       var value = others[attr];
       this.addField(attr, value, 'other');
     }
+    var lastrow = $('.attr-item:last', this.element);
+    lastrow.find('button').removeClass('attr-remove-btn').addClass('attr-add-btn');
+    lastrow.find('span.glyphicon').removeClass('glyphicon-minus').addClass('glyphicon-plus');
 
     // for relationship, no need to show title, 
     if (type === 'relationship') $('.title', this.element).addClass('hidden');
@@ -70,9 +73,6 @@ $.widget('viz.vizeditor', {
       row += '<li><button type="button" class="btn btn-default attr-remove-btn"><span class="glyphicon glyphicon-minus"></span></button></li></ul></li>';
       var $row = $(row).appendTo(this.element.find('.attr-list'));
 
-      var lastrow = $('.attr-item:last', this.element);
-      lastrow.find('button').removeClass('attr-remove-btn').addClass('attr-add-btn');
-      lastrow.find('span.glyphicon').removeClass('glyphicon-minus').addClass('glyphicon-plus');
 
       this._styleInput(attr, value, $row.find('.attr-value'));
 
