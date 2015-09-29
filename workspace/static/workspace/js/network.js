@@ -56,8 +56,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             .attr('id', 'end-arrow')
             .attr('viewBox', '0 -5 10 10')
             .attr('refX', 6)
-            .attr('markerWidth', 3)
-            .attr('markerHeight', 3)
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 5)
             .attr('orient', 'auto')
             .append('svg:path')
             .attr('d', 'M0,-5L10,0L0,5')
@@ -68,8 +68,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             .attr('id', 'start-arrow')
             .attr('viewBox', '0 -5 10 10')
             .attr('refX', 4)
-            .attr('markerWidth', 3)
-            .attr('markerHeight', 3)
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 5)
             .attr('orient', 'auto')
             .append('svg:path')
             .attr('d', 'M10,-5L0,0L10,5')
@@ -104,8 +104,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         this.chart = this.svg.append('g');
 
-        this.link = this.chart.selectAll("path");
-        this.node = this.chart.selectAll("g");
+        this.link = this.chart.selectAll(".link");
+        this.node = this.chart.selectAll(".node");
 
         // line displayed when dragging new nodes
         this.drag_line = this.chart.append('svg:path')
@@ -114,12 +114,13 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     _tick: function() {
-        this.link.attr('d', function(d) {
+        this.chart.selectAll('.link path').attr('d', function(d) {
                 var deltaX = d.target.x - d.source.x,
                     deltaY = d.target.y - d.source.y,
                     dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
                     normX = deltaX / dist,
                     normY = deltaY / dist,
+                    dr = dist / d.linknum,
                     sourcePadding = d.left ? 17 : 12,
                     targetPadding = d.right ? 17 : 12,
                     sourceX = d.source.x + (sourcePadding * normX),
@@ -127,7 +128,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     targetX = d.target.x - (targetPadding * normX),
                     targetY = d.target.y - (targetPadding * normY);
 //                    return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
-                return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+                return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
             })
         ;
 
@@ -191,7 +192,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
   onMouseOutRel: function(e) {
-    this.svg.selectAll('.link').transition().style('stroke', '#ccc');
+    this.svg.selectAll('.link path').transition().style('stroke', '#ccc');
   },
 
   onMouseOverRel: function(e) {
@@ -199,7 +200,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     var value = tar.val();
     var isvisible = tar[0].checked;
     var display = isvisible ? '' : 'none';
-    this.svg.selectAll('.link').transition().style('stroke', function(d) {
+    this.svg.selectAll('.link path').transition().style('stroke', function(d) {
       var rel = wb.store.items.relationships[d.id];
       if (rel.primary.relation === value) return 'steelblue';
       else return '#ccc';
@@ -746,6 +747,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
               source: source,
               target: target,
               id: rel.meta.id,
+              relation: rel.primary.relation
           };
           var i = this.findLink(link);
           if (i < 0) {
@@ -791,7 +793,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 source: source,
                 target: target,
                 id: rel.meta.id,
-                temp_exist: true
+                temp_exist: true,
+                relation: rel.primary.relation
               });
               this.linkMap[rel.meta.id] = this.links.length - 1;
             }
@@ -804,6 +807,33 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           } else {
             delete this.links[i].temp_exist;
           } 
+        }
+
+        // compute linknum for multiple links between nodes
+        // first sort links
+        // since we use linkMap to track the position of links, we do not want to sort the original links
+        // make a copy of the links first
+        var links_temp = JSON.parse(JSON.stringify(this.links));
+        links_temp.sort(function(a, b) {
+          if (a.source > b.source) {return 1;}
+          else if (a.source < b.source) {return -1;}
+          else {
+              if (a.target > b.target) {return 1;}
+              if (a.target < b.target) {return -1;}
+              else {return 0;}
+          }
+        });
+        //any links with duplicate source and target get an incremented 'linknum'
+        for (var i=0; i < links_temp.length; i++) {
+            if (i != 0 &&
+              links_temp[i].source == links_temp[i-1].source &&
+              links_temp[i].target == links_temp[i-1].target) {
+                links_temp[i].linknum = links_temp[i-1].linknum + 1;
+            }
+            else {
+              links_temp[i].linknum = 1;
+            }
+            this.links[this.linkMap[links_temp[i].id]].linknum = links_temp[i].linknum;
         }
 
         this.restart();
@@ -861,19 +891,35 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var _this = this;
 
         this.link = this.link.data(this.links);
-        this.link.enter().append("svg:path")
-            .attr("class", "link")
+        var link_g = this.link.enter().append("g").attr("class", "link");
+        link_g.append('path')
+            .attr('id', function(d) {
+              return 'path-' + d.id; 
+            })
             .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
             .style('marker-end', function(d) { return 'url(#end-arrow)'; })
             .on("mouseover", this.onMouseOverLink.bind(this))
             .on("mouseout", this.onMouseOutLink.bind(this))
             .on('click', this.onClickLink.bind(this))
         ;
+        var text = link_g.append('text')
+          .attr('class', 'link-text')
+          .attr('x', 6)
+          .attr('dy', 15);
+        text.append('textpath')
+          .attr("stroke", "black")
+          .attr("xlink:href", function(d) {
+            return '#path-' + d.id;
+          })
+          .text(function(d) {
+            return d.relation;
+          });
+
         // this.selected_link && this.selected_link.style('stroke-dasharray', '10,2');
 
-        this.link.append('svg:title')
-            .text(function(d) { return d.rel; })
-        ;
+        // this.link.append('svg:title')
+        //     .text(function(d) { return d.rel; })
+        // ;
         this.link.exit().remove();
 
         this.node = this.node.data(this.nodes, function(d) { return d.id; });

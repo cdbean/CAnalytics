@@ -13,7 +13,7 @@ circle.selected {
     stroke-width: dpx;
 }
 path.dragline,
-path.link {
+.link path {
     fill: none;
     stroke: #ccc;
     stroke-width: 2px;
@@ -23,9 +23,7 @@ path.link {
 .linkarrow {
     fill: #ccc;
 }
-path.link.hidden {
-    stroke-width: 0;
-}
+
 circle.node:hover {
     stroke-width: 1.5px;
     cursor: pointer; ;
