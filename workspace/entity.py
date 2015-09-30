@@ -222,10 +222,13 @@ def set_primary_attr(entity, attr, value, user, case, group):
             except:
                 pass
         setattr(entity, attr, value)
-    else: # normal field such as char and float
+    else: 
         if value == '':
             value = None
-        else:
+        # do not change boolean values
+        elif value is True or value is False:
+            pass
+        else: # normal field such as char and float
             try:
                 value = float(value)
             except:

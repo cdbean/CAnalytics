@@ -131,8 +131,9 @@ $.widget('custom.attribute_widget', {
           }
         });
       } else if (attr === 'repeated') {
-        var html = '<input class="annotator-attribute-value" type="checkbox" name="repeated" value="true">weekly';
-        input.replaceWith(html);
+        var html = '<input class="annotator-attribute-value" type="checkbox" name="repeated">weekly</input>';
+        var li = input.parent().empty();
+        $(html).appendTo(li).prop('checked', value);
 
       } else if (attr === 'repeated_until') {
         input.datetimepicker({

@@ -215,8 +215,11 @@ class Event(Entity):
     repeated_until = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        """auto fill entity_type"""
+        # auto fill entity_type
         self.entity_type = 'event'
+        # if repeated is not set, clear repeated_until as well
+        if not self.repeated:
+            self.repeated_until = None
         super(Event, self).save(*args, **kwargs)
 
 
