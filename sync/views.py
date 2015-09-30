@@ -46,8 +46,6 @@ def broadcast_users_status(user, case, group):
         })
 
     status = ishout_client.get_room_status(name)
-    print '*****************************'
-    print status
     data['online_users'] = status['members']
 
     ishout_client.broadcast_group(name, 'usersonline', data)

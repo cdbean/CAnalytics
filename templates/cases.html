@@ -46,7 +46,7 @@
             <div class="form-group hidden" id="group_name_group">
               <label for="group_name" class="col-sm-2 control-label">New group name: </label>
               <div class="col-sm-10">
-                <input class="form-control" name="group_name" placeholder="Group name">
+                <input class="form-control" id="group_name" name="group_name" data-remote="{% url 'account:validate_groupname' 0 %}" data-remote-error="The name has been used. Please try another one" placeholder="Group name">
                 <span class="help-block" id="group_name_help">Name must be unique in this case.</span>
                 <div class="help-block with-errors"></div>
               </div>
@@ -90,7 +90,7 @@
             <div class="form-group hidden" id="group_name_group">
               <label for="group_name" class="col-sm-2 control-label">New group name: </label>
               <div class="col-sm-10">
-                <input class="form-control" name="group_name" placeholder="Group name">
+                <input class="form-control" id="group_name" name="group_name" data-remote="{% url 'account:validate_groupname' 0 %}" data-remote-error="The name has been used. Please try another one" placeholder="Group name">
                 <span class="help-block" id="group_name_help">Name must be unique in this case.</span>
                 <div class="help-block with-errors"></div>
               </div>

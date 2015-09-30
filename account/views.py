@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 
 import json
 
@@ -67,3 +67,32 @@ def users(request):
             'name': u.username
         })
     return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+def validate_username(request): 
+    validated = True
+    username = request.GET['username']
+    if User.objects.filter(username=username).exists():
+        validated = False
+
+    if validated:
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest()
+
+
+
+def validate_groupname(request, case):
+    validated = True
+    try:
+        case = Case.objects.get(id=case)
+        gname = request.GET['group_name']
+    except:
+        return HttpResponseBadRequest()
+    if case.groups.filter(name=gname).exists():
+        validated = False
+
+    if validated:
+        return HttpResponse(status=200)
+    else: 
+        return HttpResponseBadRequest()

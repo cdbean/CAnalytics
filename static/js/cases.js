@@ -50,32 +50,58 @@ $('.modal').on('show.bs.modal', function(event) {
 	}
 	options += '<option value="0">Create new group</option>';
 	$(this).find('#group_selector').empty().append(options).selectpicker('refresh');
+	// put case id in input
 	$(this).data('case', case_d);
+	$(this).find('#case').val(case_d.id);
+	// change the placeholder of remote validation url
+	var gname = $(this).find('#group_name');
+	var remote = gname.data('remote');
+	remote = remote.replace('0', case_d.id);
+	gname.data('remote', remote);
 });
 
-$('.modal').on('submit', 'form', function(event) {
-	var el = event.delegateTarget;
-	var case_d = $(el).data('case');
-	$(this).find('#case').val(case_d.id);
-});
 
 $('#user_case_diag #group_selector').change(function(e) {
 	if ($(this).val() == 0) {
-		$('#user_case_diag #group_name_group').removeClass('hidden');
-		$('#user_case_diag #group_pin_group').removeClass('hidden');
+		$('#user_case_diag #group_name_group').removeClass('hidden').find('input').prop('required', true);
+		$('#user_case_diag #group_pin_group').removeClass('hidden').find('input').prop('required', true);
 	} else {
-		$('#user_case_diag #group_name_group').addClass('hidden');
-		$('#user_case_diag #group_pin_group').addClass('hidden');
+		$('#user_case_diag #group_name_group').addClass('hidden').find('input').prop('required', false);
+		$('#user_case_diag #group_pin_group').addClass('hidden').find('input').prop('required', false);
 	}
 });
 
 $('#other_case_diag #group_selector').change(function(e) {
 	if ($(this).val() == 0) {
-		$('#other_case_diag #group_name_group').removeClass('hidden');
+		$('#other_case_diag #group_name_group').removeClass('hidden').find('input').prop('required', true);
 		$('#other_case_diag #group_pin_help').text('Invite group members to this case using this PIN.');
 	} else {
-		$('#other_case_diag #group_name_group').addClass('hidden');
+		$('#other_case_diag #group_name_group').addClass('hidden').find('input').prop('required', false);
 		$('#other_case_diag #group_pin_help').text('You need the PIN to join this group. Ask group creator if you do not know it.');
 	}
 });
+
+$('form').validator({
+	custom: {
+		unique: function($el) {
+			var key = $el.attr('name');
+			var val = $el.val().trim();
+			var remote = $el.data('unique');
+			var req = {case: this.$element.find('#case').val()};
+			req[key] = val;
+			var p = Promise.resolve(
+				$.get(remote, req, function() {
+
+				})
+			).then(function(res) {
+				if (res === 'validate') return true;
+				return false;
+			});
+			return p;
+		},
+	},
+	errors: {
+		unique: 'The name has been taken. Try giving another one'
+	}
+})
 
