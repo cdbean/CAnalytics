@@ -463,16 +463,12 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             target = _this.mouseup_node;
 
             var link;
-            link = _this.links.filter(function(l) {
-                return (l.source === source && l.target === target);
-            })[0];
 
-            if(link) {
+            link = {source: source, target: target};
+            // track the temp link, delete it later
+            _this.links.push(link);
+            _this.linkMap['_tempdraw'] = _this.links.length - 1;
 
-            } else {
-                link = {source: source, target: target};
-                _this.links.push(link);
-            }
 
             // select new link
             _this.selected_link = link;
@@ -482,7 +478,13 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var pos = {top: d3.event.pageY, left: d3.event.pageX};
             wb.editor.data({
               primary: {source: source.id, target: target.id}
-            }, 'relationship').show(pos);
+            }, 'relationship').show(pos, function(action) {
+              if ('_tempdraw' in _this.linkMap) {
+                _this.links.splice([_this.linkMap['_tempdraw']], 1);
+                delete _this.linkMap['_tempdraw'];
+                _this.restart();
+              }
+            });
 
 
             _this.restart();

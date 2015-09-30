@@ -63,7 +63,7 @@ html, body {
 }
 
 /* entity */
-.wb-entity:before {
+.wb-item:before {
   content: '';
   display: inline-block;
   background-size: 15px 15px;
@@ -103,15 +103,23 @@ html, body {
 .wb-entity.resource {
     color: #2ca02c;
 }
-.wb-entity.relationship {
-    color: #ff7f0e;
-}
 /*  */
-a.wb-entity, span.wb-entity {
+.wb-item {
   font-style: italic;
   margin-left: 3px;
   margin-right: 3px;
 }
+
+.wb-item.annotation:before {
+  background-image: url('../img/entity/annotation.svg');
+}
+.wb-item.wb-relationship:before {
+  background-image: url('../img/entity/relationship.svg');
+}
+.wb-item.wb-relationship {
+    color: #ff7f0e;
+}
+
 
 a.wb-entity:hover {
   cursor: pointer;

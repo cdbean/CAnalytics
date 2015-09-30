@@ -65,7 +65,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     // item structure:
     // {'user': user_id, 'operation': '', 'time': '', 'data': ''}
     var lastrow = $('ul.history-list li.history-item:last', this.element);
-    var row = $('<li class="history-item">').prependTo(this.element.find('ul.history-list'));
+    var row = $('<li class="history-item">').appendTo(this.element.find('ul.history-list'));
     var user = wb.info.users[item.user];
     var usertag = $('<span class="username">').appendTo(row).text(user.name).css('color', user.color);
     var timetag = $('<span class="timestamp">').appendTo(row).text(this._timeformat(this._servertimeformat.parse(item.time)));
@@ -80,7 +80,11 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     $('<span class="content">').appendTo(row)
       .html(action)
     ;
-    if (wb.store.static.entity_types.indexOf(item.item) > -1) {
+    if (item.item === 'annotation') {
+      row.find('.wb-item').addClass('annotation').data('annotation', {id: item.data.id});
+    } else if (item.item === 'relationship') {
+      row.find('.wb-item').addClass('wb-relationship').data('relationship', {id: item.data.id});
+    } else if (wb.store.static.entity_types.indexOf(item.item) > -1) {
       row.find('.wb-item').addClass('wb-entity').addClass(item.item).data('entity', {id: item.data.id});
     }
 

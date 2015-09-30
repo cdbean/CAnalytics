@@ -149,13 +149,14 @@ $.widget('viz.vizeditor', {
 
   },
 
-  show: function(pos) {
+  show: function(pos, callback) {
     var width = this.element.outerWidth();
     var height = this.element.outerHeight();
     this.element.show().css({
       top: pos.top - height - 10,
       left: pos.left - width/2
     });
+    this.callback = callback;
     return this;
   },
 
@@ -171,7 +172,8 @@ $.widget('viz.vizeditor', {
     return this;
   },
 
-  hide: function() {
+  hide: function(action) {
+    if (this.callback) this.callback(action, this.item, this.item_type);
     this.clearFields();
     this.item = null;
     this.item_type = null;
@@ -244,11 +246,11 @@ $.widget('viz.vizeditor', {
       }
     });
 
-    this.hide();
+    this.hide('save');
   },
 
   _onClickCancel: function() {
-    this.hide();
+    this.hide('cancel');
   },
 
   serialize: function() {

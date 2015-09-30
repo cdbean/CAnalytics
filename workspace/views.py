@@ -301,7 +301,7 @@ def update_relationship(request, id):
     res['relationship'] = rel.serialize()
     sync_item('update', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
-    
+
 
 def delete_relationship(request, id):
     res = {}
@@ -332,8 +332,8 @@ def delete_relationship(request, id):
         'data': {
             'id': rel.id,
             'name': rel.relation,
-            'source': relationship.source.name,
-            'target': relationship.target.name,
+            'source': rel.source.name,
+            'target': rel.target.name,
         },
         'public': True,
         'case': case,

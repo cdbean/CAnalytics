@@ -126,7 +126,7 @@ class DataEntry(models.Model):
 
 class Entity(models.Model):
     name          = models.CharField(max_length=1000)
-    priority      = models.FloatField(default=5, null=True, blank=True)  # ranging from 0-9
+    priority      = models.CharField(max_length=10, null=True, blank=True)  # Low, High, Medium
     entity_type    = models.CharField(max_length=50, blank=True)
     note          = models.TextField(blank=True, null=True)
     attributes    = models.ManyToManyField(Attribute, blank=True, null=True)
@@ -183,9 +183,8 @@ class Person(Entity):
     gender       = models.CharField(max_length=10, null=True, blank=True)
     nationality  = models.CharField(max_length=50, null=True, blank=True)
     alias        = models.ForeignKey('self', null=True, blank=True)  # TODO: the person could be an alias to another person
-    ethnicity    = models.CharField(max_length=50, null=True, blank=True)
-    race         = models.CharField(max_length=10, null=True, blank=True)
-    religion     = models.CharField(max_length=50, null=True, blank=True)
+    job          = models.CharField(max_length=50, null=True, blank=True)
+    age          = models.CharField(max_length=50, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""
@@ -197,9 +196,6 @@ class Person(Entity):
 class Organization(Entity):
     person      = models.ManyToManyField(Person, null=True, blank=True)
     category    = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
-    nationality = models.CharField(max_length=50, blank=True, null=True)
-    ethnicity   = models.CharField(max_length=50, null=True, blank=True)
-    religion    = models.CharField(max_length=50, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""
@@ -244,7 +240,7 @@ class Relationship(models.Model):
     note   = models.TextField(null=True, blank=True)
     relation  = models.CharField(max_length=500, blank=True)
     confidence  = models.FloatField(null=True, blank=True)
-    priority    = models.FloatField(default=5, null=True, blank=True)  # priority defaults to 5, ranging from 0-9
+    priority    = models.CharField(max_length=10, null=True, blank=True)  # L, M, H
     dataentry  = models.ForeignKey(DataEntry, null=True, blank=True)
     attributes = models.ManyToManyField(Attribute, null=True, blank=True)
     created_at   = models.DateTimeField(default=datetime.now, verbose_name='created at')
