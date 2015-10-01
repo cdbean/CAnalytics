@@ -5,8 +5,11 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this.options.base.resizeStop = this.resize.bind(this);
       this.options.extend.maximize = this.resize.bind(this);
       this.options.extend.restore  = this.resize.bind(this);
+      this.options.extend.help     = this.help.bind(this);
       this._super('_create');
       this.element.addClass('dataentry');
+
+      this._setUI();
 
       var columns = ['ID'].concat(wb.store.static.dataentry);
 
@@ -28,6 +31,41 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     },
 
+    _setUI: function() {
+      var html = '\
+        <div class="ui-layout-center"> \
+          <div id="table-body"></div> \
+        </div> \
+        <div class="ui-layout-west"> \
+          <ul id="ds-list" class="sidebar-nav"> \
+            <li class="sidebar-brand"> Datasets </li> \
+          </ul> \
+        </div> \
+      '
+      var el = $(html).appendTo(this.element);
+      this.element.layout({
+        applyDemoStyles: true,
+        west__size: 100
+      });
+      var str = '';
+      d3.values(wb.store.items.datasets).forEach(function(ds) {
+        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name 
+        + ' <span class="badge">' + ds.dataentries.length + '</span></a>';
+      });
+      el.find('#ds-list').append(str);
+      $('#ds-list input:checkbox', el).change(this._onDatasetChecked);
+    },
+
+    _onDatasetChecked: function() {
+      var ds = [];
+      $('ul#ds-list input:checkbox:checked').each(function() {
+        var id = $(this).parent().attr('id').split('-')[1];
+        ds.push(parseInt(id));
+      });
+      wb.store.shelf_by.datasets = ds;
+      $.publish('data/filter');
+    },
+
     _destroy: function() {
       this._destroyAnnotator();
       this._super('_destroy');
@@ -39,12 +77,12 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       for (var d in wb.store.items.dataentries) {
         var de = wb.store.items.dataentries[d];
         if (de) {
-          data.push([de.id, wb.store.items.datasets[de.dataset].name, de.content, de.date]);
+          data.push([de.id, wb.store.items.datasets[de.dataset].name + '-<br>' + de.name , de.content, de.date]);
         }
       }
 
       this.table.data(data);
-      d3.select(this.element[0]).call(this.table);
+      d3.select(this.element[0]).select('#table-body').call(this.table);
 
     },
 
@@ -248,5 +286,11 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     resize: function() {
         this._super('resize');
         this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+    },
+
+    help: function() {
+      var hint = new EnjoyHint({});
+      hint.set(wb.help.dataentry);
+      hint.run();
     }
 });

@@ -10,7 +10,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">CAnalytics V3</a>
+      <a class="navbar-brand" href="#">CAnalytics</a>
     </div>
 
     {% if user.is_authenticated and case %}
@@ -25,15 +25,7 @@
               <li><a href="{% url 'home' %}">Change case</a></li>
             </ul>
         </li>
-        <li class='dataset dropdown'>
-            <a id="datasource_btn" href="#" class="dropdown-toggle" data-toggle="dropdown">Dataset<span class="caret"></span></a>
-            <ul class="dataset-list dropdown-menu">
-              {% for ds in datasets %}
-              <li><a href="#"><label><input type="checkbox" value="{{ ds.id }}">{{ ds.name }}</label><span class="badge">{{ ds.entries }}</span></a></li>
-              {% endfor %}
-            </ul>
-        </li>
-        <li><span class='user-monitor'></span><a class="viz-opts" id="dataentry-btn" href="#">Data Entry</a></li>
+        <li><span class='user-monitor'></span><a class="viz-opts" id="dataentry-btn" href="#">Documents</a></li>
         <li>
           <span class='user-monitor'></span><a id="table-dropdown" href="#" class="dropdown-toggle" data-toggle="dropdown">Table<span class="caret"></a>
             <ul class="dropdown-menu">

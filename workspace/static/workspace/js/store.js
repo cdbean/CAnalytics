@@ -34,7 +34,7 @@ wb.store = {
   // static properties
   // TODO: load these properties from server
   static: {
-    dataentry: ['dataset', 'content', 'date'],
+    dataentry: ['file', 'content', 'date'],
     event: ['person', 'location', 'organization', 'start_date', 'end_date', 'repeated', 'repeated_until', 'priority', 'category', 'note'],
     location: ['address', 'precision', 'priority', 'note'],
     person: ['gender', 'nationality', 'age', 'job', 'priority', 'note'],
@@ -194,7 +194,7 @@ wb.store = {
 
     this.shelf.annotations.forEach(function(d) {
       var ann = _this.items.annotations[d];
-      selected_entities.push(ann.entity);
+      selected_entities.push(ann.entity.id);
     });
     this.shelf.entities = this.shelf.entities.filter(function(d) {
       return selected_entities.indexOf(d) > -1;
@@ -203,7 +203,7 @@ wb.store = {
 
     this.shelf.entities.forEach(function(d) {
       var ent = _this.items.entities[d];
-      selected_relationships = selected_relationships.concat(ent.relationships);
+      selected_relationships = selected_relationships.concat(ent.meta.relationships);
     })
     this.shelf.relationships = this.shelf.relationships.filter(function(d) {
       return selected_relationships.indexOf(d) > -1;

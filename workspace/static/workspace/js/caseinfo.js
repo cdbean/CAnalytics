@@ -87,10 +87,12 @@ $.widget('viz.vizcaseinfo', $.viz.vizbase, {
   	';
   	$(otherghtml).appendTo(el)
   		.find('#othergroups').html(function() {
-  			return othergroups.map(function(d) {
-  				var url = GLOBAL_URL.case_page.replace('9999', CASE).replace('0', d.id);
-  				return '<a class="group" href="' + url +'">' + d.name + '</a>';
-  			});
+  			if (othergroups.length)
+	  			return othergroups.map(function(d) {
+	  				var url = GLOBAL_URL.case_page.replace('9999', CASE).replace('0', d.id);
+	  				return '<a class="group" href="' + url +'">' + d.name + '</a>';
+	  			});
+	  		else return 'You do not have other groups'
   		});
   },
 

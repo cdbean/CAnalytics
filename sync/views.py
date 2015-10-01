@@ -93,6 +93,7 @@ def message(request):
         sender = request.user
         msg = Message(sender=sender, content=content, group=group, case=case)
         msg.save()
+        print 'broadcast to: ', name
         ishout_client.broadcast_group(name, 'message', msg.serialize())
         res = 'success'
         return HttpResponse(res)

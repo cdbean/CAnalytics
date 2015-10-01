@@ -113,6 +113,7 @@ class DataEntry(models.Model):
         attr['dataset'] = self.dataset.id
         attr['name'] = self.name
         attr['date']    = ''
+        attr['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
         if self.date != None:
             attr['date']  = self.date.strftime('%m/%d/%Y-%H:%M:%S')
         return attr

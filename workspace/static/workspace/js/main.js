@@ -85,7 +85,7 @@ $(function() {
         });
     } else if (viz_name === 'dataentry') {
         viz = $('<div>').vizdataentrytable({
-            title: 'Data Entry',
+            title: 'Documents',
         });
     } else if (viz_name === 'timeline') {
         viz = $('<div>').viztimeline({

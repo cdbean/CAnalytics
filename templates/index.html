@@ -4,7 +4,7 @@
 {% load drealtimetags %}
 
 {% block extrajs %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.js" charset="utf-8"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.min.js" charset="utf-8"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMvHihbbhhhr61dsroJomX8kjZNi8LE9M&v=3.exp&signed_in=false&libraries=places"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/OpenLayers-2.13.1/OpenLayers.js' %}"></script>
 {% compress js %}
@@ -25,6 +25,7 @@
 <script type="text/javascript" src="{% static 'lib/etherpad-lite-jquery/js/etherpad.js' %}"></script>
 <!-- https://github.com/melanke/Watch.JS -->
 <script type="text/javascript" src="{% static 'lib/watch.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/jquery-layout-1.4/jquery.layout.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jquery-aceditable/jquery.aceditable.js' %}"></script>
 {% endcompress %}
 
@@ -88,6 +89,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery-aceditable/jquery.aceditable.css' %}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/selectize.js/selectize.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/enjoyhint/enjoyhint.css' %}" rel="stylesheet">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery-layout-1.4/layout-default.css' %}"> -->
 <link rel="stylesheet" type="text/css" href="{% static 'annotator/css/annotator.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/viz.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/popup.css' %}">
