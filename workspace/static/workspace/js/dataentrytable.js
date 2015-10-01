@@ -54,6 +54,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       });
       el.find('#ds-list').append(str);
       $('#ds-list input:checkbox', el).change(this._onDatasetChecked);
+      el.find('.ui-layout-center').resize(this.resize.bind(this));
     },
 
     _onDatasetChecked: function() {
@@ -284,8 +285,9 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     },
 
     resize: function() {
-        this._super('resize');
-        this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+      this._super('resize');
+      this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+      this.table.resize();
     },
 
     help: function() {

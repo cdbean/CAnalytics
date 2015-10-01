@@ -20,6 +20,7 @@ wb.viz.table = function() {
                 var $table = $(table_str).appendTo(this);
 
                 table = $table.dataTable({
+                    'autoWidth': false, // auto resize table when window resizes
                     "bJQueryUI": true,
                     "bDestroy": true,
                     'sScrollY': height,
@@ -237,6 +238,11 @@ wb.viz.table = function() {
         if (!arguments.length) return editable;
         editable = _;
         return exports;
+    };
+
+    exports.resize = function() {
+      $(table).css({ width: $(table).parent().width() });
+      table.fnAdjustColumnSizing();  
     };
 
     return d3.rebind(exports, dispatch, 'on');

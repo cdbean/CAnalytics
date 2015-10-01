@@ -80,6 +80,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     resize: function() {
         this._super('resize');
         this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+        this.table.resize();
     },
 
     highlight: function(item) {

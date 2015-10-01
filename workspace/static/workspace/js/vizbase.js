@@ -73,7 +73,7 @@ $.widget('viz.vizbase', {
                 });
             });
             $('.viz').css('height', height - 100);
-        } else if (n >=4 && n < 7) { // two rows
+        } else if (n >=4) { // two rows
             var row = 2;
             var col = Math.ceil(n / 2);
             $(viz).each(function(i, el) {
