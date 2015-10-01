@@ -790,7 +790,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           } else {
             var source = this.nodeMap[rel.primary.source];
             var target = this.nodeMap[rel.primary.target];
-            if (source && target) {
+            if ((source >=0) && (target >=0)) {
               this.links.push({
                 source: source,
                 target: target,
