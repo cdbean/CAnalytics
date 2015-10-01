@@ -25,6 +25,9 @@ wb.filter.remove = function(item, data) {
     } else if (data.item === 'annotation') {
       var i = wb.store.shelf_by.annotations.indexOf(data.id);
       wb.store.shelf_by.annotations.splice(i, 1);
+    } else if (data.item === 'dataentry') {
+      var i = wb.store.shelf_by.dataentries.indexOf(data.id);
+      wb.store.shelf_by.dataentries.splice(i, 1);
     } else {
       var i = wb.store.shelf_by.entities.indexOf(data.id);
       wb.store.shelf_by.entities.splice(i, 1);

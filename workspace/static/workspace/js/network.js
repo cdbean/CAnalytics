@@ -115,12 +115,13 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     _tick: function() {
         this.chart.selectAll('.link path').attr('d', function(d) {
+                d.linknum = d.linknum || 1;
                 var deltaX = d.target.x - d.source.x,
                     deltaY = d.target.y - d.source.y,
                     dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
                     normX = deltaX / dist,
                     normY = deltaY / dist,
-                    dr = dist / (d.linknum || 1),
+                    dr = dist / d.linknum, // completely arbitary
                     sourcePadding = d.left ? 17 : 12,
                     targetPadding = d.right ? 17 : 12,
                     sourceX = d.source.x + (sourcePadding * normX),
@@ -400,6 +401,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     setDrawMode: function() {
         var _this = this;
+        this.force.stop();
         this.svg.on("mousemove", function(d) {
             if(!_this.mousedown_node) {
                 return;
@@ -828,8 +830,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         //any links with duplicate source and target get an incremented 'linknum'
         for (var i=0; i < links_temp.length; i++) {
             if (i != 0 &&
-              links_temp[i].source == links_temp[i-1].source &&
-              links_temp[i].target == links_temp[i-1].target) {
+              links_temp[i].source.id == links_temp[i-1].source.id &&
+              links_temp[i].target.id == links_temp[i-1].target.id) {
                 links_temp[i].linknum = links_temp[i-1].linknum + 1;
             }
             else {
@@ -839,7 +841,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }
 
         this.restart();
-        this.setMode('normal');
+        // determine mode
+        if ($('.control.filter.selected').length) this.setMode('filter');
+        else if ($('.control.draw.selected').length) this.setMode('draw');
+        else this.setMode('normal');
     },
 
     updateView: function() {

@@ -19,6 +19,16 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         .columns(columns)
         .on('filter', function(selected) {
           wb.store.shelf_by.dataentries = selected;
+          $('.filter-div .filter-item').filter(function(i, item) {
+            return $(item).find('a').data('item') === 'dataentry';
+          }).remove();
+          selected.forEach(function(d) {
+            var de = wb.store.items.dataentries[d];
+            wb.filter.add('document: ' + de.name, {
+              item: 'dataentry',
+              id: de.id
+            });
+          });
           $.publish('data/filter', '#' + this.element.attr('id'));
         }.bind(this))
       ;
