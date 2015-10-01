@@ -24,13 +24,16 @@ wb.help.main = [
 ];
 wb.help.dataentry = [
   {
-  'next .dataTable>tbody>tr>td:nth-child(2)': 'As you read through the document, you can make annotations and tag them as a <i>person</i>, <i>location</i>, <i>organization</i>, <i>resource</i>, <i>event</i>, or <i>relationship</i>, which will be color coded',
+  'next .viz.dataentry': 'Documents are grouped into datasets. The left sidebar shows the datasets, with the number indicating the number of documents in the dataset. Sometimes you may be required by the instructor to only analyze one document at a time. Check off other documents to hide them. The sidebar can be resized',
   },
   {
-    'next .dataTable>tbody>tr>td:nth-child(2)': 'These annotated entities and relationships will be shown in other views and shared with your group immediately'
+  'next .viz.dataentry': 'As you read through the document on the right, you can make annotations and tag them as a <i>person</i>, <i>location</i>, <i>organization</i>, <i>resource</i>, <i>event</i>, or <i>relationship</i>, which will be color coded',
   },
   {
-    'mouseup .dataTable>tbody>tr>td:nth-child(2)': 'Now try selecting some text for annotation'
+    'next .viz.dataentry': 'These annotated entities and relationships will be shown in other views and shared with your group immediately'
+  },
+  {
+    'mouseup .viz.dataentry': 'Now try selecting some text for annotation'
   },
   {
     'click .annotator-adder': 'Click the pop-up icon to start an annotation',
