@@ -55,6 +55,7 @@
 <script type="text/javascript" src="{% static 'workspace/js/message.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/history.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/help.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/caseinfo.js' %}"></script>
 <script type="text/javascript" src="{% static 'sync/js/sync.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/main.js' %}"></script>
 {% endcompress %}
@@ -96,6 +97,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/network.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/message.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/history.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'workspace/css/caseinfo.css' %}">
 {% endcompress %}
 
 {% endblock %}
@@ -147,6 +149,7 @@
         notepad: '{{notepad_url}}',
         entity_attr: "{% url 'ws:entity_attr' %}",
         case_info: "{% url 'ws:case_info' %}",
+        case_page: "{% url 'ws:case_page' 9999 0 %}",
         relationship_id: "{% url 'ws:relationship_id' 0 %}"
       }
 

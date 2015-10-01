@@ -61,6 +61,7 @@ class Case(models.Model):
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     location = models.GeometryField(null=True, blank=True)
+    address  = models.CharField(max_length=200, blank=True)
     pin = models.CharField(max_length=4)
 
     objects = models.GeoManager()

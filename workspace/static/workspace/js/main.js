@@ -20,13 +20,14 @@ $.get(GLOBAL_URL.case_info, {
   res.case.end_date = wb.utility.Date(res.case.end_date);
   wb.info.case = res.case;
   wb.info.group = res.group;
+  wb.info.othergroups = res.othergroups;
 });
 
 
 $(function() {
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
-
+  $('#case-info').click(onCaseInfo);
   $('.viz-opts').click(onVizSelect);
 
   $('body').on('click', 'a.wb-entity, span.wb-entity', onClickEntity);
@@ -63,6 +64,12 @@ $(function() {
       wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'));
     }
     e.stopPropagation();
+  }
+
+  function onCaseInfo() {
+    $('<div>').vizcaseinfo({
+      title: 'Case'
+    });
   }
 
   function onVizSelect(e) {

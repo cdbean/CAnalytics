@@ -115,7 +115,7 @@ def case_page(request, case, group):
         group = request.user.groups.get(id=group)
         case = group.case_set.get(id=case)
     except:
-        return HttpResponse('Sorry, access restricted')
+        return HttpResponse('Sorry, you cannot join the group in this case')
         
     datasets = case.dataset_set.all()
     for ds in datasets:
@@ -139,6 +139,7 @@ def case_info(request):
         try:
             group = request.user.groups.get(id=request.GET['group'])
             case = group.case_set.get(id=request.GET['case'])
+            othergroups = request.user.groups.exclude(id=request.GET['group']) & case.groups.all()
         except:
             return HttpResponse('Query failed')
 
@@ -154,8 +155,16 @@ def case_info(request):
             'pin': case.pin,
             'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
             'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
+            'address': case.address,
             'location': case.location.wkt if case.location else None,
         }
+        res['othergroups'] = []
+        for g in othergroups:
+            res['othergroups'].append({
+                'id': g.id,
+                'name': g.name,
+                'pin': g.pin
+            })
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
