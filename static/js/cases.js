@@ -45,9 +45,16 @@ $('.modal').on('show.bs.modal', function(event) {
 
 
 	var options = '<option>Select a group</option>';
-	for (var i = 0; i < case_d.groups.length; i++) {
-		options += '<option value="' + case_d.groups[i].id + '">' + case_d.groups[i].name + '</option>';
+	options += '<optgroup label="Your groups">';
+	for (var i = 0; i < case_d.usergroups.length; i++) {
+		options += '<option class="usergroup" value="' + case_d.usergroups[i].id + '">' + case_d.usergroups[i].name + '</option>';
 	}
+	options += '</optgroup>';
+	options += '<optgroup label="Other groups">';
+	for (var i = 0; i < case_d.othergroups.length; i++) {
+		options += '<option class="othergroup" value="' + case_d.othergroups[i].id + '">' + case_d.othergroups[i].name + '</option>';
+	}
+	options += '</optgroup>';
 	options += '<option value="0">Create new group</option>';
 	$(this).find('#group_selector').empty().append(options).selectpicker('refresh');
 	// put case id in input
@@ -65,6 +72,11 @@ $('#user_case_diag #group_selector').change(function(e) {
 	if ($(this).val() == 0) {
 		$('#user_case_diag #group_name_group').removeClass('hidden').find('input').prop('required', true);
 		$('#user_case_diag #group_pin_group').removeClass('hidden').find('input').prop('required', true);
+		$('#user_case_diag #group_pin_help').text('Invite group members to this case using this PIN.');
+	} else if ($(this).find('option:selected').hasClass('othergroup')) {
+		$('#user_case_diag #group_name_group').addClass('hidden').find('input').prop('required', false);
+		$('#user_case_diag #group_pin_group').removeClass('hidden').find('input').prop('required', true);
+		$('#user_case_diag #group_pin_help').text('You need the PIN to join this group. Ask group creator if you do not know it.');
 	} else {
 		$('#user_case_diag #group_name_group').addClass('hidden').find('input').prop('required', false);
 		$('#user_case_diag #group_pin_group').addClass('hidden').find('input').prop('required', false);

@@ -34,30 +34,28 @@ def find_case(case, case_list):
 def cases(request):
     res = {'cases_other': [], 'cases_user': []}
     if request.method == 'GET':
-        groups = request.user.groups.all()
-        for group in groups:
-            cases = group.case_set.all()
-            for case in cases:
-                loc = find_case(case, res['cases_user'])
-                if loc < 0:
-                    res['cases_user'].append({
-                        'id': case.id,
-                        'name': case.name,
-                        'description': case.description,
-                        'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
-                        'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
-                        'location': case.location.wkt if case.location else None,
-                        'groups': [{
-                            'id': group.id,
-                            'name': group.name
-                        }]
-                    })
-                else: 
-                    res['cases_user'][loc]['groups'].append({
-                        'id': group.id,
-                        'name': group.name
-                    })
-        cases = Case.objects.exclude(groups__in=groups)
+        u_groups = request.user.groups.all()
+        # all groups that do not include user
+        nu_groups = Group.objects.exclude(id__in=u_groups.values_list('id', flat=True))
+        # cases that the user (more exactly, the groups that the user is in) has
+        cases = Case.objects.filter(groups__in=u_groups).distinct()
+        for case in cases:
+            c_groups = case.groups.all()
+            u_c_groups = c_groups & u_groups
+            nu_c_groups = c_groups & nu_groups
+            res['cases_user'].append({
+                'id': case.id,
+                'name': case.name,
+                'description': case.description,
+                'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
+                'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
+                'location': case.location.wkt if case.location else None,
+                'usergroups': [{'id': g.id, 'name': g.name} for g in u_c_groups],
+                'othergroups': [{'id': g.id, 'name': g.name} for g in nu_c_groups]
+            })
+
+        # cases that the user does not have access to
+        cases = Case.objects.exclude(groups__in=u_groups)
         for case in cases:
             g_list = [{'id': g.id, 'name': g.name} for g in case.groups.all()]
 
@@ -68,7 +66,8 @@ def cases(request):
                 'start_date': case.start_date.strftime('%m/%d/%Y-%H:%M:%S') if case.start_date else None,
                 'end_date': case.end_date.strftime('%m/%d/%Y-%H:%M:%S') if case.end_date else None,
                 'location': case.location.wkt if case.location else None,
-                'groups': g_list
+                'usergroups': [],
+                'othergroups': g_list
            })
         return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -76,12 +75,20 @@ def cases(request):
         try:
             case = Case.objects.get(id=request.POST['case'])
             g_id = int(request.POST['group'])
-            if g_id == 0:
+            if g_id == 0: # create a new group
                 group = Group.objects.create(name=request.POST['group_name'], pin=request.POST['group_pin'])
                 group.user_set.add(request.user)
                 case.groups.add(group)
-            else:
-                group = request.user.groups.get(id=g_id)
+            else: # either join user group or other group
+                try: 
+                    group = request.user.groups.get(id=g_id)
+                except:
+                    # join other group
+                    try:
+                        group = Group.objects.get(id=g_id, pin=request.POST['group_pin'])
+                        group.user_set.add(request.user)
+                    except:
+                        return HttpResponse('Group PIN incorrect')
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
         return redirect('ws:case_page', case=case.id, group=group.id)
