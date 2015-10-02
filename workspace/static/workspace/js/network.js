@@ -198,6 +198,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
   onMouseOverRel: function(e) {
     var tar = $(e.target).find(':checkbox');
+    if (!tar.length) return;
     var value = tar.val();
     var isvisible = tar[0].checked;
     var display = isvisible ? '' : 'none';
@@ -215,7 +216,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     var display = isvisible ? '' : 'none';
     this.svg.selectAll('.link').transition().style('display', function(d) {
       var rel = wb.store.items.relationships[d.id];
-      if (rel.primary.relation === value) return display;
+      if (rel.primary.relation === value) return d.display = display;
+      else return d.display;
     });
   },
 

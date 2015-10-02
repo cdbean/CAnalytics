@@ -191,11 +191,25 @@ $.widget('custom.attribute_widget', {
             options: opts.opts,
             optgroups: opts.optgroups,
             optgroupField: 'entity_type',
+            maxItems: 1,
             labelField: 'label',
             valueField: 'value',
             searchField: 'label',
             create: false,
             closeAfterSelect: true
+        });
+      } else if (attr === 'relation') {
+        var opts = d3.values(wb.store.items.relationships).map(function(d) {
+          return {label: d.primary.relation, value: d.primary.relation};
+        });
+        $(input).selectize({
+          options: opts,
+          labelField: 'label',
+          valueField: 'value',
+          searchField: 'label',
+          create: true,
+          maxItems: 1,
+          closeAfterSelect: true
         });
       }
     },

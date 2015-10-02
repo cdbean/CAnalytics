@@ -142,10 +142,24 @@ $.widget('viz.vizeditor', {
           labelField: 'label',
           valueField: 'value',
           searchField: 'label',
+          maxItems: 1,
           create: false,
           closeAfterSelect: true
       });
-    }
+    } else if (attr === 'relation') {
+        var opts = d3.values(wb.store.items.relationships).map(function(d) {
+          return {label: d.primary.relation, value: d.primary.relation};
+        });
+        $(input).selectize({
+          options: opts,
+          labelField: 'label',
+          valueField: 'value',
+          searchField: 'label',
+          create: true,
+          maxItems: 1,
+          closeAfterSelect: true
+        });
+      }
 
   },
 
