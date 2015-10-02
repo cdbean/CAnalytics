@@ -406,7 +406,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             if(!_this.mousedown_node) {
                 return;
             }
-            _this.drag_line.attr('d', 'M' + _this.mousedown_node.x + ',' + _this.mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+            var mouse = d3.mouse(_this.chart[0][0]);
+            _this.drag_line.attr('d', 'M' + _this.mousedown_node.x + ',' + _this.mousedown_node.y + 'L' + mouse[0] + ',' + mouse[1]);
 
             _this.restart();
         })
