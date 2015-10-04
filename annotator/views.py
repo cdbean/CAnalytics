@@ -188,7 +188,6 @@ def update_annotation(request, id):
     res['annotation'] = annotation.serialize()
     res['relationship'] += [r.serialize() for r in rels if r is not None]
     res['entity'] += [e.serialize() for e in ents if e is not None]
-    print ents[0].repeated
 
     for r in del_rels:
         r_info = r.serialize()

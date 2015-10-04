@@ -59,8 +59,8 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       });
       var str = '';
       d3.values(wb.store.items.datasets).forEach(function(ds) {
-        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name 
-        + ' <span class="badge">' + ds.dataentries.length + '</span></a>';
+        str += '<li><a href="#" id="ds-' + ds.id + '"><label><input type="checkbox" checked> ' + ds.name 
+        + ' <span class="badge">' + ds.dataentries.length + '</span></label></a>';
       });
       el.find('#ds-list').append(str);
       $('#ds-list input:checkbox', el).change(this._onDatasetChecked);
@@ -70,7 +70,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     _onDatasetChecked: function() {
       var ds = [];
       $('ul#ds-list input:checkbox:checked').each(function() {
-        var id = $(this).parent().attr('id').split('-')[1];
+        var id = $(this).parent().parent().attr('id').split('-')[1];
         ds.push(parseInt(id));
       });
       wb.store.shelf_by.datasets = ds;

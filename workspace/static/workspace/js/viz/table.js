@@ -19,7 +19,7 @@ wb.viz.table = function() {
                 table_str += '</tr></thead></table>';
                 var $table = $(table_str).appendTo(this);
 
-                table = $table.dataTable({
+                table = $table.DataTable({
                     'autoWidth': false, // auto resize table when window resizes
                     "bJQueryUI": true,
                     "bDestroy": true,
@@ -28,11 +28,14 @@ wb.viz.table = function() {
                     "sRowSelect": "multi", // for multi select with ctrl and shift
                     "sDom": "Rlfrtip", // enable column resizing
                 });
-                $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
+                if (title === 'dataentry' || title === 'annotation_table') $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
+                else $(table).on('click', 'tr.even>td:nth-child(2), tr.odd>td:nth-child(2)', onFilter);
+                $(table).on('click', '.control', onControl.bind(this));
             }
 
             table.fnClearTable();
             table.fnAddData(data);
+            // table.clear().data(data);
             table.fnSetColumnVis(0,false); // hide the first column, which is id
 
             // save data entry into DOM TODO: maybe this is not necessary?
@@ -41,10 +44,11 @@ wb.viz.table = function() {
                 var pos = table.fnGetPosition(this);
                 var data = table.fnGetData(pos);
                 $(row).data("id", data[0]);
+                $(row).attr('id', 'row-' + data[0]);
             });
 
             if (editable) {
-                $('td', table.fnGetNodes()).editable(GLOBAL_URL.entity_attr, {
+                $('>td', table.fnGetNodes()).not('td:first-child').editable(GLOBAL_URL.entity_attr, {
                     tooltip: "Double click to edit",
                     cancel: "Cancel",
                     submit: "Save",
@@ -74,6 +78,39 @@ wb.viz.table = function() {
             }
 
         });
+    }
+
+    function onControl(e) {
+      var tr = $(e.target).closest('tr')[0];
+      if (table.fnIsOpen(tr)) {
+        /* This row is already open - close it */
+        e.target.src = GLOBAL_URL.static + "/workspace/img/details_open.png";
+        table.fnClose(tr);
+      } else {
+        /* Open this row */
+        e.target.src = GLOBAL_URL.static + "/workspace/img/details_close.png";
+        var id = $(tr).data('id');
+        // only entities have this row expand control
+        var ent = wb.store.items.entities[id];
+        if (ent) {
+          var child = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+          var attrs = wb.store.static[ent.primary.entity_type];
+          for (var i in attrs) {
+            var k = attrs[i];
+            if (ent.primary[k]) child += '<tr><td>' + k + ':</td><td>' + ent.primary[k] + '</td></tr>';
+          }
+          for (var k in ent.other) {
+            if (ent.other[k]) child += '<tr><td>' + k + ':</td><td>' + ent.other[k] + '</td></tr>';
+          }
+          child += '</table>';
+          table.fnOpen(tr, child, 'details');
+        }
+      }
+    }
+
+    function formatDetails(table, tr) {
+      var d = table.fnGetData(tr);
+      return 'hahah';
     }
 
     function onFilter(e) {

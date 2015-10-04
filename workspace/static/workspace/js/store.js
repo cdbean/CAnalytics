@@ -35,12 +35,12 @@ wb.store = {
   // TODO: load these properties from server
   static: {
     dataentry: ['file', 'content', 'date'],
-    event: ['person', 'location', 'organization', 'start_date', 'end_date', 'repeated', 'repeated_until', 'priority', 'category', 'note'],
-    location: ['address', 'precision', 'priority', 'note'],
-    person: ['gender', 'nationality', 'age', 'job', 'priority', 'note'],
-    organization: ['person', 'category', 'priority', 'note'],
-    resource: ['condition', 'availability', 'category', 'priority', 'note'],
-    relationship: ['source', 'target', 'relation', 'priority', 'note'],
+    event: ['person', 'location', 'organization', 'start_date', 'end_date', 'repeated', 'repeated_until', 'category', 'note'],
+    location: ['address', 'precision', 'note'],
+    person: ['gender', 'nationality', 'age', 'job', 'note'],
+    organization: ['person', 'category', 'note'],
+    resource: ['condition', 'availability', 'category', 'note'],
+    relationship: ['source', 'target', 'relation', 'note'],
     meta: ['created_by', 'created_at', 'last_edited_by', 'last_edited_at'],
     entity_types: ['person', 'location', 'organization', 'event', 'resource'],
   },

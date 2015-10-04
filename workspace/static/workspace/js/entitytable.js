@@ -8,7 +8,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         this._super('_create');
 
         // two empty title columns: for one collapse, the other for delete
-        var columns = ['ID', 'Name'].concat(wb.store.static[this.options.entity]);
+        var columns = ['ID', '', 'Name'].concat(wb.store.static[this.options.entity]);
 
         this.table = wb.viz.table()
             .columns(columns)
@@ -53,14 +53,13 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
           var entity = wb.store.items.entities[d];
           if (entity && entity.primary.entity_type === entity_type) {
             // the two null values are for the two special columns
-            var row = [entity.meta.id, entity.primary.name || ''];
+            var row = [entity.meta.id, '<img src="' + GLOBAL_URL.static + '/workspace/img/details_open.png' + '" class="control"></img>', entity.primary.name || ''];
             for (var i = 0, len = attrs.length; i < len; i++) {
               var attr = attrs[i];
               var value = wb.utility.parseEntityAttr(attr, entity.primary[attr]);
 
               row.push(value);
             }
-            row.push(null);
             data.push(row);
           }
         }
