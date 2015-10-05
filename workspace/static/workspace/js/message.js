@@ -14,8 +14,8 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       <div class="messageArea"> \
         <nav> \
           <ul class="pager"> \
-            <li><a class="prev" href="#">Previous</a></li> \
-            <li><a class="next" href="#">Next</a></li> \
+            <li><a class="prev" href="#">Older</a></li> \
+            <li><a class="next" href="#">Later</a></li> \
           </ul> \
         </nav> \
         <ul class="messages"></ul> \

@@ -106,6 +106,7 @@ wb.utility = {};
 
   // scroll to an element in a container
   wb.utility.scrollTo = function(ele, container) {
+    if (ele.length == 0 || container.length == 0) return;
     $(container).animate({
       scrollTop: $(ele).offset().top - $(container).offset().top + $(container).scrollTop()
     });
