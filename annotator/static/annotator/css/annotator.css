@@ -48,22 +48,22 @@
 }
 
 .annotator-hl-event {
-    background: #17becf;
+    background: rgba(23, 190, 207, .5);
 }
 .annotator-hl-location {
-    background: #e377c2;
+    background: rgba(227, 119, 194, .5);
 }
 .annotator-hl-person {
-    background: #9467bd;
+    background: rgba(148, 103, 189, .5);
 }
 .annotator-hl-organization {
-    background: #ff9896;
+    background: rgba(255, 152, 150, .5);
 }
 .annotator-hl-resource {
-    background: #2ca02c;
+    background: rgba(44, 160, 44, .5);
 }
 .annotator-hl-relationship {
-	background: #ff7f0e;
+	background: rgba(255, 127, 14, .5);
 }
 
 .annotator-hl-temporary {
