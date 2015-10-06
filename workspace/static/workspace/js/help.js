@@ -54,9 +54,9 @@ wb.help.dataentry = [
   {
     'next form.annotator-widget': 'When annotating an event, you can add people, organization, or location to it, indicating <i>who</i> did <i>what</i> <i>wehere</i>. Relationships between these entities will be automatically created and shown in network view. If you add a date/time to the event, it will be shown in timeline view.'
   },
-  {
-  'next form.annotator-widget': 'Check <i>apply to all</i> if you want to apply your annotation to all such text across the document'
-  },
+  // {
+  // 'next form.annotator-widget': 'Check <i>apply to all</i> if you want to apply your annotation to all such text across the document'
+  // },
   {
   'next form.annotator-widget': 'After [Save] the annotation, pay attention to the success/failure notification to the top right corner. All notifications will show here, including your group members\'s messages'
   },

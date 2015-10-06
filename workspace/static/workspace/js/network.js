@@ -521,35 +521,30 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 return  e[0][0] <= d.x && d.x <= e[1][0]
                     && e[0][1] <= d.y && d.y <= e[1][1];
             });
-            d3.selectAll(".link").classed("selected", function(d) {
-                return  (e[0][0] <= d.source.x
-                    && d.source.x <= e[1][0]
-                    && e[0][1] <= d.source.y
-                    && d.source.y <= e[1][1])
-                    || (e[0][0] <= d.target.x
-                    && d.target.x <= e[1][0]
-                    && e[0][1] <= d.target.y
-                    && d.target.y <= e[1][1]);
-            });
+            // d3.selectAll(".link").classed("selected", function(d) {
+            //     return  (e[0][0] <= d.source.x
+            //         && d.source.x <= e[1][0]
+            //         && e[0][1] <= d.source.y
+            //         && d.source.y <= e[1][1])
+            //         || (e[0][0] <= d.target.x
+            //         && d.target.x <= e[1][0]
+            //         && e[0][1] <= d.target.y
+            //         && d.target.y <= e[1][1]);
+            // });
         }
 
         function brushend() {
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
             $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('from') === 'network';
+              return $(item).find('a').data('tool') === 'network';
             }).remove();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
                 wb.store.shelf_by.entities = [];
-                d3.selectAll(".node").classed("selected", function(d) {
-                    return d.selected = false;
-                });
-
-                $('.filter-div .filter-item').filter(function(i, item) {
-                  return $(item).find('a').data('from') === 'network';
-                }).remove();
-
+                // d3.selectAll(".node").classed("selected", function(d) {
+                //     return d.selected = false;
+                // });
                 wb.log({
                     operation: 'removed filter in',
                     item: 'network',
@@ -571,7 +566,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                   wb.filter.add(entity.primary.entity_type + ': ' + entity.primary.name, {
                     item: entity.primary.entity_type,
                     id: entity.meta.id,
-                    from: 'network'
+                    tool: 'network'
                   });
                 });
                 wb.log({

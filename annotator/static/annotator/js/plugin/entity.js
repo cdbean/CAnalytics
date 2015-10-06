@@ -48,11 +48,11 @@ Annotator.Plugin.Entity = (function(_super) {
             load: this.updateAttrField,
             submit: this.setEntityAttr
         });
-        this.applyAllField = this.annotator.editor.addField({
-            type: 'checkbox',
-            label: Annotator._t('Apply to all data'),
-            submit: this.applyToAll
-        });
+        // this.applyAllField = this.annotator.editor.addField({
+        //     type: 'checkbox',
+        //     label: Annotator._t('Apply to all data'),
+        //     submit: this.applyToAll
+        // });
 
         this.subscribe('entity/type/update', function(value) {
           // do when the entity type is changed
