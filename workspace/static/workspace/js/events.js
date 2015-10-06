@@ -41,6 +41,7 @@
       // do not show current user
       if (id == wb.info.user) continue;
 
+      if (!(id in wb.info.users)) continue;
       var name = wb.info.users[id].name;
       var color = wb.info.users[id].color;
       var li = $('<li class="userlist-item dropdown"></li>')

@@ -128,11 +128,31 @@ $(function() {
   }
 
   function onRelationshipCreated(data) {
-
+    if (data.user === wb.info.user) return;
+    if (data.relationship) {
+      $.publish('relationship/created', data.relationship);
+      wb.utility.notify(wb.info.users[data.user].name
+                      + ' created relationship '
+                      + data.relationship.primary.relation
+                      + ' between '
+                      + wb.store.items.entities[data.relationship.primary.source].primary.name
+                      + ' and '
+                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+    }
   }
 
   function onRelationshipUpdated(data) {
-
+    if (data.user === wb.info.user) return;
+    if (data.relationship) {
+      $.publish('relationship/updated', data.relationship);
+      wb.utility.notify(wb.info.users[data.user].name
+                      + ' updated relationship '
+                      + data.relationship.primary.relation
+                      + ' between '
+                      + wb.store.items.entities[data.relationship.primary.source].primary.name
+                      + ' and '
+                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+    }
   }
 
   function onRelationshipDeleted(data) {
@@ -143,11 +163,11 @@ $(function() {
 
     wb.utility.notify(wb.info.users[data.user].name
                       + ' deleted relationship '
-                      + data.primary.relation
+                      + data.relationship.primary.relation
                       + ' between '
-                      + wb.store.items.entities[data.primary.source]
+                      + wb.store.items.entities[data.relationship.primary.source].primary.name
                       + ' and '
-                      + wb.store.items.entities[data.primary.target]);
+                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
   }
 
   function onAnnotationCreated(data) {
