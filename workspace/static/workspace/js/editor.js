@@ -6,6 +6,7 @@ $.widget('viz.vizeditor', {
   _create: function() {
     this.element.addClass('popup editor');
     this.element.data('instance', this);
+    this.element.draggable();
     this.element.hide();
     if (this.options.relationship) this.element.data('relationship', this.options.relationship);
     if (this.options.entity) this.element.data('entity', this.options.entity);

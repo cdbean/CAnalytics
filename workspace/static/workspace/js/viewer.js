@@ -8,6 +8,7 @@ $.widget('viz.vizviewer', {
   _create: function() {
     this.element.addClass('popup viewer');
     this.element.data('instance', this);
+    this.element.draggable();
     this.element.hide();
 
     var html = ' \

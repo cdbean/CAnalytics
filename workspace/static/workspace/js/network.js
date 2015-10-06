@@ -403,7 +403,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     setDrawMode: function() {
         var _this = this;
-        this.force.stop();
         this.svg.on("mousemove", function(d) {
             if(!_this.mousedown_node) {
                 return;
@@ -411,8 +410,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var mouse = d3.mouse(_this.chart[0][0]);
             _this.drag_line.attr('d', 'M' + _this.mousedown_node.x + ',' + _this.mousedown_node.y + 'L' + mouse[0] + ',' + mouse[1]);
 
-            _this.restart();
-        })
+            // _this.restart();
+        });
 
         this.svg.on("mouseup", function() {
             if(_this.mousedown_node) {
@@ -427,10 +426,12 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
             // clear mouse event vars
             _this.resetMouseVars();
-        })
+            _this.restart();
+        });
 
         this.node.on("mousedown", function(d) {
             // select node
+            _this.force.stop();
             _this.mousedown_node = d;
             if(_this.mousedown_node === _this.selected_node) _this.selected_node = null;
             else _this.selected_node = _this.mousedown_node;
@@ -441,10 +442,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 .style('marker-end', 'url(#end-arrow)')
                 .classed('hidden', false)
                 .attr('d', 'M' + _this.mousedown_node.x + ',' + _this.mousedown_node.y + 'L' + _this.mousedown_node.x + ',' + _this.mousedown_node.y);
-
-            // _this.restart();
-            _this.force.stop();
-        })
+        });
 
         this.node.on("mouseup", function(d) {
             if(!_this.mousedown_node) return;
@@ -492,7 +490,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             });
 
 
-            _this.restart();
+            // _this.restart();
         });
 
     },
@@ -776,7 +774,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         for (var i = this.nodes.length - 1; i >= 0; i--) {
           if (!this.nodes[i].temp_exist) {
             delete this.nodeMap[this.nodes[i].id];
-            this.nodes.splice(i, 1);
+            this.nodes.slice(i, 1);
+            // update position in nodeMap after i
+            for (var j = i; j < this.nodes.length; j++) {
+              this.linkMap[this.nodes[j].id] = j;
+            }
           } else {
             delete this.nodes[i].temp_exist;
           } 
@@ -803,12 +805,18 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           }
         }
         for (var i = this.links.length - 1; i >= 0; i--) {
-          if (!this.links[i].temp_exist) {
-            delete this.linkMap[this.links[i].id];
-            this.links.splice(i, 1);
-          } else {
-            delete this.links[i].temp_exist;
-          } 
+          if (this.links[i]) {
+            if (!this.links[i].temp_exist) {
+              delete this.linkMap[this.links[i].id];
+              this.links.slice(i, 1); 
+              // update position in linkMap after i
+              for (var j = i; j < this.links.length; j++) {
+                this.linkMap[this.links[j].id] = j;
+              }
+            } else {
+              delete this.links[i].temp_exist;
+            } 
+          }
         }
 
         // compute linknum for multiple links between nodes
@@ -827,15 +835,15 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         });
         //any links with duplicate source and target get an incremented 'linknum'
         for (var i=0; i < links_temp.length; i++) {
-            if (i != 0 &&
-              links_temp[i].source.id == links_temp[i-1].source.id &&
-              links_temp[i].target.id == links_temp[i-1].target.id) {
-                links_temp[i].linknum = links_temp[i-1].linknum + 1;
-            }
-            else {
-              links_temp[i].linknum = 1;
-            }
-            this.links[this.linkMap[links_temp[i].id]].linknum = links_temp[i].linknum;
+          if (i != 0 &&
+            links_temp[i].source.id == links_temp[i-1].source.id &&
+            links_temp[i].target.id == links_temp[i-1].target.id) {
+              links_temp[i].linknum = links_temp[i-1].linknum + 1;
+          }
+          else {
+            links_temp[i].linknum = 1;
+          }
+          this.links[this.linkMap[links_temp[i].id]].linknum = links_temp[i].linknum;
         }
 
         this.restart();
