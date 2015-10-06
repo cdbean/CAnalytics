@@ -348,11 +348,34 @@ wb.viz.timeline = function() {
       shelf_by.push(d.id);
     });
     wb.store.shelf_by.entities = shelf_by;
-    var ext = brush.extent();
     $('.filter-div .filter-item').filter(function(i, item) {
-      return $(item).find('a').data('item') === 'time';
+      return $(item).find('a').data('item') === 'event';
     }).remove();
-    if (!brush.empty()) {
+    if (brush.empty()) {
+      wb.log({
+        operation: 'defiltered',
+        item: 'event',
+        tool: 'timeline'
+      });
+    } else {
+      var log_name = [];
+      shelf_by.forEach(function(d) {
+        var e = wb.store.items.entities[d];
+        wb.filter.add('event: ' + e.primary.name, {
+          item: 'event',
+          id: e.meta.id
+        });
+        log_name.push(e.primar.name);
+      });
+      wb.log({
+        operation: 'filtered',
+        item: 'event',
+        tool: 'timeline',
+        data: {
+          id: shelf_by,
+          name: log_name 
+        }
+      });
       wb.filter.add('time: ' + wb.utility.formatDateTime(ext[0]) + ' - ' + wb.utility.formatDateTime(ext[1]), {
         item: 'time',
       });

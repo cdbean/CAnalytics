@@ -235,6 +235,19 @@ def entity(request, id=0):
         except:
             return HttpResponse('Error: entity not found')
         res['entity'] = entity.serialize()
+        serverlog({
+            'user': request.user,
+            'operation': 'deleted',
+            'item': entity.entity_type,
+            'tool': 'entity_table',
+            'data': {
+                'id': entity.id,
+                'name': entity.name
+            },
+            'public': True,
+            'case': case,
+            'group': group
+        })
         entity.delete()
         sync_item('delete', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
@@ -261,8 +274,8 @@ def entity_attr(request):
         entity.save()
         serverlog({
             'user': request.user,
-            'operation': 'update',
-            'item': 'entity attribute',
+            'operation': 'updated',
+            'item': entity.entity_type,
             'tool': 'entity_table',
             'data': {
                 'id': entity.id,
@@ -342,7 +355,7 @@ def delete_relationship(request, id):
 
     serverlog({
         'user': request.user,
-        'operation': 'delete',
+        'operation': 'deleted',
         'item': 'relationship',
         'tool': 'network',
         'data': {

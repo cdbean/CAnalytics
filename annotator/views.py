@@ -268,6 +268,7 @@ def get_annotations(request):
 
 def post_annotations(request):
     res = {'annotations': [], 'entities': [], 'relationships': []}
+    log_anns = []
     data = json.loads(request.body)
 
     group = data.get('group', '')
@@ -289,20 +290,18 @@ def post_annotations(request):
 
         res['relationships'] += [r.serialize() for r in rels if r is not None]
         res['entities'] += [e.serialize() for e in ents if e is not None]
+        log_anns.append({'id': ann.id, 'name': ann.quote})
 
-        # save to activity log
-        serverlog({
-            'user': request.user,
-            'operation': 'created',
-            'item': 'annotation',
-            'tool': 'dataentry',
-            'data': {
-                'id': ann.id,
-                'name': ann.quote
-            },
-            'group': group,
-            'case': case
-        })
+    # save to activity log
+    serverlog({
+        'user': request.user,
+        'operation': 'created',
+        'item': 'annotations',
+        'tool': 'dataentry',
+        'data': log_anns,
+        'group': group,
+        'case': case
+    })
 
     sync_item('create', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
@@ -311,6 +310,7 @@ def post_annotations(request):
 
 def update_annotations(request):
     res = {'annotations': [], 'entities': [], 'relationships': []}
+    log_anns = []
     data = json.loads(request.body)
 
     group = data.get('group', '')
@@ -330,6 +330,7 @@ def update_annotations(request):
         res['annotations'].append(annotation.serialize())
         res['relationships'] += [r.serialize() for r in rels if r is not None]
         res['entities'] += [e.serialize() for e in ents if e is not None]
+        log_anns.append({'id': annotation.id, 'name': annotation.quote})
 
         for r in del_rels:
             r_info = r.serialize()
@@ -337,18 +338,15 @@ def update_annotations(request):
             res['relationships'].append(r_info)
             r.delete()
 
-        serverlog({
-            'user': request.user,
-            'operation': 'updated',
-            'item': 'annotation',
-            'tool': 'dataentry',
-            'data': {
-                'id': annotation.id,
-                'name': annotation.quote
-            },
-            'group': group,
-            'case': case
-        })
+    serverlog({
+        'user': request.user,
+        'operation': 'updated',
+        'item': 'annotations',
+        'tool': 'dataentry',
+        'data': log_anns,
+        'group': group,
+        'case': case
+    })
 
     sync_item('update', 'annotation', res, case, group, request.user)
 
@@ -357,6 +355,7 @@ def update_annotations(request):
 
 def del_annotations(request):
     res = {'annotations': [], 'entity': {}, 'relationship': {}}
+    log_anns = []
     data = json.loads(request.body)
     group = data.get('group', '')
     case = data.get('case', '')
@@ -373,19 +372,17 @@ def del_annotations(request):
         ann_info, ent_info, rel_info = del_ann(annotation)
 
         res['annotations'].append(ann_info)
+        log_anns.append({'id': ann_info['id'], 'name': ann_info['quote']})
 
-        serverlog({
-            'user': request.user,
-            'operation': 'deleted',
-            'item': 'annotation',
-            'tool': 'dataentry',
-            'data': {
-                'id': ann_info['id'],
-                'name': ann_info['quote']
-            },
-            'case': case,
-            'group': group
-        })
+    serverlog({
+        'user': request.user,
+        'operation': 'deleted',
+        'item': 'annotation',
+        'tool': 'dataentry',
+        'data': log_anns,
+        'case': case,
+        'group': group
+    })
 
     # entity and relationship are the same for all annotation
     # record it for the last annotation

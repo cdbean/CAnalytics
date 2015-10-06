@@ -9,7 +9,7 @@ wb.utility = {};
   var d3_color = d3.scale.category10();
 
   wb.utility.formatDate = function(d) {
-    if (d) return d3.time.format("%B %d, %Y")(d);
+    if (d) return d3.time.format("%b %d, %Y")(d);
     return '';
   };
 
@@ -19,7 +19,7 @@ wb.utility = {};
   };
 
   wb.utility.formatDateTime = function(d) {
-    if (d) return d3.time.format("%B %d, %Y-%I:%M %p")(d);
+    if (d) return d3.time.format("%b %d, %Y-%I:%M %p")(d);
     return '';
   };
 

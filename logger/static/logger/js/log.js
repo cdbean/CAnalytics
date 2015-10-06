@@ -5,11 +5,12 @@ if (!wb) {
 wb.log = function(act) {
   var action = {
     group: GROUP,
-    'case': CASE,
+    case: CASE,
     operation: '',
     item: '',
     data: '{}',
-    'public': true
+    tool: '',
+    public: true
   };
   $.extend(action, act);
 

@@ -268,9 +268,8 @@ wb.store = {
       var e = _this.items.entities[ent];
       e.meta.relationships.forEach(function(rel) {
         var r = _this.items.relationships[rel];
-        if (r.primary.relation === 'involve') {
-          // get directed and indirected related relationships and entities
-          selected_entities.push(r.primary.source);
+        if (r.primary.relation === 'involve' && r.primary.source === ent) {
+          // e.g. if the entity is an event, and 'involves' another person, the person should be filtered as 'related'
           selected_entities.push(r.primary.target);
           selected_relationships.push(rel);
         }

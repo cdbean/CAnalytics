@@ -4,15 +4,14 @@ wb.filter = {};
 // @data: 
 //    - item
 //    - id
-wb.filter.add = function(label, data) {
+wb.filter.add = function(label, data, tool) {
   var item = '<li class="filter-item"></li>';
   $(item).appendTo($('.filter-div .filter-list'))
     .attr('id', data.item + '-' + data.id)
-    .append('<a class="entity"></a><span class="glyphicon glyphicon-remove remove"></span>')
+    .append('<a class="wb-item"></a><span class="glyphicon glyphicon-remove remove"></span>')
     .find('a')
     .text(label)
     .data(data);
-
 };
 
 wb.filter.remove = function(item, data) {
@@ -33,13 +32,13 @@ wb.filter.remove = function(item, data) {
       wb.store.shelf_by.entities.splice(i, 1);
     }
   } else {
-    if (data.item === 'time') {
+    if (data.item === 'event') {
       // if time filter is removed
       // remove all event entities from shelf_by
       wb.store.shelf_by.entities = wb.store.shelf_by.entities.filter(function(d) {
         return wb.store.items.entities[d].primary.entity_type !== 'event';
       });
-    } else if (data.item === 'map') {
+    } else if (data.item === 'location') {
       // if map filter is removed
       // remove all location entities from shelf_by
       wb.store.shelf_by.entities = wb.store.shelf_by.entities.filter(function(d) {
@@ -48,5 +47,13 @@ wb.filter.remove = function(item, data) {
     }
   }
   $(item).remove();
+
+  wb.log({
+    operation: 'defiltered',
+    item: data.item,
+    data: data, 
+    tool: ''
+  });
+
   $.publish('data/filter');
 };
