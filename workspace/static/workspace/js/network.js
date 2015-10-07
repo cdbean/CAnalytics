@@ -85,9 +85,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         ;
 
         // d3 behaviors
-        var scaleX = d3.scale.linear().range([0, this.width]).domain([0, this.width]),
-            scaleY = d3.scale.linear().range([0, this.height]).domain([0, this.height]);
-        this.zoom = d3.behavior.zoom().x(scaleX).y(scaleY);
+        this.scaleX = d3.scale.linear().range([0, this.width]).domain([0, this.width]);
+        this.scaleY = d3.scale.linear().range([0, this.height]).domain([0, this.height]);
+        this.zoom = d3.behavior.zoom().x(this.scaleX).y(this.scaleY);
         this.brush = d3.svg.brush();
         this.drag = this.force.drag();
 
@@ -976,6 +976,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.height = this.element.height() - this.margin.top - this.margin.bottom;
         this.element.find('svg').attr('width', this.width).attr('height', this.height);
         this.element.find('svg').find('rect').attr('width', this.width).attr('height', this.height);
+        this.scaleX .range([0, this.width]).domain([0, this.width]);
+        this.scaleY .range([0, this.width]).domain([0, this.width]);
         this.force.size([this.width, this.height]).resume();
         this.force.start();
     },
