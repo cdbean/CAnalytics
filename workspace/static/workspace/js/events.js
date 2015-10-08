@@ -211,8 +211,10 @@
 
   function onNewAction(e, act) {
     $('.viz.history').each(function(i, viz) {
-      viz = $(viz).data('instance');
-      viz.add(act);
+      var $viz = $(viz).data('instance');
+      $viz.add(act);
+      var ele = $('ul.history-list', viz);
+      wb.utility.scrollTo($('li.history-item:last', ele), ele);
     });
   }
 })();

@@ -43,6 +43,7 @@ class Action(models.Model):
         # automatically send activity logs that are public
         # to all users in the group
         data = self.serialize()
-        sync.views.broadcast_activity(data, self.case, self.group, self.user)
+        if self.public:
+            sync.views.broadcast_activity(data, self.case, self.group, self.user)
 
         super(Action, self).save(*args, **kwargs)

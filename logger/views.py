@@ -36,7 +36,6 @@ def logs(request):
 
 
 def log(request):
-    res = {}
     if request.method == 'POST':
         group = Group.objects.get(id=request.POST['group'])
         case = Case.objects.get(id=request.POST['case'])
@@ -51,14 +50,15 @@ def log(request):
             'case': case,
             'public': request.POST.get('public', '')
         }
-        serverlog(log)
-        return HttpResponse(json.dumps(res), content_type='application/json')
+        act = serverlog(log)
+        return HttpResponse(json.dumps(act), content_type='application/json')
 
 def serverlog(data):
     if ('public' not in data) or (data['public'] == ''):
         data['public'] = True
+    if (data['public'] == 'false'): data['public'] = False
 
-    Action.objects.create(
+    act = Action.objects.create(
         user=data['user'],
         operation=data['operation'],
         item=data['item'],
@@ -68,3 +68,4 @@ def serverlog(data):
         case=data['case'],
         public=data['public']
     )
+    return act.serialize()

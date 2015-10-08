@@ -421,6 +421,38 @@ Annotator = (function(_super) {
     Annotator.prototype.showViewer = function(annotations, location) {
         this.viewer.element.css(location);
         this.viewer.load(annotations);
+        var _this = this;
+        // log read annotations
+        annotations.forEach(function(ann) {
+            wb.log.log({
+                operation: 'read',
+                item: 'annotation',
+                tool: 'document',
+                data: wb.log.logAnnotation(ann),
+                public: false
+            });
+            if (ann.entity) {
+                if (ann.entity.entity_type === 'relationship') {
+                    var relationship = wb.store.items.relationships[ann.entity.id];
+                    wb.log.log({
+                        operation: 'read',
+                        item: 'relationship',
+                        tool: 'document',
+                        data: wb.log.logItem(relationship),
+                        public: false
+                    });
+                } else {
+                    var entity = wb.store.items.entities[ann.entity.id];
+                    wb.log.log({
+                        operation: 'read',
+                        item: entity.primary.entity_type,
+                        tool: 'document',
+                        data: wb.log.logItem(entity),
+                        public: false
+                    });
+                }
+            } 
+        });
         return this.publish('annotationViewerShown', [this.viewer, annotations]);
     };
 

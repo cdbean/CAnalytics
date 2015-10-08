@@ -107,13 +107,34 @@ Annotator.Plugin.Store = (function(_super) {
                 ;
                 _this.updateAnnotation(annotation, ann);
 
-                if (entity.length)
+                wb.log.log({
+                    operation: 'created',
+                    item: 'annotation',
+                    tool: 'document',
+                    data: wb.log.logAnnotation(annotation),
+                });
+
+                if (entity.length) {
                   $.publish('entity/created', entity);
-                if (relationship.length)
+                    wb.log.log({
+                        operation: 'created',
+                        item: entity.primary.entity_type,
+                        tool: 'document',
+                        data: wb.log.logItem(entity)
+                    });
+                }
+                if (relationship.length) {
                   $.publish("relationship/created", relationship);
+                    wb.log.log({
+                        operation: 'created',
+                        item: 'relationship',
+                        tool: 'document',
+                        data: wb.log.logItem(relationship)
+                    });
+                }
 
                 $.publish('annotation/created', annotation);
-                wb.utility.notify('1 annotation added!', 'success');
+                wb.utility.notify('Annotation created!', 'success');
             });
         } else {
             return this.updateAnnotation(annotation, {});
@@ -130,23 +151,11 @@ Annotator.Plugin.Store = (function(_super) {
             ;
 
             $.publish('annotation/updated', anns);
+            anns.forEach(function(ann) {
+                _this.updateAnnotation(annotation, ann);
+            });
             if (relationships && relationships.length > 0) {
-                // if server responds with relationships, it means entity changes
-                // otherwise, there is no need to update relationships, thus the server will not send back relationships
                 $.publish('relationship/updated', relationships);
-                for (var i = 0; i < annotations.length; i++) {
-                    // assume the order of the old and new annotations are the same
-                    var annotation = annotations[i],
-                        ann        = anns[i]
-                    ;
-                    var highlights = annotation.highlights;
-                    for (var j = 0; j < highlights.length; j++) {
-                        $(highlights[j]).removeClass()
-                            .addClass('annotator-hl annotator-hl-' + entity.primary.entity_type)
-                        ;
-                    }
-                    _this.updateAnnotation(annotation, ann);
-                }
             }
             if (entities.length){
                 // if entity type does not change; only attributes change
@@ -168,13 +177,31 @@ Annotator.Plugin.Store = (function(_super) {
                 ;
                 if (relationship.length){
                     $.publish('relationship/updated', relationship);
+                    wb.log.log({
+                        operation: 'updated',
+                        item: 'relationship',
+                        tool: 'document',
+                        data: wb.log.logItem(relationship)
+                    });
                 }
                 if (entity.length) {
                     $.publish('entity/updated', entity);
+                    wb.log.log({
+                        operation: 'updated',
+                        item: entity.primary.entity_type,
+                        tool: 'document',
+                        data: wb.log.logItem(entity)
+                    });
                 }
                 _this.updateAnnotation(annotation, ann);
                 $.publish('annotation/updated', ann);
-                wb.utility.notify('1 annotation updated!', 'success');
+                wb.log.log({
+                    operation: 'updated',
+                    item: 'annotation',
+                    tool: 'document',
+                    data: wb.log.logAnnotation(ann),
+                });
+                wb.utility.notify('Annotation updated!', 'success');
             }));
         }
     };
@@ -188,14 +215,34 @@ Annotator.Plugin.Store = (function(_super) {
                     entity = data.entity,
                     relationship = data.relationship;
 
-                if (entity && entity.deleted)
+                if (entity && entity.deleted) {
                   $.publish('entity/deleted', entity);
-                if (relationship && relationship.deleted)
+                    wb.log.log({
+                        operation: 'deleted',
+                        item: entity.primary.entity_type,
+                        tool: 'document',
+                        data: wb.log.logItem(entity)
+                    });
+                }
+                if (relationship && relationship.deleted) {
                   $.publish('relationship/deleted', relationship);
+                    wb.log.log({
+                        operation: 'deleted',
+                        item: 'relationship',
+                        tool: 'document',
+                        data: wb.log.logItem(relationship)
+                    });
+                }
 
+                wb.log.log({
+                    operation: 'deleted',
+                    item: 'annotation',
+                    tool: 'document',
+                    data: wb.log.logAnnotation(ann),
+                });
                 _this.unregisterAnnotation(annotation);
                 $.publish('annotation/deleted', annotation);
-                wb.utility.notify('1 annotation deleted', 'success');
+                wb.utility.notify('Annotation deleted', 'success');
             });
         } else {
             _this.unregisterAnnotation(annotation);

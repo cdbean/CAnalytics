@@ -58,6 +58,10 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
           .data('page', data.next_page);
       else 
         $('.pager .next', this.element).addClass('hidden');
+
+      // scroll to bottom
+      var ele = _this.element.find('.history-list');
+      wb.utility.scrollTo($('li.history-item:last', ele), ele)
     });
   },
 
