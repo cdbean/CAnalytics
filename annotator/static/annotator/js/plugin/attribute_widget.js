@@ -183,6 +183,7 @@ $.widget('custom.attribute_widget', {
             valueField: 'value',
             searchField: 'label',
             create: true,
+            maxItems: 1,
             closeAfterSelect: true
         });
       } else if (attr === 'source' || attr === 'target') {

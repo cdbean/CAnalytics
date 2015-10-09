@@ -12,7 +12,6 @@ from annotator.models import Annotation
 from workspace.entity import get_or_create_entity, set_primary_attr, get_or_create_relationship
 from sync.views import sync_item
 import sync.views as sync
-from logger.views import serverlog
 
 # Create your views here.
 def cases_page(request):
@@ -206,11 +205,15 @@ def data(request):
 @login_required
 def entity(request, id=0):
     if request.method == 'POST':
+        # client cannot create an entity directly now
+        # they have to create an entity by creating the annotation
+        pass
+    if request.method == 'PUT':
         res = {'entity': [], 'relationship': []}
-        data = request.POST
+        data = json.loads(request.body)
         case = Case.objects.get(id=data['case'])
         group = Group.objects.get(id=data['group'])
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(data, case, group, request.user)
+        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(data['data'], case, group, request.user)
         res['entity'] = [entity.serialize()] if entity else []
         res['entity'] += [e.serialize() for e in new_ents]
         res['relationship'] += [r.serialize() for r in new_rels]
@@ -235,19 +238,6 @@ def entity(request, id=0):
         except:
             return HttpResponse('Error: entity not found')
         res['entity'] = entity.serialize()
-        serverlog({
-            'user': request.user,
-            'operation': 'deleted',
-            'item': entity.entity_type,
-            'tool': 'entity_table',
-            'data': {
-                'id': entity.id,
-                'name': entity.name
-            },
-            'public': True,
-            'case': case,
-            'group': group
-        })
         entity.delete()
         sync_item('delete', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
@@ -272,21 +262,6 @@ def entity_attr(request):
             entity.attributes.add(attribute)
 
         entity.save()
-        serverlog({
-            'user': request.user,
-            'operation': 'updated',
-            'item': entity.entity_type,
-            'tool': 'entity_table',
-            'data': {
-                'id': entity.id,
-                'name': entity.name,
-                'attribute': attr,
-                'value': value,
-            },
-            'public': True,
-            'case': case,
-            'group': group
-        })
         return HttpResponse(value) # just return the value or return the whole entity?
 
 
@@ -310,12 +285,14 @@ def relationships(request):
 
 
 def create_relationship(request):
-    res = {}
+    res = {'relationship': {}, 'entity': []}
     data = json.loads(request.body)
     case = Case.objects.get(id=data['case'])
     group = Group.objects.get(id=data['group'])
-    rel, created, new_ents = get_or_create_relationship(data['data'], case, group, request.user)
+    rel, created, new_ents, updated_ents = get_or_create_relationship(data['data'], case, group, request.user)
     res['relationship'] = rel.serialize()
+    res['entity'] += [e.serialize() for e in new_ents]
+    res['entity'] += [e.serialize() for e in updated_ents]
     sync_item('create', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -326,7 +303,7 @@ def update_relationship(request, id):
     data = json.loads(request.body)
     case = Case.objects.get(id=data['case'])
     group = Group.objects.get(id=data['group'])
-    rel, created, new_ents = get_or_create_relationship(data['data'], case, group, request.user)
+    rel, created, new_ents, updated_ents = get_or_create_relationship(data['data'], case, group, request.user)
     res['relationship'] = rel.serialize()
     sync_item('update', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
@@ -353,21 +330,6 @@ def delete_relationship(request, id):
             if target.entity_type == 'person': source.person.remove(target)
         res['entity'] = source.serialize()
 
-    serverlog({
-        'user': request.user,
-        'operation': 'deleted',
-        'item': 'relationship',
-        'tool': 'network',
-        'data': {
-            'id': rel.id,
-            'name': rel.relation,
-            'source': rel.source.name,
-            'target': rel.target.name,
-        },
-        'public': True,
-        'case': case,
-        'group': group
-    })
     rel.delete()
     sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')

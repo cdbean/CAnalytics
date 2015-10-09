@@ -118,8 +118,11 @@ wb.store = {
           }
           $.publish('data/updated', prop);
         }
+      } else {
+        // entity attribute change
+        $.publish('data/updated');
       }
-    }, 1, true); // one level deep
+    }, 3, true); // one level deep
   },
 
   // put items on shelf

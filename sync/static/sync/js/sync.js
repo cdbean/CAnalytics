@@ -139,6 +139,9 @@ $(function() {
                       + ' and '
                       + wb.store.items.entities[data.relationship.primary.target].primary.name);
     }
+    if (data.entity) {
+      $.publish('entity/updated', data.entity);
+    }
   }
 
   function onRelationshipUpdated(data) {
@@ -152,6 +155,9 @@ $(function() {
                       + wb.store.items.entities[data.relationship.primary.source].primary.name
                       + ' and '
                       + wb.store.items.entities[data.relationship.primary.target].primary.name);
+    }
+    if (data.entity) {
+      $.publish('entity/updated', data.entity);
     }
   }
 

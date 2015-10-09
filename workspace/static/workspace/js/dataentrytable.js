@@ -20,15 +20,35 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         .on('filter', function(selected) {
           wb.store.shelf_by.dataentries = selected;
           $('.filter-div .filter-item').filter(function(i, item) {
-            return $(item).find('a').data('item') === 'dataentry';
+            return $(item).find('a').data('tool') === 'document table';
           }).remove();
+          var selected_docs = [];
           selected.forEach(function(d) {
             var de = wb.store.items.dataentries[d];
+            selected_docs.push(de);
             wb.filter.add('document: ' + de.name, {
-              item: 'dataentry',
-              id: de.id
+              item: 'documents',
+              id: de.id,
+              tool: 'document table',
+              public: false
             });
           });
+          if (selected_docs.length === 0) {
+            wb.log.log({
+                operation: 'defiltered',
+                item: 'documents',
+                tool: 'document table',
+                public: false
+            });
+          } else {
+            wb.log.log({
+                operation: 'filtered',
+                item: 'documents',
+                tool: 'document table',
+                data: wb.log.logDocs(selected_docs),
+                public: false
+            });
+          }
           $.publish('data/filter', '#' + this.element.attr('id'));
         }.bind(this))
       ;
@@ -268,7 +288,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           annotator.setupAnnotation(annotation);
         } else {
           $(store.annotations[i].highlights).removeClass()
-              .addClass('annotator-hl annotator-hl-' + annotation.tag.entity_type)
+              .addClass('annotator-hl annotator-hl-' + annotation.entity.entity_type)
           ;
           store.updateAnnotation(store.annotations[i], annotation);
         }

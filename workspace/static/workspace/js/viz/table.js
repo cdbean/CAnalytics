@@ -139,13 +139,7 @@ wb.viz.table = function() {
       var selected_rows = $('tr.row_selected', table);
 
       if (selected_rows.length === 0) {
-        dispatch.filter([]);
-        wb.log({
-          operation: 'removed filter',
-          item: title,
-          tool: title,
-        });
-        return;
+        return dispatch.filter([]);
       }
 
       var records_id = [];
@@ -153,16 +147,7 @@ wb.viz.table = function() {
         var id = $(row).data('id');
         records_id.push(id);
       });
-      dispatch.filter(records_id);
-      wb.log({
-        operation: 'filtered',
-        item: title,
-        tool: title,
-        data: JSON.stringify({
-          'id': records_id.join(','),
-//         'name': selected_names.join(',')
-        })
-      });
+      return dispatch.filter(records_id);
     }
     /*
     function onFilter(e) {

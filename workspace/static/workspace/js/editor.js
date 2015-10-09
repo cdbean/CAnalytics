@@ -106,7 +106,7 @@ $.widget('viz.vizeditor', {
     } else if (attr === 'priority') {
       // initialize as select drop down
       input.val(5)
-    } else if (attr === 'people') {
+    } else if (attr === 'person') {
       var opts = this.prepareSelectOptions('person');
       $(input).selectize({
           options: opts.opts,
@@ -116,7 +116,7 @@ $.widget('viz.vizeditor', {
           create: true,
           closeAfterSelect: true
         });
-    } else if (attr === 'organizations') {
+    } else if (attr === 'organization') {
       var opts = this.prepareSelectOptions('organization');
       $(input).selectize({
           options: opts.opts,
@@ -134,6 +134,7 @@ $.widget('viz.vizeditor', {
           valueField: 'value',
           searchField: 'label',
           create: true,
+          maxItems: 1,
           closeAfterSelect: true
       });
     } else if (attr === 'source' || attr === 'target') {
@@ -164,9 +165,10 @@ $.widget('viz.vizeditor', {
 
   },
 
-  show: function(pos, callback) {
+  show: function(pos, tool, callback) {
     var width = this.element.outerWidth();
     var height = this.element.outerHeight();
+    this.tool = tool;
     this.element.show().css({
       top: pos.top - height - 10,
       left: pos.left - width/2
@@ -192,6 +194,7 @@ $.widget('viz.vizeditor', {
     this.clearFields();
     this.item = null;
     this.item_type = null;
+    this.tool = null;
     this.element.hide();
     return this;
   },
@@ -231,6 +234,8 @@ $.widget('viz.vizeditor', {
     } else if (this.item_type === 'relationship') {
       url = GLOBAL_URL.relationship_id.replace(/\/0/, opt.data.id ? '/' + opt.data.id : '');
     }
+
+    var item_type = this.item_type;
     $.ajax({
       url: url,
       data: JSON.stringify(opt),
@@ -240,19 +245,40 @@ $.widget('viz.vizeditor', {
         if (d.entity) {
           if (opt.data.id) {
             $.publish('entity/updated', d.entity);
-            wb.utility.notify('Entity updated!', 'success');
+            if (item_type === 'entity') {
+              wb.utility.notify('Entity updated!', 'success');
+              wb.log.log({
+                operation: opt.data.id ? 'updated' : 'created',
+                item: this.item.primary.entity_type,
+                tool: this.tool,
+                data: wb.log.logItem(this.item),
+              });
+            }
           } else {
             $.publish('entity/created', d.entity);
-            wb.utility.notify('Entity created!', 'success');
+            if (item_type === 'entity') {
+              wb.utility.notify('Entity created!', 'success');
+              wb.log.log({
+                operation: opt.data.id ? 'updated' : 'created',
+                item: 'relationship',
+                tool: this.tool,
+                data: wb.log.logItem(this.item),
+              });
+            }
           }
+          // d.entity is an array
+          // including the entity that is updated, and possiblity related entities (newly created) 
+          // just log the currently updated entity
         }
         if (d.relationship) {
           if (opt.data.id) {
             $.publish('relationship/updated', d.relationship);
-            wb.utility.notify('relationship updated!', 'success');
+            if (item_type === 'relationship')
+              wb.utility.notify('relationship updated!', 'success');
           } else {
             $.publish('relationship/created', d.relationship);
-            wb.utility.notify('relationship created!', 'success');
+            if (item_type === 'relationship')
+              wb.utility.notify('relationship created!', 'success');
           }
         }
       },
@@ -261,7 +287,7 @@ $.widget('viz.vizeditor', {
       }
     });
 
-    this.hide('save');
+    this.hide(opt.data.id ? 'update' : 'create');
   },
 
   _onClickCancel: function() {
@@ -280,11 +306,11 @@ $.widget('viz.vizeditor', {
             res['geometry'] = {};
             res['geometry']['geometry'] = [place.geometry.location.lng(), place.geometry.location.lat()];
             res['geometry']['address'] = place.formatted_address;
-          } else if (attr === 'people') {
+          } else if (attr === 'person') {
             if (value) value = value.split(',');
             else value = [];
             res[attr] = value;
-          } else if (attr === 'organizations') {
+          } else if (attr === 'organization') {
             if (value) value = value.split(',');
             else value = [];
             res[attr] = value;

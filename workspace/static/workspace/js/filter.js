@@ -15,45 +15,38 @@ wb.filter.add = function(label, data, tool) {
 };
 
 wb.filter.remove = function(item, data) {
+  var logdata;
   if (data.id) {
     // if the item has id, it is an entity/relationship/annotation
     // remove from the store shelf
     if (data.item ===  'relationship') {
       var i = wb.store.shelf_by.relationships.indexOf(data.id);
       wb.store.shelf_by.relationships.splice(i, 1);
+      logdata = wb.log.logItem(wb.store.items.relationships[data.id]);
     } else if (data.item === 'annotation') {
       var i = wb.store.shelf_by.annotations.indexOf(data.id);
       wb.store.shelf_by.annotations.splice(i, 1);
+      logdata = wb.log.logAnnotation(wb.store.items.annotations[data.id]);
     } else if (data.item === 'dataentry') {
       var i = wb.store.shelf_by.dataentries.indexOf(data.id);
       wb.store.shelf_by.dataentries.splice(i, 1);
+      logdata = wb.log.logDoc(wb.store.items.dataentries[data.id]);
     } else {
       var i = wb.store.shelf_by.entities.indexOf(data.id);
       wb.store.shelf_by.entities.splice(i, 1);
+      logdata = wb.log.logItem(wb.store.items.entities[data.id]);
     }
-  } else {
-    if (data.item === 'event') {
-      // if time filter is removed
-      // remove all event entities from shelf_by
-      wb.store.shelf_by.entities = wb.store.shelf_by.entities.filter(function(d) {
-        return wb.store.items.entities[d].primary.entity_type !== 'event';
-      });
-    } else if (data.item === 'location') {
-      // if map filter is removed
-      // remove all location entities from shelf_by
-      wb.store.shelf_by.entities = wb.store.shelf_by.entities.filter(function(d) {
-        return wb.store.items.entities[d].primary.entity_type !== 'location';
-      });
-    }
-  }
+    
+    wb.log.log({
+      operation: 'defiltered',
+      item: data.item,
+      data: logdata, 
+      tool: 'filter bar',
+      public: false
+    });
+  }  
   $(item).remove();
 
-  wb.log({
-    operation: 'defiltered',
-    item: data.item,
-    data: data, 
-    tool: ''
-  });
 
   $.publish('data/filter');
 };

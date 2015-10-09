@@ -247,55 +247,51 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     },
 
     filterByLocation: function(feature) {
-        var shelf_by = wb.store.shelf_by.entities;
+        var shelf_by = wb.store.shelf_by.entities.slice();
         var selectedFeas = []; // selected feature ids
+
+        $('.filter-div .filter-item').filter(function(i, item) {
+          return $(item).find('a').data('tool') === 'map';
+        }).remove();
+
+        this.features.forEach(function(d) {
+          var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
+          if (i > -1) shelf_by.splice(i, 1);
+        });
+
         // get the id of all selected features
         this.layers.forEach(function(layer) {
             for (var i = 0, len = layer.selectedFeatures.length; i < len; i++) {
                 selectedFeas.push(layer.selectedFeatures[i].attributes.id);
             }
         });
+        shelf_by = shelf_by.concat(selectedFeas);
+        wb.store.shelf_by.entities = shelf_by;
 
         if (selectedFeas.length == 0) {
-            this.features.forEach(function(d) {
-              var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
-              if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
-            });
-
-            $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('item') === 'map';
-            }).remove();
-
-            wb.log({
-                operation: 'removed filter in',
-                item: 'map',
-                tool: 'map'
+            wb.log.log({
+                operation: 'defiltered',
+                item: 'locations',
+                tool: 'map',
+                public: false
             });
         } else {
-            selectedFeas.forEach(function(d) {
-              if (shelf_by.indexOf(d) < 0)
-                shelf_by.push(d);
+            var selected_locations = selectedFeas.map(function(id) {
+                var e = wb.store.items.entities[id];
+                wb.filter.add('location: ' + e.primary.name, {
+                    item: 'location',
+                    id: e.meta.id,
+                    tool: 'map'
+                });
+                return e;
             });
-            shelf_by = wb.utility.uniqueArray(shelf_by);
 
-            var selected_names = selectedFeas.map(function(id) {
-              return wb.store.items.entities[id].primary.name;
-            });
-
-            $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('item') === 'map';
-            }).remove();
-
-            wb.filter.add('map filter', {'item': 'map'});
-
-            wb.log({
-                operation: 'filtered in',
-                item: 'map',
+            wb.log.log({
+                operation: 'filtered',
+                item: 'locations',
                 tool: 'map',
-                data: JSON.stringify({
-                  'id': selectedFeas.join(','),
-                  'name': selected_names.join(',')
-                })
+                data: wb.log.logItems(selected_locations),
+                public: false
             });
         }
         $.publish('data/filter', '#' + this.element.attr('id'));

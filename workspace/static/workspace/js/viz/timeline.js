@@ -316,7 +316,7 @@ wb.viz.timeline = function() {
     var pos = {top: d3.event.pageY, left: d3.event.pageX};
     showNodeInfoTimer = setTimeout(function() {
       var entity = wb.store.items.entities[d.id];
-      wb.viewer.data(entity, 'entity').show(pos);
+      wb.viewer.data(entity, 'entity').show(pos, 'timeline');
     }, 500);
   }
 
@@ -352,32 +352,29 @@ wb.viz.timeline = function() {
       return $(item).find('a').data('item') === 'event';
     }).remove();
     if (brush.empty()) {
-      wb.log({
+      wb.log.log({
         operation: 'defiltered',
-        item: 'event',
-        tool: 'timeline'
+        item: 'events',
+        tool: 'timeline',
+        public: false
       });
     } else {
-      var log_name = [];
+      var selected_events = [];
       shelf_by.forEach(function(d) {
         var e = wb.store.items.entities[d];
         wb.filter.add('event: ' + e.primary.name, {
           item: 'event',
-          id: e.meta.id
+          id: e.meta.id,
+          tool: 'timeline',
         });
-        log_name.push(e.primar.name);
+        selected_events.push(e);
       });
-      wb.log({
+      wb.log.log({
         operation: 'filtered',
-        item: 'event',
+        item: 'events',
         tool: 'timeline',
-        data: {
-          id: shelf_by,
-          name: log_name 
-        }
-      });
-      wb.filter.add('time: ' + wb.utility.formatDateTime(ext[0]) + ' - ' + wb.utility.formatDateTime(ext[1]), {
-        item: 'time',
+        data: wb.log.logItems(selected_events),
+        public: false
       });
     }
     dispatch.filter();

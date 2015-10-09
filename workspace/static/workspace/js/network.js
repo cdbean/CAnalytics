@@ -481,7 +481,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             var pos = {top: d3.event.pageY, left: d3.event.pageX};
             wb.editor.data({
               primary: {source: source.id, target: target.id}
-            }, 'relationship').show(pos, function(action) {
+            }, 'relationship').show(pos, 'network', function(action) {
               if ('_tempdraw' in _this.linkMap) {
                 _this.links.splice([_this.linkMap['_tempdraw']], 1);
                 delete _this.linkMap['_tempdraw'];
@@ -543,15 +543,15 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 // d3.selectAll(".node").classed("selected", function(d) {
                 //     return d.selected = false;
                 // });
-                wb.log({
-                    operation: 'removed filter in',
-                    item: 'network',
-                    tool: 'network'
+                wb.log.log({
+                    operation: 'defiltered',
+                    item: 'entities',
+                    tool: 'network',
+                    public: false
                 });
             }
             else {
                 var ents_id = [];
-                var selected_names = [];
                 d3.selectAll('.node.selected').each(function(d) {
                     var r = wb.store.items.entities[d.id];
                     ents_id.push(d.id);
@@ -559,22 +559,22 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 })
                 wb.store.shelf_by.entities = ents_id;
 
+                selected_entities = []
                 ents_id.forEach(function(d) {
                   var entity = wb.store.items.entities[d];
+                  selected_entities.push(entity);
                   wb.filter.add(entity.primary.entity_type + ': ' + entity.primary.name, {
                     item: entity.primary.entity_type,
                     id: entity.meta.id,
                     tool: 'network'
                   });
                 });
-                wb.log({
+                wb.log.log({
                     operation: 'filtered in',
-                    item: 'network',
+                    item: 'entities',
                     tool: 'network',
-                    data: {
-                      'id': ents_id.join(','),
-                      'name': selected_names.join(',')
-                    }
+                    data: wb.log.logItems(selected_entities),
+                    public: false
                 });
             }
             $.publish('data/filter', '#' + _this.element.attr("id"));
@@ -990,7 +990,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       var pos = {top: d3.event.pageY, left: d3.event.pageX};
       this.showNodeInfoTimer = setTimeout(function() {
         var entity = wb.store.items.entities[d.id];
-        wb.viewer.data(entity, 'entity').show(pos);
+        wb.viewer.data(entity, 'entity').show(pos, 'network');
       }, 1000);
     },
 
@@ -1027,7 +1027,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       var pos = {top: d3.event.pageY, left: d3.event.pageX};
       this.showLinkInfoTimer = setTimeout(function() {
         var rel = wb.store.items.relationships[d.id];
-        wb.viewer.data(rel, 'relationship').show(pos);
+        wb.viewer.data(rel, 'relationship').show(pos, 'network');
       }, 500);
     },
 

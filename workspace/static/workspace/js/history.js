@@ -74,22 +74,26 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     var usertag = $('<span class="username">').appendTo(row).text(user.name).css('color', user.color);
     var timetag = $('<span class="timestamp">').appendTo(row).text(this._timeformat(this._servertimeformat.parse(item.time)));
 
-    var action = item.operation + ' ' + item.item;
+    var action = 'In ' + item.tool + '<i> ' + item.operation + ' </i>' + item.item;
     var entity;
     if (item.data) {
       if (item.data.name) {
         action += ' <a class="wb-item">' + item.data.name + '</span>';
       }
     }
-    $('<span class="content">').appendTo(row)
-      .html(action)
-    ;
+    $('<span class="content">').appendTo(row).html(action);
     if (item.item === 'annotation') {
       row.find('.wb-item').addClass('annotation').data('annotation', {id: item.data.id});
     } else if (item.item === 'relationship') {
       row.find('.wb-item').addClass('wb-relationship').data('relationship', {id: item.data.id});
     } else if (wb.store.static.entity_types.indexOf(item.item) > -1) {
       row.find('.wb-item').addClass('wb-entity').addClass(item.item).data('entity', {id: item.data.id});
+    } else if (item.item === 'entities') {
+      // multiple entities
+      item.data.forEach(function(d) {
+        var el = ' <a class="wb-item">' + d.name + '</span>';
+        $(el).appendTo($('.content', row)).addClass('wb-entity').addClass(d.primary.entity_type).data('entity', {id: d.id});
+      });
     }
 
     // hide user and time tag when it's the same user and within 60s

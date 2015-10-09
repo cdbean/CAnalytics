@@ -60,11 +60,17 @@ wb.log.logAnnotation = function(ann) {
 
 // dump entity or relationship
 wb.log.logItem = function(item) {
+  var geo = null; 
+  if ('geometry' in item.primary) {
+    geo = item.primary.geometry;
+    delete item.primary.geometry;
+  }
   var ent = JSON.parse(JSON.stringify(item));
+  if (geo) item.primary.geometry = geo;
+
   ent.id = item.meta.id;
   ent.name = item.primary.name || item.primary.relation;
   // address some special attributes
-  if ('geometry' in ent.primary) delete ent.primary.geometry;
   ['organization', 'person', 'location', 'source', 'target'].forEach(function(attr) {
     if (attr in ent.primary) {
       if (ent.primary[attr].constructor !== Array) ent.primary[attr] = [ent.primary[attr]];
@@ -81,5 +87,19 @@ wb.log.logItem = function(item) {
     }
   });
   return JSON.stringify(ent);
+};
+
+wb.log.logItems = function(items) {
+  return '[' + items.map(wb.log.logItem).join(',') + ']';
+};
+
+wb.log.logDocs = function(docs) {
+  return '[' + docs.map(wb.log.logDoc).join(',') + ']';
+};
+
+wb.log.logDoc = function(doc) {
+  var de = wb.store.items.dataentries[doc];
+  var ds = wb.store.items.datasets[de.dataset];
+  return JSON.stringify({id: de.id, name: de.name, dataset: {id: ds.id, name: ds.name}});
 };
 

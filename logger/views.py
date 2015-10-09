@@ -56,6 +56,8 @@ def log(request):
 def serverlog(data):
     if ('public' not in data) or (data['public'] == ''):
         data['public'] = True
+    # somehow the boolean value is interpreted as string
+    # convert it manually now
     if (data['public'] == 'false'): data['public'] = False
 
     act = Action.objects.create(

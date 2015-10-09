@@ -107,34 +107,33 @@ Annotator.Plugin.Store = (function(_super) {
                 ;
                 _this.updateAnnotation(annotation, ann);
 
+                if (entity.length) {
+                    $.publish('entity/created', entity);
+                    wb.log.log({
+                        operation: 'created',
+                        item: 'entities',
+                        tool: 'document',
+                        data: wb.log.logItems(entity)
+                    });
+                }
+                if (relationship.length) {
+                    $.publish("relationship/created", relationship);
+                    wb.log.log({
+                        operation: 'created',
+                        item: 'relationships',
+                        tool: 'document',
+                        data: wb.log.logItems(relationship)
+                    });
+                }
+
+                $.publish('annotation/created', annotation);
+                wb.utility.notify('Annotation created!', 'success');
                 wb.log.log({
                     operation: 'created',
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(annotation),
                 });
-
-                if (entity.length) {
-                  $.publish('entity/created', entity);
-                    wb.log.log({
-                        operation: 'created',
-                        item: entity.primary.entity_type,
-                        tool: 'document',
-                        data: wb.log.logItem(entity)
-                    });
-                }
-                if (relationship.length) {
-                  $.publish("relationship/created", relationship);
-                    wb.log.log({
-                        operation: 'created',
-                        item: 'relationship',
-                        tool: 'document',
-                        data: wb.log.logItem(relationship)
-                    });
-                }
-
-                $.publish('annotation/created', annotation);
-                wb.utility.notify('Annotation created!', 'success');
             });
         } else {
             return this.updateAnnotation(annotation, {});
@@ -171,7 +170,7 @@ Annotator.Plugin.Store = (function(_super) {
         var _this = this;
         if (__indexOf.call(this.annotations, annotation) >= 0) {
             return this._apiRequest('update', annotation, (function(data) {
-                var ann = data.annotations,
+                var ann = data.annotation,
                     entity = data.entity,
                     relationship = data.relationship
                 ;
@@ -179,29 +178,29 @@ Annotator.Plugin.Store = (function(_super) {
                     $.publish('relationship/updated', relationship);
                     wb.log.log({
                         operation: 'updated',
-                        item: 'relationship',
+                        item: 'relationships',
                         tool: 'document',
-                        data: wb.log.logItem(relationship)
+                        data: wb.log.logItem(relationships)
                     });
                 }
                 if (entity.length) {
                     $.publish('entity/updated', entity);
                     wb.log.log({
                         operation: 'updated',
-                        item: entity.primary.entity_type,
+                        item: 'entities',
                         tool: 'document',
-                        data: wb.log.logItem(entity)
+                        data: wb.log.logItems(entity)
                     });
                 }
                 _this.updateAnnotation(annotation, ann);
                 $.publish('annotation/updated', ann);
+                wb.utility.notify('Annotation updated!', 'success');
                 wb.log.log({
                     operation: 'updated',
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(ann),
                 });
-                wb.utility.notify('Annotation updated!', 'success');
             }));
         }
     };
@@ -234,15 +233,15 @@ Annotator.Plugin.Store = (function(_super) {
                     });
                 }
 
+                _this.unregisterAnnotation(annotation);
+                $.publish('annotation/deleted', annotation);
+                wb.utility.notify('Annotation deleted', 'success');
                 wb.log.log({
                     operation: 'deleted',
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(ann),
                 });
-                _this.unregisterAnnotation(annotation);
-                $.publish('annotation/deleted', annotation);
-                wb.utility.notify('Annotation deleted', 'success');
             });
         } else {
             _this.unregisterAnnotation(annotation);

@@ -36,7 +36,7 @@ $.widget('viz.vizviewer', {
     this.clearFields();
 
     this.item = d;
-    this.item_type = type;
+    this.item_type = type; // item_type: 'entity' or 'relationship'
 
     if (type === 'entity')
       type = d.primary.entity_type;
@@ -87,13 +87,31 @@ $.widget('viz.vizviewer', {
     return this;
   },
 
-  show: function(pos) {
+  show: function(pos, tool) {
     var width = this.element.outerWidth();
     var height = this.element.outerHeight();
+    this.tool = tool;
     this.element.show().css({
       top: pos.top - height - 10,
       left: pos.left - width/2
     });
+    if (this.item_type === 'relationship') {
+      wb.log.log({
+        operation: 'read',
+        item: 'relationship',
+        tool: this.tool,
+        data: wb.log.logItem(this.item),
+        public: false,
+      });
+    } else {
+      wb.log.log({
+        operation: 'read',
+        item: this.item.primary.entity_type,
+        tool: this.tool,
+        data: wb.log.logItem(this.item),
+        public: false
+      });
+    }
     return this;
   },
 
@@ -101,6 +119,7 @@ $.widget('viz.vizviewer', {
     this.clearFields();
     this.item = null;
     this.item_type = null;
+    this.tool = null;
     this.element.hide();
     return this;
   },
@@ -120,7 +139,7 @@ $.widget('viz.vizviewer', {
       .show({
         top: pos.top + 10 + height,
         left: pos.left + width/2
-      });
+      }, this.tool);
     this.hide();
   },
 
@@ -138,8 +157,22 @@ $.widget('viz.vizviewer', {
         success: function(res) {
           wb.utility.notify('Deleted a relationship', 'success');
           $.publish('relationship/deleted', res.relationship);
+          wb.log.log({
+            operation: 'deleted',
+            item: 'relationship',
+            tool: this.tool,
+            data: wb.log.logItem(res.relationship),
+          });
           // if res includes entity, it means an entity has been updated due to the deletion of the relationship
-          if (res.entity) $.publish('entity/updated', res.entity);
+          if (res.entity) {
+            $.publish('entity/updated', res.entity);
+            wb.log.log({
+              operation: 'updated',
+              item: res.entity.primary.entity_type,
+              tool: this.tool,
+              data: wb.log.logItem(res.entity),
+            });
+          } 
         },
         error: function(e) {
           console.log(e);
@@ -155,9 +188,15 @@ $.widget('viz.vizviewer', {
           group: GROUP
         },
         type: 'DELETE',
-        success: function() {
+        success: function(res) {
           wb.utility.notify('Deleted an entity', 'success');
-          $.publish('entity/deleted', item);
+          $.publish('entity/deleted', res.entity);
+          wb.log.log({
+            operation: 'deleted',
+            item: res.entity.primary.entity_type,
+            tool: this.tool,
+            data: wb.log.logItem(res.entity),
+          });
         },
         error: function(e) {
           console.log(e);

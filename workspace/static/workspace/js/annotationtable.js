@@ -19,15 +19,35 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
               if (viz) viz.highlight(selected[selected.length - 1])
 
               $('.filter-div .filter-item').filter(function(i, item) {
-                return $(item).find('a').data('item') === 'annotation';
+                return $(item).find('a').data('tool') === 'annotation table';
               }).remove();
-              wb.store.shelf_by.annotations.forEach(function(d) {
+
+              var selected_anns = [];
+              selected.forEach(function(d) {
                 var ann = wb.store.items.annotations[d];
+                selected_anns.push(ann);
                 wb.filter.add('annotation: ' + ann.quote,  {
                   item: 'annotation',
-                  id: d
+                  id: d,
+                  tool: 'annotation table'
                 });
               });
+              if (selected_anns.length === 0) {
+                wb.log.log({
+                    operation: 'defiltered',
+                    item: 'annotations',
+                    tool: 'annotation table',
+                    public: false
+                });
+              } else {
+                wb.log.log({
+                    operation: 'filtered',
+                    item: 'annotations',
+                    tool: 'annotation table',
+                    data: wb.log.logAnnotations(selected_anns),
+                    public: false
+                });
+              }
             }.bind(this))
         ;
         this.updateData();

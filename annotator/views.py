@@ -6,7 +6,6 @@ from django.contrib.auth.models import User, Group
 from workspace.entity import get_or_create_entity, get_or_create_relationship
 from workspace.models import DataEntry, Case
 from sync.views import sync_item
-from logger.views import serverlog
 from annotator.models import Annotation
 
 
@@ -28,13 +27,14 @@ def create_ann(data, case, group, user):
     rel = data.get('relationship', None)
     new_rels = []
     new_ents = []
+    updated_ents = []
     if entity['entity_type'] == 'relationship':
         rel = entity
     if rel:
-        rel, created, new_ents = get_or_create_relationship(rel, case, group, user)
+        rel, created, new_ents, updated_ents = get_or_create_relationship(rel, case, group, user)
         entity = None
     elif entity:
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
+        entity, created, new_ents, new_rels, del_rels, updated_ents = get_or_create_entity(entity, case, group, user)
 
     annotation = Annotation.objects.create(
         startOffset=ranges[0]['startOffset'],
@@ -51,7 +51,7 @@ def create_ann(data, case, group, user):
         case=case
     )
 
-    return annotation, new_ents + [entity], new_rels + [rel]
+    return annotation, [entity] + new_ents + updated_ents, [rel] + new_rels 
 
 
 def update_ann(annotation, data, case, group, user):
@@ -66,21 +66,22 @@ def update_ann(annotation, data, case, group, user):
     rel = data.get('relationship', None)
     new_rels = []
     del_rels = []
+    updated_ents = []
 
     if entity['entity_type'] == 'relationship':
         rel = entity
     if rel:
-        rel, created, new_ents = get_or_create_relationship(rel, case, group, user)
+        rel, created, new_ents, updated_ents = get_or_create_relationship(rel, case, group, user)
         entity = None
     if entity:
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(entity, case, group, user)
+        entity, created, new_ents, new_rels, del_rels, updated_ents = get_or_create_entity(entity, case, group, user)
 
     annotation.last_edited_by = user
     annotation.entity = entity
     annotation.relationship = rel
     annotation.save()
 
-    return annotation, new_ents + [entity], new_rels + [rel], del_rels
+    return annotation, [entity] + new_ents + updated_ents, [rel] + new_rels, del_rels
 
 
 def del_ann(annotation):
@@ -150,19 +151,6 @@ def post_annotation(request):
     res['relationship'] += [r.serialize() for r in rels if r is not None]
     res['entity'] += [e.serialize() for e in ents if e is not None]
 
-    # save to activity log
-    serverlog({
-        'user': request.user,
-        'operation': 'created',
-        'item': 'annotation',
-        'tool': 'dataentry',
-        'data': {
-            'id': ann.id,
-            'name': ann.quote
-        },
-        'group': group,
-        'case': case
-    })
     # sync annotation
     sync_item('create', 'annotation', res, case, group, request.user)
 
@@ -185,7 +173,7 @@ def update_annotation(request, id):
 
     ann, ents, rels, del_rels = update_ann(annotation, data, case, group, request.user)
 
-    res['annotation'] = annotation.serialize()
+    res['annotation'] = ann.serialize()
     res['relationship'] += [r.serialize() for r in rels if r is not None]
     res['entity'] += [e.serialize() for e in ents if e is not None]
 
@@ -195,18 +183,6 @@ def update_annotation(request, id):
         res['relationship'].append(r_info)
         r.delete()
 
-    serverlog({
-        'user': request.user,
-        'operation': 'updated',
-        'item': 'annotation',
-        'tool': 'dataentry',
-        'data': {
-            'id': annotation.id,
-            'name': annotation.quote
-        },
-        'group': group,
-        'case': case
-    })
     sync_item('update', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
@@ -230,19 +206,6 @@ def del_annotation(request, id):
     res['annotation'] = ann_info
     res['entity'] = ent_info
     res['relationship'] = rel_info
-
-    serverlog({
-        'user': request.user,
-        'operation': 'deleted',
-        'item': 'annotation',
-        'tool': 'dataentry',
-        'data': {
-            'id': annotation.id,
-            'name': annotation.quote
-        },
-        'case': case,
-        'group': group
-    })
 
     sync_item('delete', 'annotation', res, case, group, request.user)
 
@@ -292,17 +255,6 @@ def post_annotations(request):
         res['entities'] += [e.serialize() for e in ents if e is not None]
         log_anns.append({'id': ann.id, 'name': ann.quote})
 
-    # save to activity log
-    serverlog({
-        'user': request.user,
-        'operation': 'created',
-        'item': 'annotations',
-        'tool': 'dataentry',
-        'data': log_anns,
-        'group': group,
-        'case': case
-    })
-
     sync_item('create', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -338,16 +290,6 @@ def update_annotations(request):
             res['relationships'].append(r_info)
             r.delete()
 
-    serverlog({
-        'user': request.user,
-        'operation': 'updated',
-        'item': 'annotations',
-        'tool': 'dataentry',
-        'data': log_anns,
-        'group': group,
-        'case': case
-    })
-
     sync_item('update', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
@@ -373,16 +315,6 @@ def del_annotations(request):
 
         res['annotations'].append(ann_info)
         log_anns.append({'id': ann_info['id'], 'name': ann_info['quote']})
-
-    serverlog({
-        'user': request.user,
-        'operation': 'deleted',
-        'item': 'annotation',
-        'tool': 'dataentry',
-        'data': log_anns,
-        'case': case,
-        'group': group
-    })
 
     # entity and relationship are the same for all annotation
     # record it for the last annotation
