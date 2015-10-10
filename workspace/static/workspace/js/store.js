@@ -168,6 +168,7 @@ wb.store = {
 
     this.shelf.datasets.forEach(function(d) {
       var ds = _this.items.datasets[d];
+      if (!ds) return;
       selected_dataentries = selected_dataentries.concat(ds.dataentries);
     });
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {
@@ -188,6 +189,7 @@ wb.store = {
 
     this.shelf.dataentries.forEach(function(d) {
       var de = _this.items.dataentries[d];
+      if (!de) return;
       selected_annotations = selected_annotations.concat(de.annotations);
     });
     this.shelf.annotations = this.shelf.annotations.filter(function(d) {
@@ -197,6 +199,7 @@ wb.store = {
 
     this.shelf.annotations.forEach(function(d) {
       var ann = _this.items.annotations[d];
+      if (!ann) return;
       selected_entities.push(ann.entity.id);
     });
     this.shelf.entities = this.shelf.entities.filter(function(d) {
@@ -206,6 +209,7 @@ wb.store = {
 
     this.shelf.entities.forEach(function(d) {
       var ent = _this.items.entities[d];
+      if (!ent) return;
       selected_relationships = selected_relationships.concat(ent.meta.relationships);
     })
     this.shelf.relationships = this.shelf.relationships.filter(function(d) {
@@ -227,6 +231,7 @@ wb.store = {
 
     this.shelf.annotations.forEach(function(d) {
       var ann = _this.items.annotations[d];
+      if (!ann) return;
       selected_dataentries.push(ann.anchor);
       selected_entities.push(ann.entity && ann.entity.id);
       selected_relationships.push(ann.relationship && ann.relationship.id);
@@ -256,6 +261,7 @@ wb.store = {
 
     this.shelf_by.entities.forEach(function(ent_id) {
       var ent = _this.items.entities[ent_id];
+      if (!ent) return;
       selected_annotations = selected_annotations.concat(ent.meta.annotations);
       // get directly related relationships
       selected_relationships = selected_relationships.concat(ent.meta.relationships);
@@ -263,14 +269,17 @@ wb.store = {
     selected_relationships.forEach(function(rel) {
       // get directly related entities
       var r = _this.items.relationships[rel];
+      if (!r) return;
       selected_entities.push(r.primary.source);
       selected_entities.push(r.primary.target);
     });
     selected_entities = wb.utility.uniqueArray(selected_entities);
     selected_entities.forEach(function(ent) {
       var e = _this.items.entities[ent];
+      if (!e) return;
       e.meta.relationships.forEach(function(rel) {
         var r = _this.items.relationships[rel];
+        if (!r) return;
         if (r.primary.relation === 'involve' && r.primary.source === ent) {
           // e.g. if the entity is an event, and 'involves' another person, the person should be filtered as 'related'
           selected_entities.push(r.primary.target);
@@ -298,6 +307,7 @@ wb.store = {
 
     this.shelf.annotations.forEach(function(d) {
       var ann = _this.items.annotations[d];
+      if (!ann) return;
       selected_dataentries.push(ann.anchor);
     });
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {
@@ -319,6 +329,7 @@ wb.store = {
 
     this.shelf.relationships.forEach(function(d) {
       var r = _this.items.relationships[d];
+      if (!r) return;
       selected_entities.push(r.primary.source);
       selected_entities.push(r.primary.target);
       selected_annotations = selected_annotations.concat(r.meta.annotations);
@@ -335,6 +346,7 @@ wb.store = {
 
     this.shelf.annotations.forEach(function(d) {
       var ann = _this.items.annotations[d];
+      if (!ann) return;
       selected_dataentries.push(ann.anchor);
     });
     this.shelf.dataentries = this.shelf.dataentries.filter(function(d) {

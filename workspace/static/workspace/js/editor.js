@@ -97,7 +97,7 @@ $.widget('viz.vizeditor', {
   },
 
   _styleInput: function(attr, value, input) {
-    if (/date/.test(attr)) {
+    if (/date/.test(attr) || attr === 'repeated_until') {
       input.datetimepicker();
     } else if (attr === 'address') {
       // initialize as google place search

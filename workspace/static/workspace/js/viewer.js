@@ -18,7 +18,7 @@ $.widget('viz.vizviewer', {
     ';
     var controls = ' \
       <span class="viewer-controls"> \
-        <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-remove"></span></button> \
+        <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-trash"></span></button> \
         <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
       </span> \
     '

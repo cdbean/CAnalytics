@@ -15,8 +15,9 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             div: this.element.attr("id"),
             eventListeners: {
                 featureover: function(e) {
-                    this.highlight(e.feature);
-                }.bind(this),
+                    // this.highlight(e.feature);
+                    console.log(this.events.getMousePosition(e))
+                },
                 featureout: function(e) {
                     this.unhighlight(e.feature);
                 }.bind(this)
@@ -176,6 +177,9 @@ $.widget("viz.vizmap", $.viz.vizbase, {
           }
         }
         var entity = wb.store.items.entities[feature.attributes.id];
+
+        wb.viewer.data(entity, 'entity').show(pos, 'network');
+
         var primary = entity.primary;
         var popup = '<div id="map-popup" class="entity-tooltip"><table>';
         popup += '<tr><th>' + wb.utility.capfirst(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
@@ -189,39 +193,14 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         feature.popup = new OpenLayers.Popup.FramedCloud(
                 "location_info",
                 feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(200,150),
+                // new OpenLayers.Size(200,150),
+                null,
                 popup,
                 null,
                 true
         );
 
         this.map.addPopup(feature.popup, true);
-
-        // for (var i = 0; i < this.highlightedFeatures.length; i++) {
-        //     this.mapControls['select'].unhighlight(this.highlightedFeatures[i]);
-        // }
-        // this.highlightedFeatures = [];
-        // for (var i = 0; i < this.map.popups.length; i++) {
-        //     this.map.removePopup(this.map.popups[i]);
-        // }
-        //
-        // var layers = [linelayer, pointlayer];
-        // for (var i = 0; i < features_id.length; i++) {
-        //     for (var j = 0; j < layers.length; j++) {
-        //         var found = false;
-        //         var locallayer = layers[j];
-        //         for (var k = 0, len = locallayer.features.length; k < len; k++) {
-        //             if (locallayer.features[k].attributes.id == features_id[i]) {
-        //                 this._showDetails(locallayer.features[k]);
-        //                 this.mapControls['select'].highlight(locallayer.features[k]);
-        //                 this.highlightedFeatures.push(locallayer.features[k]);
-        //                 found = true;
-        //                 break;
-        //             }
-        //         }
-        //         if (found == true) break;
-        //     }
-        // }
     },
     unhighlight: function(feature) {
         if (feature.popup) {
@@ -237,7 +216,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         feature.popup = new OpenLayers.Popup.FramedCloud(
                 "footprint_info",
                 feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(200,150),
+                new OpenLayers.Size(100,80),
                 content.html(),
                 null,
                 true

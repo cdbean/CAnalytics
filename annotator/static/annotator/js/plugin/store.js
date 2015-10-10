@@ -180,7 +180,7 @@ Annotator.Plugin.Store = (function(_super) {
                         operation: 'updated',
                         item: 'relationships',
                         tool: 'document',
-                        data: wb.log.logItem(relationships)
+                        data: wb.log.logItems(relationship)
                     });
                 }
                 if (entity.length) {

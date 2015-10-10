@@ -97,23 +97,16 @@ wb.viz.table = function() {
           var attrs = wb.store.static[ent.primary.entity_type];
           for (var i in attrs) {
             var k = attrs[i];
-            var val = '';
-            if (ent.primary[k]) {
-              if (k === 'organization' || k === 'location' || k === 'person') {
-                if ($.isArray(ent.primary[k])) {
-                  val = ent.primary[k].map(function(d) {
-                    return wb.store.items.entities[d].primary.name;
-                  }).join(', ');
-                } else 
-                  val = wb.store.items.entities[ent.primary[k]].primary.name;
-              } else {
-                val = ent.primary[k];
-              }
-            }
-            if (val) child += '<tr><td>' + k + ':</td><td>' + val + '</td></tr>';
+            var val = ent.primary[k];
+            if (val) child += '<tr><td>' + k + ':</td><td>' + wb.utility.parseEntityAttr(k, val) + '</td></tr>';
           }
           for (var k in ent.other) {
             if (ent.other[k]) child += '<tr><td>' + k + ':</td><td>' + ent.other[k] + '</td></tr>';
+          }
+          var metas = wb.store.static.meta;
+          for (var i = 0, len = metas.length; i < len; i++) {
+            var attr = metas[i], value = ent.meta[attr];
+            if (value) child += '<tr><td>' + attr + ':</td><td>' + wb.utility.parseEntityAttr(attr, value) + '</td></tr>';
           }
           child += '</table>';
           table.fnOpen(tr, child, 'details');
