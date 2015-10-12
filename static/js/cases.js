@@ -50,12 +50,12 @@ $('.modal').on('show.bs.modal', function(event) {
 		options += '<option class="usergroup" value="' + case_d.usergroups[i].id + '">' + case_d.usergroups[i].name + '</option>';
 	}
 	options += '</optgroup>';
+	options += '<option value="0">Create new group</option>';
 	options += '<optgroup label="Other groups">';
 	for (var i = 0; i < case_d.othergroups.length; i++) {
 		options += '<option class="othergroup" value="' + case_d.othergroups[i].id + '">' + case_d.othergroups[i].name + '</option>';
 	}
 	options += '</optgroup>';
-	options += '<option value="0">Create new group</option>';
 	$(this).find('#group_selector').empty().append(options).selectpicker('refresh');
 	// put case id in input
 	$(this).data('case', case_d);

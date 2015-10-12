@@ -1,39 +1,5 @@
 $(function() {
-  // join room
-  // $.subscribe('users/loaded', function() {
-  //   if (! ('ishout' in window)) return;
-
-  //   var room = CASE + '-' + GROUP;
-  //   room = room.replace(/\s/g, '');
-  //   ishout.joinRoom(room, function(data) {
-  //     // after joining room, server will return a list of users in the room:
-  //     // {users: [user_id]}
-  //     onUsersOnline(data.users);
-  //     $.post('/sync/join', {
-  //       'case': CASE,
-  //       'group': GROUP,
-  //     });
-  //   });
-  // });
-
-  // // get all users in this group
-  // $.get(GLOBAL_URL.users, {
-  //   case: CASE,
-  //   group: GROUP
-  // }, function(users) {
-  //   for (var i = 0, len = users.length; i < len; i++) {
-  //     var user = users[i];
-  //     user.color = wb.utility.randomColor(i);
-  //     wb.info.users[user.id] = user;
-  //   }
-  //   // change the color of the user name in nav bar
-  //   var mycolor = wb.info.users[wb.info.user].color;
-  //   $('.nav #username').css('color', mycolor);
-    
-  //   // after users are loaded, join room and fetch users online
-  //   $.publish('users/loaded');
-  // });
-
+  var user_tool = {}; // track the current tool users are using
 
   if (! ("ishout" in window)) {
     wb.utility.notify('Collaboration features unavailable at the moment');
@@ -69,6 +35,47 @@ $(function() {
 
   ishout.on('action', onNewAction);
 
+  ishout.on('user.tool', onUserTool);
+
+
+  function onUserTool(d) {
+    var user = wb.info.users[d.user];
+    var tool = d.tool;
+    if (user && tool) {
+      console.log(user.name + ' is using ' + tool);
+      $('.user-monitor').empty();
+      $('.user-icon').remove();
+      user_tool[user.id] = tool;
+      for (u in user_tool) {
+        if (wb.info.user == u) continue; // skip the current user
+        var t = user_tool[u];
+        u = wb.info.users[u];
+
+        // show indicator in page header
+        if (t.indexOf('table') > -1) {
+          var el = $('#table-dropdown, #' + t.replace(' ', '_') + '-btn');
+        } else if (t === 'document') {
+          var el = $('#dataentry-btn');
+        } 
+        else {
+          var el = $('#' + t + '-btn');
+        }
+        if (el) {
+          $('<span class="user-thumb">.</span>').appendTo(el.parent().find('.user-monitor'))
+            .css('color', u.color);
+        }
+        // show indicator in view title bar
+        $('.viz').each(function(i, v) {
+          if ($(v).data('instance').options.tool === t) {
+            $('<span class="badge user-icon"></span>').appendTo($(v).parent().find('.ui-dialog-title'))
+              .text(u.name[0])
+              .css('color', u.color);
+          }
+        })
+      }
+    }
+  }
+
 
   function onUsersOnline(data) {
     var users = data.users;
@@ -84,7 +91,13 @@ $(function() {
     // update the color of the user name in nav bar
     var mycolor = wb.info.users[wb.info.user].color;
     $('.nav #username').css('color', mycolor);
+
     $.publish('user/online', online_users);
+
+    // remove user thumb in tool if the user is no longer online
+    for (u in user_tool) {
+      if (online_users.indexOf(u) < 0) delete user_tool[u];
+    }
   }
 
   function onNewMessage(data) {

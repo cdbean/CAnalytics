@@ -73,9 +73,12 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         </div> \
       '
       var el = $(html).appendTo(this.element);
-      this.element.layout({
+      this.layout = this.element.layout({
         applyDemoStyles: true,
-        west__size: 100
+        west__size: 100,
+        onresize: function() {
+          this.table.resize();
+        }.bind(this)
       });
       var str = '';
       d3.values(wb.store.items.datasets).forEach(function(ds) {
@@ -84,7 +87,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       });
       el.find('#ds-list').append(str);
       $('#ds-list input:checkbox', el).change(this._onDatasetChecked);
-      el.find('.ui-layout-center').resize(this.resize.bind(this));
+      // el.find('.ui-layout-center').resize(this.resize.bind(this));
     },
 
     _onDatasetChecked: function() {
@@ -316,6 +319,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     resize: function() {
       this._super('resize');
+      this.layout.resizeAll();
       this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
       this.table.resize();
     },

@@ -29,6 +29,16 @@
   $.subscribe('user/online', onUserOnline);
 
 
+  // lister to the following events and broadcast
+  $.subscribe('user/tool', onUserTool);
+
+  function onUserTool(e, d) {
+    ishout.rooms.forEach(function(r) {
+      ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
+    });
+  }
+
+
   function onUserOnline() {
     var users = [].slice.call(arguments, 1);
 

@@ -51,6 +51,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
           }
         });
       }
+      $.publish('user/tool', 'message');
     });
 
     var _this = this;

@@ -1,6 +1,7 @@
 $.widget('viz.vizbase', {
     options: {
         title: '',
+        tool: '',
         width: 800,
         height: 500,
         base: { // for jquery dialog
@@ -8,6 +9,10 @@ $.widget('viz.vizbase', {
             resizable : true,
             draggable : true,
             closeOnEscape: false,
+            // show: {
+            //     effect: 'scale',
+            //     percent: 100
+            // }
         },
         extend: { // for jquery dialogextend
             maximizable : true,
@@ -30,6 +35,8 @@ $.widget('viz.vizbase', {
         this.options.base.width = $(window).width() / 2 - 20;
         this.options.base.height = $(window).height() / 2 - 20;
         this.options.base.title = this.options.title;
+        this.options.base.focus = this.onFocus.bind(this);
+
         this.element.dialog(this.options.base).dialogExtend(this.options.extend);
         this.options.extend.help = this.help;
         this.options.extend.arrange_window = this.arrange_window;
@@ -54,6 +61,10 @@ $.widget('viz.vizbase', {
     },
     help: function() {
 
+    },
+
+    onFocus: function() {
+        $.publish('user/tool', this.options.tool);
     },
 
     arrange_window: function() {

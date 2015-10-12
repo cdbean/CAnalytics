@@ -82,41 +82,50 @@ $(function() {
         viz = $('<div>').vizentitytable({
             title: viz_name,
             entity: viz_name,
+            tool: viz_name + ' table'
         });
     } else if (viz_name === 'dataentry') {
         viz = $('<div>').vizdataentrytable({
             title: 'Documents',
+            tool: 'document'
         });
     } else if (viz_name === 'timeline') {
         viz = $('<div>').viztimeline({
             title: 'Timeline',
+            tool: 'timeline'
         });
     } else if (viz_name === 'map') {
         viz = $('<div>').vizmap({
             title: 'Map',
+            tool: 'map'
         });
     } else if (viz_name === 'network') {
         viz = $('<div>').viznetwork({
             title: 'Network',
+            tool: 'network'
         });
     } else if (viz_name === 'notepad') {
         viz = $('<div>').viznotepad({
             title: 'Notepad',
+            tool: 'notepad',
             url: GLOBAL_URL.notepad,
         });
     } else if (viz_name === 'message') {
       viz = $('<div>').vizmessage({
-        title: 'Message'
+        title: 'Message',
+        tool: 'message'
       });
       $(this).find('.unread').text('');
     } else if (viz_name === 'history') {
       viz = $('<div>').vizhistory({
         title: 'History',
+        tool: 'history',
         url: GLOBAL_URL.history
       });
     } else if (viz_name === 'annotation') {
       viz = $('<div>').vizannotationtable({
         title: 'Annotations',
+        tool: 'annotation table',
       });
     }
   }

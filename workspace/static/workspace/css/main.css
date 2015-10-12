@@ -1,6 +1,6 @@
 /* page header */
 .navbar-default {
-  background-color: #4d6cbb;
+  background-color: #1A40A0;
 }
 .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand, .navbar-default .navbar-brand:focus {
   color: white;
@@ -157,5 +157,19 @@ a.wb-entity:hover:after {
 
 .pager {
   margin: 0;
+}
+
+.user-monitor {
+  position: absolute;
+  top: -12px;
+  left: 5px;
+  font-size: 5em;
+}
+.user-monitor .user-thumb {
+  /*padding-right: 1em;*/
+}
+.user-icon {
+  background-color: white;
+  margin-left: 5px;
 }
 
