@@ -29,7 +29,7 @@
   }
 
 $.fn.extend({
-  autocomplete: function(urlOrData, options) {
+  acautocomplete: function(urlOrData, options) {
     var isUrl = typeof urlOrData == "string";
     options = $.extend({
       formatEditableResult: function(row) { return '<a contenteditable="false" href="#" tabindex="-1" >@' + row[options.jsonterm] + '</a>&nbsp;';}

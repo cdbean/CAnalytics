@@ -88,7 +88,7 @@
             } else {
                 for(var j in b){
                     if (b.hasOwnProperty(j)) {
-                        if(a[j] === undefined) {
+                        if(a&&a[j] === undefined) {
                             bplus.push(j);
                         }
                     }

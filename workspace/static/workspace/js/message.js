@@ -67,7 +67,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     var sources = d3.values(wb.store.items.entities).map(function(d) {
       return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
     });
-    this.element.find('#message_content').autocomplete(sources, {
+    this.element.find('#message_content').acautocomplete(sources, {
       matchContains: true,
       scroll: true,
       hotkeymode:true,

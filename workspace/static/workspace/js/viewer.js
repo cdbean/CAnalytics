@@ -156,22 +156,22 @@ $.widget('viz.vizviewer', {
         type: 'DELETE',
         success: function(res) {
           wb.utility.notify('Deleted a relationship', 'success');
-          $.publish('relationship/deleted', res.relationship);
           wb.log.log({
             operation: 'deleted',
             item: 'relationship',
             tool: this.tool,
             data: wb.log.logItem(res.relationship),
           });
+          $.publish('relationship/deleted', res.relationship);
           // if res includes entity, it means an entity has been updated due to the deletion of the relationship
           if (res.entity) {
-            $.publish('entity/updated', res.entity);
             wb.log.log({
               operation: 'updated',
               item: res.entity.primary.entity_type,
               tool: this.tool,
               data: wb.log.logItem(res.entity),
             });
+            $.publish('entity/updated', res.entity);
           } 
         },
         error: function(e) {

@@ -214,34 +214,35 @@ Annotator.Plugin.Store = (function(_super) {
                     entity = data.entity,
                     relationship = data.relationship;
 
+                wb.log.log({
+                    operation: 'deleted',
+                    item: 'annotation',
+                    tool: 'document',
+                    data: wb.log.logAnnotation(annotation),
+                });
+
                 if (entity && entity.deleted) {
-                  $.publish('entity/deleted', entity);
                     wb.log.log({
                         operation: 'deleted',
                         item: entity.primary.entity_type,
                         tool: 'document',
                         data: wb.log.logItem(entity)
                     });
+                    $.publish('entity/deleted', entity);
                 }
                 if (relationship && relationship.deleted) {
-                  $.publish('relationship/deleted', relationship);
                     wb.log.log({
                         operation: 'deleted',
                         item: 'relationship',
                         tool: 'document',
                         data: wb.log.logItem(relationship)
                     });
+                    $.publish('relationship/deleted', relationship);
                 }
 
                 _this.unregisterAnnotation(annotation);
                 $.publish('annotation/deleted', annotation);
                 wb.utility.notify('Annotation deleted', 'success');
-                wb.log.log({
-                    operation: 'deleted',
-                    item: 'annotation',
-                    tool: 'document',
-                    data: wb.log.logAnnotation(ann),
-                });
             });
         } else {
             _this.unregisterAnnotation(annotation);

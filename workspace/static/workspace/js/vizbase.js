@@ -65,6 +65,12 @@ $.widget('viz.vizbase', {
 
     onFocus: function() {
         $.publish('user/tool', this.options.tool);
+        wb.log.log({
+            operation: 'focused',
+            item: this.options.tool,
+            tool: this.options.tool,
+            public: false
+        });
     },
 
     arrange_window: function() {

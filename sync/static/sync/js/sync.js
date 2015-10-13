@@ -42,7 +42,6 @@ $(function() {
     var user = wb.info.users[d.user];
     var tool = d.tool;
     if (user && tool) {
-      console.log(user.name + ' is using ' + tool);
       $('.user-monitor').empty();
       $('.user-icon').remove();
       user_tool[user.id] = tool;
@@ -112,14 +111,14 @@ $(function() {
     if (data.user === wb.info.user) return;
 
     var entity;
-    if (data.entity) {
+    if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
       if (data.entity.constructor === Array)
         entity = data.entity[0];
       else
         entity = data.entity;
     }
-    if (data.relationship)
+    if (!$.isEmptyObject(data.relationship))
       $.publish('relationship/updated', data.relationship);
 
     wb.utility.notify(wb.info.users[data.user].name
@@ -142,7 +141,7 @@ $(function() {
 
   function onRelationshipCreated(data) {
     if (data.user === wb.info.user) return;
-    if (data.relationship) {
+    if (!$.isEmptyObject(data.relationship)) {
       $.publish('relationship/created', data.relationship);
       wb.utility.notify(wb.info.users[data.user].name
                       + ' created relationship '
@@ -152,14 +151,14 @@ $(function() {
                       + ' and '
                       + wb.store.items.entities[data.relationship.primary.target].primary.name);
     }
-    if (data.entity) {
+    if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
     }
   }
 
   function onRelationshipUpdated(data) {
     if (data.user === wb.info.user) return;
-    if (data.relationship) {
+    if (!$.isEmptyObject(data.relationship)) {
       $.publish('relationship/updated', data.relationship);
       wb.utility.notify(wb.info.users[data.user].name
                       + ' updated relationship '
@@ -169,7 +168,7 @@ $(function() {
                       + ' and '
                       + wb.store.items.entities[data.relationship.primary.target].primary.name);
     }
-    if (data.entity) {
+    if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
     }
   }
@@ -178,7 +177,7 @@ $(function() {
     if (data.user === wb.info.user) return;
     $.publish('relationship/deleted', data.relationship);
     // if data includes entity, it means that entity has been updated due to the deletion of the relationship
-    if (data.entity) $.publish('entity/updated', data.entity);
+    if (!$.isEmptyObject(data.entity)) $.publish('entity/updated', data.entity);
 
     wb.utility.notify(wb.info.users[data.user].name
                       + ' deleted relationship '
@@ -196,9 +195,9 @@ $(function() {
     var relationship = data.relationship || data.relationships;
 
     $.publish('annotation/created', annotation);
-    if (entity)
+    if (!$.isEmptyObject(entity))
       $.publish('entity/created', entity);
-    if (relationship)
+    if (!$.isEmptyObject(relationship))
       $.publish('relationship/created', relationship);
 
     var length = annotation.length || 1;
@@ -215,15 +214,15 @@ $(function() {
     var relationship = data.relationship || data.relationships;
 
     $.publish('annotation/updated', annotation);
-    if (entity)
+    if (!$.isEmptyObject(entity))
       $.publish('entity/updated', entity);
-    if (relationship)
+    if (!$.isEmptyObject(relationship))
       $.publish('relationship/updated', relationship);
 
     var length = annotation.length || 1;
     var quote = annotation.quote || annotation[0].quote;
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' update ' + length + ' annotation on '
+                      + ' updated ' + length + ' annotation on '
                       + quote
                     );
   }
@@ -235,15 +234,15 @@ $(function() {
     var relationship = data.relationship || data.relationships;
 
     $.publish('annotation/deleted', annotation);
-    if (entity)
+    if (!$.isEmptyObject(entity))
       $.publish('entity/deleted', entity);
-    if (relationship)
+    if (!$.isEmptyObject(relationship))
       $.publish('relationship/deleted', relationship);
 
     var length = annotation.length || 1;
     var quote = annotation.quote || annotation[0].quote;
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' delete ' + length + ' annotation on '
+                      + ' deleted ' + length + ' annotation on '
                       + quote
                     );
   }

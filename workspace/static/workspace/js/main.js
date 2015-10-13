@@ -68,7 +68,8 @@ $(function() {
 
   function onCaseInfo() {
     $('<div>').vizcaseinfo({
-      title: 'Case'
+      title: 'Case',
+      tool: 'case',
     });
   }
 

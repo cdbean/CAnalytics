@@ -248,7 +248,7 @@ $.widget('viz.vizeditor', {
             if (item_type === 'entity') {
               wb.utility.notify('Entity updated!', 'success');
               wb.log.log({
-                operation: opt.data.id ? 'updated' : 'created',
+                operation: 'updated',
                 item: this.item.primary.entity_type,
                 tool: this.tool,
                 data: wb.log.logItem(this.item),
@@ -259,8 +259,8 @@ $.widget('viz.vizeditor', {
             if (item_type === 'entity') {
               wb.utility.notify('Entity created!', 'success');
               wb.log.log({
-                operation: opt.data.id ? 'updated' : 'created',
-                item: 'relationship',
+                operation: 'created',
+                item: this.item.primary.entity_type,
                 tool: this.tool,
                 data: wb.log.logItem(this.item),
               });
@@ -275,10 +275,22 @@ $.widget('viz.vizeditor', {
             $.publish('relationship/updated', d.relationship);
             if (item_type === 'relationship')
               wb.utility.notify('relationship updated!', 'success');
+              wb.log.log({
+                operation: 'updated',
+                item: 'relationship',
+                tool: this.tool,
+                data: wb.log.logItem(this.item),
+              });
           } else {
             $.publish('relationship/created', d.relationship);
             if (item_type === 'relationship')
               wb.utility.notify('relationship created!', 'success');
+              wb.log.log({
+                operation: 'created',
+                item: 'relationship',
+                tool: this.tool,
+                data: wb.log.logItem(this.item),
+              });
           }
         }
       },

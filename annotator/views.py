@@ -99,10 +99,11 @@ def del_ann(annotation):
     ann_info = annotation.serialize()
     annotation.delete()
     if entity:
-        entity_info = entity.serialize()
-        if entity.annotation_set.count() == 0:
+        ent_info = entity.serialize()
+        # if no other annotation or relationship refers to this entity, delete it
+        if entity.annotation_set.count() == 0 and entity.relates_as_source.count() == 0 and entity.relates_as_target.count() == 0:
             entity.delete()
-            entity_info['deleted'] = True
+            ent_info['deleted'] = True
     elif relationship:
         relationship_info = relationship.serialize()
         if relationship.annotation_set.count() == 0:

@@ -31,11 +31,15 @@ class Action(models.Model):
 
     def serialize(self):
         return {
+            'id': self.id,
             'user': self.user.id,
             'operation': self.operation,
             'item': self.item,
             'tool': self.tool,
             'data': json.loads(self.data),
+            'public': self.public,
+            'group': self.group.id,
+            'case': self.case.id,
             'time': self.time.strftime('%m/%d/%Y-%H:%M:%S'),
         }
 

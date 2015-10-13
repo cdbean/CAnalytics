@@ -45,14 +45,18 @@ wb.log.logAnnotation = function(ann) {
   if ('entity' in a) {
     if (a.entity.entity_type === 'relationship') {
       var r = wb.store.items.relationships[a.entity.id];
-      var source = wb.store.items.entities[r.primary.source];
-      source = {id: source.meta.id, entity_type: source.primary.entity_type, name: source.primary.name};
-      var target = wb.store.items.entities[r.primary.target];
-      target = {id: target.meta.id, entity_type: target.primary.entity_type, name: target.primary.name};
-      a.entity = {id: r.meta.id, relation: r.primary.relation, source: source, target: target};
+      if (r) { 
+        var source = wb.store.items.entities[r.primary.source];
+        source = {id: source.meta.id, entity_type: source.primary.entity_type, name: source.primary.name};
+        var target = wb.store.items.entities[r.primary.target];
+        target = {id: target.meta.id, entity_type: target.primary.entity_type, name: target.primary.name};
+        a.entity = {id: r.meta.id, relation: r.primary.relation, source: source, target: target};
+      }
     } else {
       var e = wb.store.items.entities[a.entity.id];
-      a.entity = {id: e.meta.id, entity_type: e.primary.entity_type, name: e.primary.name};
+      if (e) {
+        a.entity = {id: e.meta.id, entity_type: e.primary.entity_type, name: e.primary.name};
+      }
     }
   }
   return JSON.stringify(a);
@@ -76,14 +80,14 @@ wb.log.logItem = function(item) {
       if (ent.primary[attr].constructor !== Array) ent.primary[attr] = [ent.primary[attr]];
       ent.primary[attr] = ent.primary[attr].map(function(d) {
         var e = wb.store.items.entities[d];
-        return {id: e.meta.id, name: e.primary.name};
+        if (e) return {id: e.meta.id, name: e.primary.name};
       });
     }
   });
   ['created_by', 'last_edited_by'].forEach(function(attr) {
     if (attr in ent.meta) {
       var u = wb.info.users[ent.meta[attr]];
-      ent.meta[attr] = {id: u.id, name: u.name};
+      if (u) ent.meta[attr] = {id: u.id, name: u.name};
     }
   });
   return JSON.stringify(ent);

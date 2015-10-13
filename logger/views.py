@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 import json
+import csv
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User, Group
@@ -51,6 +52,11 @@ def log(request):
             'public': request.POST.get('public', '')
         }
         act = serverlog(log)
+        # write to file
+        cols = ['id', 'time', 'user', 'operation', 'item', 'tool', 'public', 'group', 'case', 'data']
+        with open('activities.log', 'a') as ofile:
+            writer = csv.DictWriter(ofile, fieldnames=cols)
+            writer.writerow(act)
         return HttpResponse(json.dumps(act), content_type='application/json')
 
 def serverlog(data):

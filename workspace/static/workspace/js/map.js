@@ -15,8 +15,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             div: this.element.attr("id"),
             eventListeners: {
                 featureover: function(e) {
-                    // this.highlight(e.feature);
-                    console.log(this.events.getMousePosition(e))
+                    this.highlight(e.feature);
+                    // console.log(this.events.getMousePosition(e))
                 },
                 featureout: function(e) {
                     this.unhighlight(e.feature);
@@ -143,6 +143,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             }
           }
         }
+        this.linelayer.removeAllFeatures();
+        this.pointlayer.removeAllFeatures();
         this.linelayer.addFeatures(line_feas);
         this.pointlayer.addFeatures(point_feas);
         this.features = this.pointlayer.features.concat(this.linelayer.features);
