@@ -81,11 +81,13 @@ wb.utility = {};
   };
 
 
-  wb.utility.notify = function(msg, type) {
+  wb.utility.notify = function(msg, type, delay) {
+    // type: success | info | warning | error
+    if (type === 'error') type = 'danger';
     $('.notifications').notify({
       message: {text: msg},
       type: type || 'info',
-      fadeOut: {enabled: true, delay: 3000}
+      fadeOut: {enabled: true, delay: delay || 3000}
     }).show();
   };
 

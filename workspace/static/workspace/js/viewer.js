@@ -35,6 +35,11 @@ $.widget('viz.vizviewer', {
   data: function(d, type) {
     this.clearFields();
 
+    if ($.isEmptyObject(d)) {
+      this.element.find('.title').text('Item does not exist');
+      return this;
+    }
+
     this.item = d;
     this.item_type = type; // item_type: 'entity' or 'relationship'
 
@@ -95,22 +100,24 @@ $.widget('viz.vizviewer', {
       top: pos.top - height - 10,
       left: pos.left - width/2
     });
-    if (this.item_type === 'relationship') {
-      wb.log.log({
-        operation: 'read',
-        item: 'relationship',
-        tool: this.tool,
-        data: wb.log.logItem(this.item),
-        public: false,
-      });
-    } else {
-      wb.log.log({
-        operation: 'read',
-        item: this.item.primary.entity_type,
-        tool: this.tool,
-        data: wb.log.logItem(this.item),
-        public: false
-      });
+    if (this.item) {
+      if (this.item_type === 'relationship') {
+        wb.log.log({
+          operation: 'read',
+          item: 'relationship',
+          tool: this.tool,
+          data: wb.log.logItem(this.item),
+          public: false,
+        });
+      } else {
+        wb.log.log({
+          operation: 'read',
+          item: this.item.primary.entity_type,
+          tool: this.tool,
+          data: wb.log.logItem(this.item),
+          public: false
+        });
+      }
     }
     return this;
   },
@@ -146,6 +153,7 @@ $.widget('viz.vizviewer', {
   _onClickDelete: function() {
     var item = this.item;
     var item_type = this.item_type;
+    var tool = this.tool;
     if (this.item_type === 'relationship') {
       $.ajax({
         url: GLOBAL_URL.relationship_id.replace('0', this.item.meta.id),
@@ -159,20 +167,17 @@ $.widget('viz.vizviewer', {
           wb.log.log({
             operation: 'deleted',
             item: 'relationship',
-            tool: this.tool,
+            tool: tool,
             data: wb.log.logItem(res.relationship),
           });
           $.publish('relationship/deleted', res.relationship);
           // if res includes entity, it means an entity has been updated due to the deletion of the relationship
-          if (res.entity) {
-            wb.log.log({
-              operation: 'updated',
-              item: res.entity.primary.entity_type,
-              tool: this.tool,
-              data: wb.log.logItem(res.entity),
-            });
+          if (!$.isEmptyObject(res.entity)) {
             $.publish('entity/updated', res.entity);
           } 
+          if (!$.isEmptyObject(res.annotation)) {
+            $.publish('annotation/deleted', res.annotation);
+          }
         },
         error: function(e) {
           console.log(e);
@@ -194,9 +199,15 @@ $.widget('viz.vizviewer', {
           wb.log.log({
             operation: 'deleted',
             item: res.entity.primary.entity_type,
-            tool: this.tool,
+            tool: tool,
             data: wb.log.logItem(res.entity),
           });
+          if (!$.isEmptyObject(res.relationship)) {
+            $.publish('relationship/deleted', res.relationship);
+          }
+          if (!$.isEmptyObject(res.annotation)) {
+            $.publish('annotation/deleted', res.annotation);
+          }
         },
         error: function(e) {
           console.log(e);

@@ -161,8 +161,11 @@ $.widget('viz.vizeditor', {
           maxItems: 1,
           closeAfterSelect: true
         });
-      }
-
+    } else if (attr === 'repeated') {
+        var html = '<input class="attr-value" style="width:auto;" type="checkbox" name="repeated"> weekly</input>';
+        var li = $(input).parent().empty();
+        $(html).appendTo(li).prop('checked', value);
+    }
   },
 
   show: function(pos, tool, callback) {
@@ -236,6 +239,8 @@ $.widget('viz.vizeditor', {
     }
 
     var item_type = this.item_type;
+    var tool = this.tool;
+    var item = this.item;
     $.ajax({
       url: url,
       data: JSON.stringify(opt),
@@ -249,9 +254,9 @@ $.widget('viz.vizeditor', {
               wb.utility.notify('Entity updated!', 'success');
               wb.log.log({
                 operation: 'updated',
-                item: this.item.primary.entity_type,
-                tool: this.tool,
-                data: wb.log.logItem(this.item),
+                item: item.primary.entity_type,
+                tool: tool,
+                data: wb.log.logItem(item),
               });
             }
           } else {
@@ -260,9 +265,9 @@ $.widget('viz.vizeditor', {
               wb.utility.notify('Entity created!', 'success');
               wb.log.log({
                 operation: 'created',
-                item: this.item.primary.entity_type,
-                tool: this.tool,
-                data: wb.log.logItem(this.item),
+                item: item.primary.entity_type,
+                tool: tool,
+                data: wb.log.logItem(d.entity),
               });
             }
           }
@@ -278,8 +283,8 @@ $.widget('viz.vizeditor', {
               wb.log.log({
                 operation: 'updated',
                 item: 'relationship',
-                tool: this.tool,
-                data: wb.log.logItem(this.item),
+                tool: tool,
+                data: wb.log.logItem(item),
               });
           } else {
             $.publish('relationship/created', d.relationship);
@@ -288,8 +293,8 @@ $.widget('viz.vizeditor', {
               wb.log.log({
                 operation: 'created',
                 item: 'relationship',
-                tool: this.tool,
-                data: wb.log.logItem(this.item),
+                tool: tool,
+                data: wb.log.logItem(d.relationship),
               });
           }
         }
@@ -325,6 +330,9 @@ $.widget('viz.vizeditor', {
           } else if (attr === 'organization') {
             if (value) value = value.split(',');
             else value = [];
+            res[attr] = value;
+          } else if (attr === 'repeated') {
+            value = $(row).find('.attr-value')[0].checked;
             res[attr] = value;
           } else {
             res[attr] = value;

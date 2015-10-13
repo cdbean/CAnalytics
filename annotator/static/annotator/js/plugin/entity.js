@@ -58,6 +58,9 @@ Annotator.Plugin.Entity = (function(_super) {
           // do when the entity type is changed
           // put entity attributes in the list
           var entity = self.annotation.entity;
+
+          if (value === 'relationship') $(self.entityNameField).addClass('hidden');
+          else $(self.entityNameField).removeClass('hidden');
          
           var attribute_widget = $(self.attrField).find('.annotator-attribute-widget').data('instance');
           attribute_widget.reset();
@@ -195,11 +198,7 @@ Annotator.Plugin.Entity = (function(_super) {
             annotation.entity = {};
         }
         var name = $(field).find('.entity_name').val();
-        if (name) {
-            annotation.entity.name = name;
-        } else {
-            alert ('Entity name is required!'); // TODO: more elegant form validation
-        }
+        annotation.entity.name = name || 'Unknown';
     },
 
     Entity.prototype.initEntityTypeField = function(field) {

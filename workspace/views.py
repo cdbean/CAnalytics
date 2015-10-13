@@ -213,9 +213,10 @@ def entity(request, id=0):
         data = json.loads(request.body)
         case = Case.objects.get(id=data['case'])
         group = Group.objects.get(id=data['group'])
-        entity, created, new_ents, new_rels, del_rels = get_or_create_entity(data['data'], case, group, request.user)
+        entity, created, new_ents, new_rels, del_rels, updated_ents = get_or_create_entity(data['data'], case, group, request.user)
         res['entity'] = [entity.serialize()] if entity else []
         res['entity'] += [e.serialize() for e in new_ents]
+        res['entity'] += [e.serialize() for e in updated_ents]
         res['relationship'] += [r.serialize() for r in new_rels]
 
         for r in del_rels:
@@ -238,6 +239,14 @@ def entity(request, id=0):
         except:
             return HttpResponse('Error: entity not found')
         res['entity'] = entity.serialize()
+        rels = entity.relates_as_source.all() | entity.relates_as_target.all()
+        res['relationship'] = [r.serialize() for r in rels]
+        anns = entity.annotation_set.all()
+        res['annotation'] = [a.serialize() for a in anns]
+        for r in rels:
+            anns = r.annotation_set.all()
+            res['annotation'] += [a.serialize() for a in anns]
+
         entity.delete()
         sync_item('delete', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
@@ -329,7 +338,8 @@ def delete_relationship(request, id):
         elif source.entity_type == 'organization':
             if target.entity_type == 'person': source.person.remove(target)
         res['entity'] = source.serialize()
-
+    anns = rel.annotation_set.all()
+    res['annotation'] = [a.serialize() for a in anns]
     rel.delete()
     sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')

@@ -30,7 +30,8 @@ $(function() {
   $('#case-info').click(onCaseInfo);
   $('.viz-opts').click(onVizSelect);
 
-  $('body').on('click', 'a.wb-entity, span.wb-entity', onClickEntity);
+  $('body').on('mouseover', '.wb-item', onMouseOverEntity);
+  $('body').on('click', '.wb-item', onClickEntity);
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
@@ -57,13 +58,97 @@ $(function() {
     wb.viewer.hide();
   }
 
-  function onClickEntity(e) {
+  function onMouseOverEntity(e) {
     var ent = $(e.target).data('entity');
     if (ent) {
       var entity = wb.store.items.entities[ent.id || ent]; // ent could be an object or an id only
       wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'));
+    } else {
+      var rel = $(e.target).data('relationship');
+      if (rel) {
+        var relationship = wb.store.items.relationships[rel.id || rel];
+        wb.viewer.data(relationship, 'relationship').show(wb.utility.mousePosition(e, 'body'), 'reference');
+      }
     }
     e.stopPropagation();
+  }
+
+  function onClickEntity(e) {
+    $(e.target).toggleClass('filtered');
+    var tofilter = $(e.target).hasClass('filtered');
+    var ent = $(e.target).data('entity');
+    if (ent) {
+      ent = wb.store.items.entities[ent.id || ent];
+      if ($.isEmptyObject(ent)) return false;
+
+      if (tofilter) {
+        var i = wb.store.shelf_by.entities.indexOf(ent.meta.id);
+        if (i < 0) wb.store.shelf_by.entities.push(ent.meta.id);
+        wb.filter.add(ent.primary.entity_type + ': ' + ent.primary.name, {
+          id: ent.meta.id,
+          item: ent.primary.entity_type,
+          tool: 'reference'
+        });
+        wb.log.log({
+            operation: 'filtered',
+            item: ent.primary.entity_type,
+            tool: 'reference',
+            data: wb.log.logItem(ent),
+            public: false
+        });
+      } else {
+        $('.filter-div .filter-item').filter(function(i, item) {
+          var d = $(item).find('a').data();
+          return d.tool === 'reference' && d.id === ent.meta.id && d.item === ent.primary.entity_type;
+        }).remove();
+        var i = wb.store.shelf_by.entities.indexOf(ent.meta.id);
+        if (i >= 0) wb.store.shelf_by.entities.splice(i, 1);
+        wb.log.log({
+            operation: 'defiltered',
+            item: ent.primary.entity_type,
+            tool: 'reference',
+            data: wb.log.logItem(ent),
+            public: false
+        });
+      }
+    } else {
+      var rel = $(e.target).data('relationship');
+      if (rel) {
+        rel = wb.store.items.relationships[rel.id || rel];
+        if ($.isEmptyObject(rel)) return false;
+        if (tofilter) {
+          var i = wb.store.shelf_by.relationships.indexOf(rel.meta.id);
+          if (i < 0) wb.store.shelf_by.relationships.push(rel.meta.id);
+          wb.filter.add('relationship: ' + rel.primary.relation, {
+            id: rel.meta.id,
+            item: 'relationship',
+            tool: 'reference'
+          });
+          wb.log.log({
+              operation: 'filtered',
+              item: 'relationship',
+              tool: 'reference',
+              data: wb.log.logItem(rel),
+              public: false
+          });
+        } else {
+          $('.filter-div .filter-item').filter(function(i, item) {
+            var d = $(item).find('a').data();
+            return d.tool === 'reference' && d.id === rel.meta.id && d.item === 'relationship';
+          }).remove();
+          var i = wb.store.shelf_by.relationships.indexOf(rel.meta.id);
+          if (i >= 0) wb.store.shelf_by.relationships.splice(i, 1);
+          wb.log.log({
+              operation: 'defiltered',
+              item: 'relationship',
+              tool: 'reference',
+              data: wb.log.logItem(rel),
+              public: false
+          });
+        }
+      }
+    }
+    $.publish('data/filter');
   }
 
   function onCaseInfo() {

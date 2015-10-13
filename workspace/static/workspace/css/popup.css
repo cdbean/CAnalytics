@@ -128,6 +128,7 @@
 
 .editor .attr-add-btn, .editor .attr-remove-btn {
   padding: 1px;
+  float: right;
 }
 
 .editor .attr-list .attr-key {

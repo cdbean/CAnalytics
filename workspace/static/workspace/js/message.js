@@ -67,6 +67,10 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     var sources = d3.values(wb.store.items.entities).map(function(d) {
       return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
     });
+    var s1 = d3.values(wb.store.items.relationships).map(function(d) {
+      return {'name': d.primary.relation, 'id': d.meta.id, 'entity_type': 'relationship'};
+    });
+    sources = sources.concat(s1);
     this.element.find('#message_content').acautocomplete(sources, {
       matchContains: true,
       scroll: true,
@@ -74,8 +78,15 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       noresultsmsg: 'No matches',
       jsonterm: 'name',
       formatResult: function(row) {
-        return '<a contenteditable="false" class="wb-entity ' + row['entity_type'] 
-        + '" data-entity="' + row['id'] + '" href="#" tabindex="-1">' + row['name'] + '</a> ';
+        if (row['entity_type'] === 'relationship') {
+          var classname = 'wb-relationship';
+          var data = 'data-relationship=' + row['id'];
+        } else {
+          var classname = 'wb-entity ' + row['entity_type'];
+          var data = 'data-entity=' + row['id'];
+        }
+        return '<a contenteditable="false" class="wb-item ' + classname + '" '
+        + data + ' href="#" tabindex="-1">' + row['name'] + '</a> ';
       }
     });
   },

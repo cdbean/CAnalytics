@@ -434,22 +434,24 @@ Annotator = (function(_super) {
             if (ann.entity) {
                 if (ann.entity.entity_type === 'relationship') {
                     var relationship = wb.store.items.relationships[ann.entity.id];
-                    wb.log.log({
-                        operation: 'read',
-                        item: 'relationship',
-                        tool: 'document',
-                        data: wb.log.logItem(relationship),
-                        public: false
-                    });
+                    if (relationship)
+                        wb.log.log({
+                            operation: 'read',
+                            item: 'relationship',
+                            tool: 'document',
+                            data: wb.log.logItem(relationship),
+                            public: false
+                        });
                 } else {
                     var entity = wb.store.items.entities[ann.entity.id];
-                    wb.log.log({
-                        operation: 'read',
-                        item: entity.primary.entity_type,
-                        tool: 'document',
-                        data: wb.log.logItem(entity),
-                        public: false
-                    });
+                    if (entity)
+                        wb.log.log({
+                            operation: 'read',
+                            item: entity.primary.entity_type,
+                            tool: 'document',
+                            data: wb.log.logItem(entity),
+                            public: false
+                        });
                 }
             } 
         });

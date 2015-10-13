@@ -570,7 +570,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                   });
                 });
                 wb.log.log({
-                    operation: 'filtered in',
+                    operation: 'filtered',
                     item: 'entities',
                     tool: 'network',
                     data: wb.log.logItems(selected_entities),
@@ -774,10 +774,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         for (var i = this.nodes.length - 1; i >= 0; i--) {
           if (!this.nodes[i].temp_exist) {
             delete this.nodeMap[this.nodes[i].id];
-            this.nodes.slice(i, 1);
+            this.nodes.splice(i, 1);
             // update position in nodeMap after i
             for (var j = i; j < this.nodes.length; j++) {
-              this.linkMap[this.nodes[j].id] = j;
+              this.nodeMap[this.nodes[j].id] = j;
             }
           } else {
             delete this.nodes[i].temp_exist;
@@ -808,7 +808,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           if (this.links[i]) {
             if (!this.links[i].temp_exist) {
               delete this.linkMap[this.links[i].id];
-              this.links.slice(i, 1); 
+              this.links.splice(i, 1); 
               // update position in linkMap after i
               for (var j = i; j < this.links.length; j++) {
                 this.linkMap[this.links[j].id] = j;

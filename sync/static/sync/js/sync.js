@@ -132,6 +132,8 @@ $(function() {
     if (data.user === wb.info.user) return;
 
     $.publish('entity/deleted', data.entity);
+    if (!$.isEmptyObject(data.relationship)) $.publish('relationship/deleted', data.relationship);
+    if (!$.isEmptyObject(data.annotation)) $.publish('annotation/deleted', data.annotation);
     wb.utility.notify(wb.info.users[data.user].name
                       + ' deleted  '
                       + data.entity.primary.entity_type
@@ -178,6 +180,7 @@ $(function() {
     $.publish('relationship/deleted', data.relationship);
     // if data includes entity, it means that entity has been updated due to the deletion of the relationship
     if (!$.isEmptyObject(data.entity)) $.publish('entity/updated', data.entity);
+    if (!$.isEmptyObject(data.annotation)) $.publish('annotation/deleted', data.annotation);
 
     wb.utility.notify(wb.info.users[data.user].name
                       + ' deleted relationship '
