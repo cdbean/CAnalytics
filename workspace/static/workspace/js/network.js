@@ -555,7 +555,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 d3.selectAll('.node.selected').each(function(d) {
                     var r = wb.store.items.entities[d.id];
                     ents_id.push(d.id);
-                    selected_names.push(r.primary.name);
                 })
                 wb.store.shelf_by.entities = ents_id;
 
