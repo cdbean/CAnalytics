@@ -170,6 +170,7 @@ Annotator.Plugin.Entity = (function(_super) {
                 delete annotation.entity;
             }
             else name = entity.primary.name || entity.primary.relation;
+            $(field).find('.entity_name').val(name);
         } else {
             name = annotation.quote;
             var item = null;
@@ -179,11 +180,13 @@ Annotator.Plugin.Entity = (function(_super) {
                     return false;
                 }
             });
-            $(field).find('.entity_name').data('ui-autocomplete')._trigger('select', 'autocompleteselect', {item:item});
+            if (item) 
+                $(field).find('.entity_name').data('ui-autocomplete')._trigger('select', 'autocompleteselect', {item:item});
+            else
+                $(field).find('.entity_name').val(name);
 
             // $(field).find('.entity_name').autocomplete('search', name);
         }
-        $(field).find('.entity_name').val(name);
     };
 
 
