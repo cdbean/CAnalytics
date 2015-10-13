@@ -1,12 +1,12 @@
 .viz.message .messageArea {
   margin: 0;
-  height: calc(100% - 90px);
+  height: calc(100% - 60px);
 }
 
-.viz.message .inputMessage #message_content {
+.viz.message .inputMessage {
   -moz-appearance: textfield;
   -webkit-appearance: textfield;
-  bottom: 0;
+  bottom: 1px;
   height: 60px;
   left: 0;
   right: 0;
@@ -15,13 +15,20 @@
   background-color: -moz-field;
   border: 1px solid darkgray;
   box-shadow: 1px 1px 1px 0 lightgray inset;
-  margin-top: 5px;
-  padding: 6px 12px;
+  margin: 0;
+  padding: 0;
   width: 100%;
   outline: 0px solid transparent;
 }
+.viz.message .inputMessage #message_content {
+  height: 60px;
+}
+.viz.message .inputMessage button {
+  font-size: 14px;
+  height: 60px;
+}
 
-viz.message .inputMessage #message_content:focus {
+.viz.message .inputMessage #message_content:focus {
   outline: 0px solid transparent;
 }
 

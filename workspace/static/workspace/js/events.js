@@ -33,9 +33,11 @@
   $.subscribe('user/tool', onUserTool);
 
   function onUserTool(e, d) {
-    ishout.rooms.forEach(function(r) {
-      ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
-    });
+    if (ishout) {
+      ishout.rooms.forEach(function(r) {
+        ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
+      });
+    }
   }
 
 

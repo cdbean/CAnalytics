@@ -21,8 +21,12 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         <ul class="messages"></ul> \
       </div> \
       <form class="inputMessage"> \
-        <div id="message_content" contentEditable=true data-placeholder="Hit [Ctrl+Enter] to send message.."></div> \
-        <input type="submit" style="display: none;"> \
+        <div class="input-group"> \
+          <div id="message_content" class="form-control" contentEditable=true data-placeholder="Hit [Ctrl+Enter] to send message.."></div> \
+          <span class="input-group-btn"> \
+            <button type="button" class="btn btn-primary" id="send-btn">Send</input> \
+          </span> \
+        </div> \
       </form> \
     ';
 
@@ -38,23 +42,11 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     // initialize events listeners for components
     var input = this.element.find('#message_content').keydown(function(e) {
       if (e.which == 13 && e.ctrlKey) { // press enter
-        var content = $(this).html();
-        $(this).html('');
-        _this.element.parent().removeClass('highlighted');
-
-        $.post(GLOBAL_URL.message, {
-          content: content,
-          case: CASE,
-          group: GROUP
-        }, function(res) {
-          if (res === 'success') {
-          }
-        });
+        this.sendMessage();
       }
-      $.publish('user/tool', 'message');
-    });
+    }.bind(this));
+    this.element.find('#send-btn').click(this.sendMessage.bind(this));
 
-    var _this = this;
     $('.pager>li>a', this.element).click(function(e) {
       var page = $(this).data('page');
       _this.loadMessages(+page);
@@ -87,6 +79,21 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         }
         return '<a contenteditable="false" class="wb-item ' + classname + '" '
         + data + ' href="#" tabindex="-1">' + row['name'] + '</a> ';
+      }
+    });
+  },
+
+  sendMessage: function() {
+    this.element.parent().removeClass('highlighted');
+    var el = this.element.find('#message_content');
+    var msg = el.html();
+    el.html('');
+    $.post(GLOBAL_URL.message, {
+      content: msg,
+      case: CASE,
+      group: GROUP
+    }, function(res) {
+      if (res === 'success') {
       }
     });
   },
