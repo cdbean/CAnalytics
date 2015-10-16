@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 
 import json
 
@@ -29,25 +29,29 @@ def login(request):
 
 
 def register(request):
+    if request.method == 'GET':
+        return render(request, 'account/register.html')
+
     if request.method == 'POST':
         username = request.POST.get('username', '')
         email = request.POST.get('email', '')
         psd   = request.POST.get('password', '')
-    if username and email and psd:
-        if User.objects.filter(username=username).exists():
-            user = authenticate(username=username, password=psd)
-            if user:
-                auth_login(request, user)
-                return redirect('workspace.views.home')
+        fname = request.POST.get('fname')
+        lname = request.POST.get('lname')
+        if username and email and psd:
+            if User.objects.filter(username=username).exists():
+                user = authenticate(username=username, password=psd)
+                if user:
+                    auth_login(request, user)
+                    return redirect('home')
+                else:
+                    return HttpResponse('User name exists')
             else:
-                return HttpResponse('Error: username and password do not match')
-        else:
-            User.objects.create_user(username=username, email=email, password=psd)
-            user = authenticate(username=username, password=psd)
-            auth_login(request, user)
-            return redirect('workspace.views.home')
+                User.objects.create_user(username=username, email=email, password=psd, first_name=fname, last_name=lname)
+                user = authenticate(username=username, password=psd)
+                auth_login(request, user)
+                return redirect('home')
 
-    return
 
 def logout(request):
     auth_logout(request)
@@ -63,3 +67,32 @@ def users(request):
             'name': u.username
         })
     return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+def validate_username(request): 
+    validated = True
+    username = request.GET['username']
+    if User.objects.filter(username=username).exists():
+        validated = False
+
+    if validated:
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest()
+
+
+
+def validate_groupname(request, case):
+    validated = True
+    try:
+        case = Case.objects.get(id=case)
+        gname = request.GET['group_name']
+    except:
+        return HttpResponseBadRequest()
+    if case.groups.filter(name=gname).exists():
+        validated = False
+
+    if validated:
+        return HttpResponse(status=200)
+    else: 
+        return HttpResponseBadRequest()

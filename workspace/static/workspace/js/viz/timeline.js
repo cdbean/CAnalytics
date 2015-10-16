@@ -37,6 +37,15 @@ wb.viz.timeline = function() {
     itemHeight = trackHeight * .8;
 
     selection.each(function() {
+      if (data.length === 0) {
+        return d3.select(this).append('div')
+          .attr('class', 'center-block placeholder')
+          .attr('width', '200px')
+          .style('text-align', 'center')
+          .html('No events created yet');
+      } 
+      else d3.select(this).selectAll('.placeholder').remove();
+
       if (!svg)  {
         svg = d3.select(this).append('svg')
           .attr('width', outwidth)
@@ -45,6 +54,7 @@ wb.viz.timeline = function() {
         var g = svg.append('g')
           .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
           ;
+
         g.append('clipPath')
           .attr('id', 'clip')
           .append('rect')
@@ -211,11 +221,12 @@ wb.viz.timeline = function() {
   };
 
   exports.filter = function(subset) {
-    svg.selectAll('.item')
-      .attr('display', function(d) {
-        if (subset.indexOf(d.id) > -1) return '';
-        else return 'none';
-      });
+    if (svg)
+      svg.selectAll('.item')
+        .attr('display', function(d) {
+          if (subset.indexOf(d.id) > -1) return '';
+          else return 'none';
+        });
   };
 
   exports.setBrushMode = function() {
@@ -350,7 +361,7 @@ wb.viz.timeline = function() {
     var pos = {top: d3.event.pageY, left: d3.event.pageX};
     showNodeInfoTimer = setTimeout(function() {
       var entity = wb.store.items.entities[d.id];
-      wb.viewer.data(entity, 'entity').show(pos);
+      wb.viewer.data(entity, 'entity').show(pos, 'timeline');
     }, 500);
   }
 
@@ -382,13 +393,33 @@ wb.viz.timeline = function() {
       shelf_by.push(d.id);
     });
     wb.store.shelf_by.entities = shelf_by;
-    var ext = brush.extent();
     $('.filter-div .filter-item').filter(function(i, item) {
-      return $(item).find('a').data('item') === 'time';
+      return $(item).find('a').data('item') === 'event';
     }).remove();
-    if (!brush.empty()) {
-      wb.filter.add('time: ' + wb.utility.formatDateTime(ext[0]) + ' - ' + wb.utility.formatDateTime(ext[1]), {
-        item: 'time',
+    if (brush.empty()) {
+      wb.log.log({
+        operation: 'defiltered',
+        item: 'events',
+        tool: 'timeline',
+        public: false
+      });
+    } else {
+      var selected_events = [];
+      shelf_by.forEach(function(d) {
+        var e = wb.store.items.entities[d];
+        wb.filter.add('event: ' + e.primary.name, {
+          item: 'event',
+          id: e.meta.id,
+          tool: 'timeline',
+        });
+        selected_events.push(e);
+      });
+      wb.log.log({
+        operation: 'filtered',
+        item: 'events',
+        tool: 'timeline',
+        data: wb.log.logItems(selected_events),
+        public: false
       });
     }
     dispatch.filter();

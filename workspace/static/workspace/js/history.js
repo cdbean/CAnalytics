@@ -7,62 +7,106 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     this._super('_create');
     this.element.addClass('history');
     this.options.extend.help = this.help;
+    this._timeformat = d3.time.format('%b %d %Y, %H:%M:%S');
+    this._servertimeformat = d3.time.format('%m/%d/%Y-%H:%M:%S');
 
     this._setupUI();
-    this.loadData();
+    this.loadData(0);
   },
 
   _setupUI: function() {
     var html = '\
+      <nav> \
+        <ul class="pager"> \
+          <li><a class="prev" href="#">Older</a></li> \
+          <li><a class="next" href="#">Later</a></li> \
+        </ul> \
+      </nav> \
       <ul class="history-list"></ul> \
     ';
     this.element.append(html);
 
+    var _this = this;
+    $('.pager>li>a', this.element).click(function(e) {
+      var page = $(this).data('page');
+      _this.loadData(+page);
+    });
     // click on timestamp, jump to context
     this.element.on('click', 'li.history-item .timestamp', this.jumpToContext.bind(this));
   },
 
-  loadData: function() {
+  loadData: function(page) {
     var _this = this;
+    $('.history-list', this.element).empty();
 
     $.get(this.options.url, {
-      'case': wb.info.case,
-      group: wb.info.group
+      'case': CASE,
+      group: GROUP,
+      page: page
     }, function(data) {
-      for (var i = 0, len = data.length; i < len; i++) {
-        _this.add(data[i]);
+      for (var i = 0, len = data.items.length; i < len; i++) {
+        _this.add(data.items[i]);
       }
-    });
+      if (data.has_previous) 
+        $('.pager .prev', this.element).removeClass('hidden')
+          .data('page', data.previous_page);
+      else 
+        $('.pager .prev', this.element).addClass('hidden');
 
+      if (data.has_next) 
+        $('.pager .next', this.element).removeClass('hidden')
+          .data('page', data.next_page);
+      else 
+        $('.pager .next', this.element).addClass('hidden');
+
+      // scroll to bottom
+      var ele = _this.element.find('.history-list');
+      wb.utility.scrollTo($('li.history-item:last', ele), ele)
+    });
   },
 
   add: function(item) {
     // item structure:
     // {'user': user_id, 'operation': '', 'time': '', 'data': ''}
-    var row = $('<li class="history-item">').prependTo(this.element.find('ul.history-list'));
+    var lastrow = $('ul.history-list li.history-item:last', this.element);
+    var row = $('<li class="history-item">').appendTo(this.element.find('ul.history-list'));
     var user = wb.info.users[item.user];
-    $('<span class="timestamp">').appendTo(row)
-      .text(item.time);
-    $('<span class="username">').appendTo(row)
-      .text(user.name)
-      .css('color', user.color);
+    var usertag = $('<span class="username">').appendTo(row).text(user.name).css('color', user.color);
+    var timetag = $('<span class="timestamp">').appendTo(row).text(this._timeformat(this._servertimeformat.parse(item.time)));
 
-    var action = item.operation + ' ' + item.item;
+    var action = 'In ' + item.tool + '<i> ' + item.operation + ' </i>' + item.item;
     var entity;
     if (item.data) {
       if (item.data.name) {
-        action += ' <a class="item">' + item.data.name + '</span>';
+        action += ' <a class="wb-item">' + item.data.name + '</span>';
       }
-
     }
-    $('<span class="content">').appendTo(row)
-      .html(action)
-    ;
-    if (wb.store.static.entity_types.indexOf(item.item) > -1) {
-      row.find('.item').addClass('entity').addClass(item.item).data('entity', {id: item.data.id});
+    $('<span class="content">').appendTo(row).html(action);
+    if (item.item === 'annotation') {
+      row.find('.wb-item').addClass('annotation').data('annotation', {id: item.data.id});
+    } else if (item.item === 'relationship') {
+      row.find('.wb-item').addClass('wb-relationship').data('relationship', {id: item.data.id});
+    } else if (wb.store.static.entity_types.indexOf(item.item) > -1) {
+      row.find('.wb-item').addClass('wb-entity').addClass(item.item).data('entity', {id: item.data.id});
+    } else if (item.item === 'entities') {
+      // multiple entities
+      item.data.forEach(function(d) {
+        var el = ' <a class="wb-item">' + d.name + '</span>';
+        $(el).appendTo($('.content', row)).addClass('wb-entity').addClass(d.primary.entity_type).data('entity', {id: d.id});
+      });
     }
 
-    if (item.user === wb.info.user) {
+    // hide user and time tag when it's the same user and within 60s
+    if (lastrow.find('.username').text() === usertag.text()) {
+      var lasttime = this._timeformat.parse(lastrow.find('.timestamp').text());
+      var thistime = this._timeformat.parse(row.find('.timestamp').text());
+      if (Math.floor((thistime - lasttime) / 1000) < 60) {
+        usertag.addClass('hidden');
+        timetag.addClass('hidden');
+      }
+    }
+
+    if (item.user !== wb.info.user) {
       row.css('background-color', '#eee')
     }
 

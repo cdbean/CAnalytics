@@ -48,19 +48,22 @@
 }
 
 .annotator-hl-event {
-    background: rgba(250, 250, 30, 0.5);
+    background: rgba(23, 190, 207, .5);
 }
 .annotator-hl-location {
-    background: rgba(15, 236, 15, 0.3);
+    background: rgba(227, 119, 194, .5);
 }
 .annotator-hl-person {
-    background: rgba(250, 21, 21, 0.3);
+    background: rgba(148, 103, 189, .5);
 }
 .annotator-hl-organization {
-    background: rgba(37, 7, 192, 0.3);
+    background: rgba(255, 152, 150, .5);
 }
 .annotator-hl-resource {
-    background: rgba(243, 105, 6, 0.3);
+    background: rgba(44, 160, 44, .5);
+}
+.annotator-hl-relationship {
+	background: rgba(255, 127, 14, .5);
 }
 
 .annotator-hl-temporary {
@@ -70,8 +73,8 @@
 .annotator-hl-uncertain {
     background: rgba(255, 255, 115, 0.2)
 }
-.annotator-hl.active {
-    background: #B0BED9;
+.annotator-hl.highlighted {
+    background: yellow;
 }
 
 /* Annotator Wrapper

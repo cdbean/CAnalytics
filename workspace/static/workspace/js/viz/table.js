@@ -19,7 +19,8 @@ wb.viz.table = function() {
                 table_str += '</tr></thead></table>';
                 var $table = $(table_str).appendTo(this);
 
-                table = $table.dataTable({
+                table = $table.DataTable({
+                    'autoWidth': false, // auto resize table when window resizes
                     "bJQueryUI": true,
                     "bDestroy": true,
                     'sScrollY': height,
@@ -27,11 +28,14 @@ wb.viz.table = function() {
                     "sRowSelect": "multi", // for multi select with ctrl and shift
                     "sDom": "Rlfrtip", // enable column resizing
                 });
-                $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
+                if (title === 'dataentry' || title === 'annotation_table') $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
+                else $(table).on('click', 'tr.even>td:nth-child(2), tr.odd>td:nth-child(2)', onFilter);
+                $(table).on('click', '.control', onControl.bind(this));
             }
 
             table.fnClearTable();
             table.fnAddData(data);
+            // table.clear().data(data);
             table.fnSetColumnVis(0,false); // hide the first column, which is id
 
             // save data entry into DOM TODO: maybe this is not necessary?
@@ -40,10 +44,11 @@ wb.viz.table = function() {
                 var pos = table.fnGetPosition(this);
                 var data = table.fnGetData(pos);
                 $(row).data("id", data[0]);
+                $(row).attr('id', 'row-' + data[0]);
             });
 
             if (editable) {
-                $('td', table.fnGetNodes()).editable(GLOBAL_URL.entity_attr, {
+                $('>td', table.fnGetNodes()).not('td:first-child').editable(GLOBAL_URL.entity_attr, {
                     tooltip: "Double click to edit",
                     cancel: "Cancel",
                     submit: "Save",
@@ -53,7 +58,11 @@ wb.viz.table = function() {
                     callback: function( sValue, y ) {
                         var aPos = table.fnGetPosition( this );
                         table.fnUpdate( sValue, aPos[0], aPos[2] );
-                        dispatch.edit();
+                        var column = table.fnGetPosition( this )[2];
+                        var attr = table.fnSettings().aoColumns[column].sTitle.toLowerCase();
+                        var ent = wb.store.items.entities[$(this.parentNode).data('id')];
+                        ent.primary[attr] = sValue;
+                        dispatch.edit(ent, attr);
                     },
                     submitdata: function ( value, settings ) {
                         var column = table.fnGetPosition( this )[2];
@@ -71,6 +80,45 @@ wb.viz.table = function() {
         });
     }
 
+    function onControl(e) {
+      var tr = $(e.target).closest('tr')[0];
+      if (table.fnIsOpen(tr)) {
+        /* This row is already open - close it */
+        e.target.src = GLOBAL_URL.static + "/workspace/img/details_open.png";
+        table.fnClose(tr);
+      } else {
+        /* Open this row */
+        e.target.src = GLOBAL_URL.static + "/workspace/img/details_close.png";
+        var id = $(tr).data('id');
+        // only entities have this row expand control
+        var ent = wb.store.items.entities[id];
+        if (ent) {
+          var child = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+          var attrs = wb.store.static[ent.primary.entity_type];
+          for (var i in attrs) {
+            var k = attrs[i];
+            var val = ent.primary[k];
+            if (val) child += '<tr><td>' + k + ':</td><td>' + wb.utility.parseEntityAttr(k, val) + '</td></tr>';
+          }
+          for (var k in ent.other) {
+            if (ent.other[k]) child += '<tr><td>' + k + ':</td><td>' + ent.other[k] + '</td></tr>';
+          }
+          var metas = wb.store.static.meta;
+          for (var i = 0, len = metas.length; i < len; i++) {
+            var attr = metas[i], value = ent.meta[attr];
+            if (value) child += '<tr><td>' + attr + ':</td><td>' + wb.utility.parseEntityAttr(attr, value) + '</td></tr>';
+          }
+          child += '</table>';
+          table.fnOpen(tr, child, 'details');
+        }
+      }
+    }
+
+    function formatDetails(table, tr) {
+      var d = table.fnGetData(tr);
+      return 'hahah';
+    }
+
     function onFilter(e) {
       if ( $(this.parentNode).hasClass('row_selected') ) {
         $(this.parentNode).removeClass('row_selected');
@@ -84,13 +132,7 @@ wb.viz.table = function() {
       var selected_rows = $('tr.row_selected', table);
 
       if (selected_rows.length === 0) {
-        dispatch.filter([]);
-        wb.log({
-          operation: 'removed filter',
-          item: title,
-          tool: title,
-        });
-        return;
+        return dispatch.filter([]);
       }
 
       var records_id = [];
@@ -98,16 +140,7 @@ wb.viz.table = function() {
         var id = $(row).data('id');
         records_id.push(id);
       });
-      dispatch.filter(records_id);
-      wb.log({
-        operation: 'filtered',
-        item: title,
-        tool: title,
-        data: JSON.stringify({
-          'id': records_id.join(','),
-//         'name': selected_names.join(',')
-        })
-      });
+      return dispatch.filter(records_id);
     }
     /*
     function onFilter(e) {
@@ -233,6 +266,11 @@ wb.viz.table = function() {
         if (!arguments.length) return editable;
         editable = _;
         return exports;
+    };
+
+    exports.resize = function() {
+      $(table).css({ width: $(table).parent().width() });
+      table.fnAdjustColumnSizing();  
     };
 
     return d3.rebind(exports, dispatch, 'on');

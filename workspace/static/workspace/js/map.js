@@ -16,7 +16,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             eventListeners: {
                 featureover: function(e) {
                     this.highlight(e.feature);
-                }.bind(this),
+                    // console.log(this.events.getMousePosition(e))
+                },
                 featureout: function(e) {
                     this.unhighlight(e.feature);
                 }.bind(this)
@@ -40,7 +41,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
         );
 
-        map.addLayers([gmap, ghyb, gphy, gsat]);
+        map.addLayers([gsat, ghyb, gmap, gphy]);
 
         this.pointlayer = new OpenLayers.Layer.Vector("Points", {
             styleMap: new OpenLayers.StyleMap({
@@ -72,10 +73,18 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.layers.push(this.pointlayer, this.linelayer);
         map.addLayers([this.pointlayer, this.linelayer]);
 
-        map.setCenter(new OpenLayers.LonLat(-77.86000, 40.79339).transform(
-            new OpenLayers.Projection("EPSG:4326"),
-            map.getProjectionObject()
-        ), 15); // zoom level
+        var defaultloc = new OpenLayers.LonLat(-77.86000, 40.79339); // set default to State College
+        if (wb.info.case.location) {
+            var wktParser = new OpenLayers.Format.WKT();
+            var feature = wktParser.read(wb.info.case.location);
+            var origin_prj = new OpenLayers.Projection("EPSG:4326");
+            var dest_prj   = new OpenLayers.Projection("EPSG:900913");
+            if (feature) {
+                feature.geometry.transform(origin_prj, dest_prj); // projection of google map
+            }
+            defaultloc = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
+        }
+        map.setCenter(defaultloc, 15); // zoom level
 
         var controlPanel = new OpenLayers.Control.Panel();
         map.addControl(new OpenLayers.Control.LayerSwitcher());
@@ -134,6 +143,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             }
           }
         }
+        this.linelayer.removeAllFeatures();
+        this.pointlayer.removeAllFeatures();
         this.linelayer.addFeatures(line_feas);
         this.pointlayer.addFeatures(point_feas);
         this.features = this.pointlayer.features.concat(this.linelayer.features);
@@ -168,6 +179,9 @@ $.widget("viz.vizmap", $.viz.vizbase, {
           }
         }
         var entity = wb.store.items.entities[feature.attributes.id];
+
+        wb.viewer.data(entity, 'entity').show(pos, 'network');
+
         var primary = entity.primary;
         var popup = '<div id="map-popup" class="entity-tooltip"><table>';
         popup += '<tr><th>' + wb.utility.capfirst(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
@@ -181,39 +195,14 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         feature.popup = new OpenLayers.Popup.FramedCloud(
                 "location_info",
                 feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(200,150),
+                // new OpenLayers.Size(200,150),
+                null,
                 popup,
                 null,
                 true
         );
 
         this.map.addPopup(feature.popup, true);
-
-        // for (var i = 0; i < this.highlightedFeatures.length; i++) {
-        //     this.mapControls['select'].unhighlight(this.highlightedFeatures[i]);
-        // }
-        // this.highlightedFeatures = [];
-        // for (var i = 0; i < this.map.popups.length; i++) {
-        //     this.map.removePopup(this.map.popups[i]);
-        // }
-        //
-        // var layers = [linelayer, pointlayer];
-        // for (var i = 0; i < features_id.length; i++) {
-        //     for (var j = 0; j < layers.length; j++) {
-        //         var found = false;
-        //         var locallayer = layers[j];
-        //         for (var k = 0, len = locallayer.features.length; k < len; k++) {
-        //             if (locallayer.features[k].attributes.id == features_id[i]) {
-        //                 this._showDetails(locallayer.features[k]);
-        //                 this.mapControls['select'].highlight(locallayer.features[k]);
-        //                 this.highlightedFeatures.push(locallayer.features[k]);
-        //                 found = true;
-        //                 break;
-        //             }
-        //         }
-        //         if (found == true) break;
-        //     }
-        // }
     },
     unhighlight: function(feature) {
         if (feature.popup) {
@@ -229,7 +218,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         feature.popup = new OpenLayers.Popup.FramedCloud(
                 "footprint_info",
                 feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(200,150),
+                new OpenLayers.Size(100,80),
                 content.html(),
                 null,
                 true
@@ -239,55 +228,51 @@ $.widget("viz.vizmap", $.viz.vizbase, {
     },
 
     filterByLocation: function(feature) {
-        var shelf_by = wb.store.shelf_by.entities;
+        var shelf_by = wb.store.shelf_by.entities.slice();
         var selectedFeas = []; // selected feature ids
+
+        $('.filter-div .filter-item').filter(function(i, item) {
+          return $(item).find('a').data('tool') === 'map';
+        }).remove();
+
+        this.features.forEach(function(d) {
+          var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
+          if (i > -1) shelf_by.splice(i, 1);
+        });
+
         // get the id of all selected features
         this.layers.forEach(function(layer) {
             for (var i = 0, len = layer.selectedFeatures.length; i < len; i++) {
                 selectedFeas.push(layer.selectedFeatures[i].attributes.id);
             }
         });
+        shelf_by = shelf_by.concat(selectedFeas);
+        wb.store.shelf_by.entities = shelf_by;
 
         if (selectedFeas.length == 0) {
-            this.features.forEach(function(d) {
-              var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
-              if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
-            });
-
-            $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('item') === 'map';
-            }).remove();
-
-            wb.log({
-                operation: 'removed filter in',
-                item: 'map',
-                tool: 'map'
+            wb.log.log({
+                operation: 'defiltered',
+                item: 'locations',
+                tool: 'map',
+                public: false
             });
         } else {
-            selectedFeas.forEach(function(d) {
-              if (shelf_by.indexOf(d) < 0)
-                shelf_by.push(d);
+            var selected_locations = selectedFeas.map(function(id) {
+                var e = wb.store.items.entities[id];
+                wb.filter.add('location: ' + e.primary.name, {
+                    item: 'location',
+                    id: e.meta.id,
+                    tool: 'map'
+                });
+                return e;
             });
-            shelf_by = wb.utility.uniqueArray(shelf_by);
 
-            var selected_names = selectedFeas.map(function(id) {
-              return wb.store.items.entities[id].primary.name;
-            });
-
-            $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('item') === 'map';
-            }).remove();
-
-            wb.filter.add('map filter', {'item': 'map'});
-
-            wb.log({
-                operation: 'filtered in',
-                item: 'map',
+            wb.log.log({
+                operation: 'filtered',
+                item: 'locations',
                 tool: 'map',
-                data: JSON.stringify({
-                  'id': selectedFeas.join(','),
-                  'name': selected_names.join(',')
-                })
+                data: wb.log.logItems(selected_locations),
+                public: false
             });
         }
         $.publish('data/filter', '#' + this.element.attr('id'));

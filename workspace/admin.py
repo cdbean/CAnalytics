@@ -1,5 +1,6 @@
 # from django.contrib import admin
 from django.contrib.gis import admin
+from mce_filebrowser.admin import MCEFilebrowserAdmin
 
 from workspace import models
 
@@ -16,6 +17,10 @@ class GoogleAdmin(admin.OSMGeoAdmin):
     map_height = 600
     openlayers_url = "lib/OpenLayers-2.13.1/OpenLayers.js"
 
+
+class HTMLAdmin(MCEFilebrowserAdmin):
+    pass
+
 admin.site.register(models.Case, GoogleAdmin)
 admin.site.register(models.Dataset)
-admin.site.register(models.DataEntry)
+admin.site.register(models.DataEntry, HTMLAdmin)

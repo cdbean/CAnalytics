@@ -13,6 +13,7 @@
   $.subscribe('entity/created', onEntitiesCreated);
   $.subscribe('entity/updated', onEntitiesUpdated);
   $.subscribe('entity/deleted', onEntitiesDeleted);
+  $.subscribe('entity/attribute/update', onEntityAttrUpdated);
 
   $.subscribe('relationship/created', onRelationshipsCreated);
   $.subscribe('relationship/updated', onRelationshipsUpdated);
@@ -28,6 +29,18 @@
   $.subscribe('user/online', onUserOnline);
 
 
+  // lister to the following events and broadcast
+  $.subscribe('user/tool', onUserTool);
+
+  function onUserTool(e, d) {
+    if (ishout) {
+      ishout.rooms.forEach(function(r) {
+        ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
+      });
+    }
+  }
+
+
   function onUserOnline() {
     var users = [].slice.call(arguments, 1);
 
@@ -40,6 +53,7 @@
       // do not show current user
       if (id == wb.info.user) continue;
 
+      if (!(id in wb.info.users)) continue;
       var name = wb.info.users[id].name;
       var color = wb.info.users[id].color;
       var li = $('<li class="userlist-item dropdown"></li>')
@@ -67,8 +81,16 @@
   }
 
   function onDataUpdated() {
-    updateDataBut(['.dataentry']);
-    updateViewsBut(['.dataentry']);
+    var datatype = [].slice.call(arguments, 1)
+    // if annotations are updated, we do not need to update other views
+    // only update views when entities or relationships are updated
+    if (datatype.indexOf('annotations') < 0) {
+      updateDataBut(['.dataentry']);
+      updateViewsBut(['.dataentry']);
+    } else { // update annotation table
+      var viz = $('.viz.annotation').data('instance');
+      if (viz) viz.updateData().updateView();
+    }
   }
 
   function onDataFiltered() {
@@ -95,6 +117,10 @@
   function onEntitiesDeleted() {
     var entities = [].slice.call(arguments, 1);
     wb.store.removeItems(entities, 'entities');
+  }
+
+  function onEntityAttrUpdated(ent, attr) {
+
   }
 
   function onRelationshipsCreated() {
@@ -179,16 +205,28 @@
   }
 
   function onNewMessage(e, msg) {
+    if (msg.sender !== wb.info.user) {
+      wb.utility.notify(wb.info.users[msg.sender].name + ' sent a message');
+      var num = $('#message-btn .unread').text();
+      if (!num) num = 1;
+      else num = +num + 1;
+      $('#message-btn .unread').text(num);
+    }
     $('.viz.message').each(function(i, viz) {
-      viz = $(viz).data('instance');
-      viz.loadMessage(msg);
+      var $viz = $(viz).data('instance');
+      $viz.loadMessage(msg);
+      var ele = $('ul.messages', viz);
+      wb.utility.scrollTo($('span.messagebody:last', ele), ele);
+      if (msg.sender !== wb.info.user) $(viz).parent().addClass('highlighted');
     });
   }
 
   function onNewAction(e, act) {
     $('.viz.history').each(function(i, viz) {
-      viz = $(viz).data('instance');
-      viz.add(act);
+      var $viz = $(viz).data('instance');
+      $viz.add(act);
+      var ele = $('ul.history-list', viz);
+      wb.utility.scrollTo($('li.history-item:last', ele), ele);
     });
   }
 })();

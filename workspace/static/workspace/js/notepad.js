@@ -14,7 +14,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
         .attr('id', id)
         .appendTo(this.element);
 
-        var padId = wb.info.case + '-' + wb.info.group;
+        var padId = CASE + '-' + GROUP;
         $('#' + id).pad({
           'padId': padId,
           'showChat': false,
@@ -23,7 +23,8 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
           'userName': wb.info.users[wb.info.user].name,
           'userColor': wb.info.users[wb.info.user].color,
           width: '100%',
-          height: '100%'
+          height: '100%',
+          plugins: {'autocomp': 'true', 'copy_paste_images': 'true', 'tables2': 'false'}
         });
     },
 
@@ -44,6 +45,10 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
 
     updateData: function() {
         // in accordance with other artifacts, useless here
+
+    },
+
+    updateView: function() {
 
     },
 

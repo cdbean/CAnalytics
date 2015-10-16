@@ -6,6 +6,7 @@ $.widget('viz.vizeditor', {
   _create: function() {
     this.element.addClass('popup editor');
     this.element.data('instance', this);
+    this.element.draggable();
     this.element.hide();
     if (this.options.relationship) this.element.data('relationship', this.options.relationship);
     if (this.options.entity) this.element.data('entity', this.options.entity);
@@ -22,6 +23,7 @@ $.widget('viz.vizeditor', {
       </form> \
     ';
     this.element.append(html);
+
 
     this.element.on('click', '.attr-add-btn', this._onClickAdd.bind(this));
     this.element.on('click', '.attr-remove-btn', this._onClickRemove.bind(this));
@@ -51,6 +53,13 @@ $.widget('viz.vizeditor', {
       var value = others[attr];
       this.addField(attr, value, 'other');
     }
+    var lastrow = $('.attr-item:last', this.element);
+    lastrow.find('button').removeClass('attr-remove-btn').addClass('attr-add-btn');
+    lastrow.find('span.glyphicon').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+
+    // for relationship, no need to show title, 
+    if (type === 'relationship') $('.title', this.element).addClass('hidden');
+
     return this;
   },
 
@@ -62,15 +71,9 @@ $.widget('viz.vizeditor', {
       var row = '<li><ul class="attr-item ' + primary + '">';
       row += '<li><input class="attr-key" placeholder="Attribute..." value="' + attr + '"/></li>';
       row += '<li><input class="attr-value" placeholder="Unknown" value="' + value + '"/></li>';
+      row += '<li><button type="button" class="btn btn-default attr-remove-btn"><span class="glyphicon glyphicon-minus"></span></button></li></ul></li>';
+      var $row = $(row).appendTo(this.element.find('.attr-list'));
 
-      var lastrow = this.element.find('.attr-item:last');
-      if (lastrow.length) { // if there is already an attribute row
-          row += '<li><button type="button" class="btn btn-default attr-remove-btn"><span class="glyphicon glyphicon-minus"></span></button></li></ul></li>';
-          var $row = $(row).insertBefore(lastrow.parent()); // lastrow is <ul>, lastrow's parent is <li>
-      } else { // if it is the first attribute row
-          row += '<li><button type="button" class="btn btn-default attr-add-btn"><span class="glyphicon glyphicon-plus"></span></button></li></ul></li>';
-          var $row = $(row).appendTo(this.element.find('.attr-list'));
-      }
 
       this._styleInput(attr, value, $row.find('.attr-value'));
 
@@ -94,7 +97,7 @@ $.widget('viz.vizeditor', {
   },
 
   _styleInput: function(attr, value, input) {
-    if (/date/.test(attr)) {
+    if (/date/.test(attr) || attr === 'repeated_until') {
       input.datetimepicker();
     } else if (attr === 'address') {
       // initialize as google place search
@@ -103,7 +106,7 @@ $.widget('viz.vizeditor', {
     } else if (attr === 'priority') {
       // initialize as select drop down
       input.val(5)
-    } else if (attr === 'people') {
+    } else if (attr === 'person') {
       var opts = this.prepareSelectOptions('person');
       $(input).selectize({
           options: opts.opts,
@@ -113,7 +116,7 @@ $.widget('viz.vizeditor', {
           create: true,
           closeAfterSelect: true
         });
-    } else if (attr === 'organizations') {
+    } else if (attr === 'organization') {
       var opts = this.prepareSelectOptions('organization');
       $(input).selectize({
           options: opts.opts,
@@ -131,6 +134,7 @@ $.widget('viz.vizeditor', {
           valueField: 'value',
           searchField: 'label',
           create: true,
+          maxItems: 1,
           closeAfterSelect: true
       });
     } else if (attr === 'source' || attr === 'target') {
@@ -140,20 +144,39 @@ $.widget('viz.vizeditor', {
           labelField: 'label',
           valueField: 'value',
           searchField: 'label',
+          maxItems: 1,
           create: false,
           closeAfterSelect: true
       });
+    } else if (attr === 'relation') {
+        var opts = d3.values(wb.store.items.relationships).map(function(d) {
+          return {label: d.primary.relation, value: d.primary.relation};
+        });
+        $(input).selectize({
+          options: opts,
+          labelField: 'label',
+          valueField: 'value',
+          searchField: 'label',
+          create: true,
+          maxItems: 1,
+          closeAfterSelect: true
+        });
+    } else if (attr === 'repeated') {
+        var html = '<input class="attr-value" style="width:auto;" type="checkbox" name="repeated"> weekly</input>';
+        var li = $(input).parent().empty();
+        $(html).appendTo(li).prop('checked', value);
     }
-
   },
 
-  show: function(pos) {
+  show: function(pos, tool, callback) {
     var width = this.element.outerWidth();
     var height = this.element.outerHeight();
+    this.tool = tool;
     this.element.show().css({
       top: pos.top - height - 10,
       left: pos.left - width/2
     });
+    this.callback = callback;
     return this;
   },
 
@@ -169,10 +192,12 @@ $.widget('viz.vizeditor', {
     return this;
   },
 
-  hide: function() {
+  hide: function(action) {
+    if (this.callback) this.callback(action, this.item, this.item_type);
     this.clearFields();
     this.item = null;
     this.item_type = null;
+    this.tool = null;
     this.element.hide();
     return this;
   },
@@ -200,31 +225,90 @@ $.widget('viz.vizeditor', {
   },
 
   _onClickSave: function() {
-    var data = {};
-    data.attribute = this.serialize();
     var url;
-    data.id = this.item.meta && this.item.meta.id;
-    data.name = this.element.find('.title').val();
-    data.case = wb.info.case;
-    data.group = wb.info.group;
+    var opt = {data: {}, case: CASE, group: GROUP};
+    opt.data.attribute = this.serialize();
+    opt.data.id = this.item.meta && this.item.meta.id;
+    opt.data.name = this.element.find('.title').val();
+
     if (this.item_type === 'entity') {
-      url = GLOBAL_URL.entity_id.replace(/\/0/, data.id ? '': '/' + data.id);
-      data.entity_type = this.item.primary.entity_type;
+      url = GLOBAL_URL.entity_id.replace(/\/0/, opt.data.id ? '/' + opt.data.id : '');
+      opt.data.entity_type = this.item.primary.entity_type;
     } else if (this.item_type === 'relationship') {
-      url = GLOBAL_URL.relationship_id.replace(/\/0/, data.id ? '': '/' + data.id);
+      url = GLOBAL_URL.relationship_id.replace(/\/0/, opt.data.id ? '/' + opt.data.id : '');
     }
-    $.post(url, {data: JSON.stringify(data)}, function(d) {
-      $.publish('entity/updated', d.entity);
-      if (d.relationship)
-        $.publish('relationship/updated', d.relationship);
-      wb.utility.notify('Entity successfully updated!', 'success');
+
+    var item_type = this.item_type;
+    var tool = this.tool;
+    var item = this.item;
+    $.ajax({
+      url: url,
+      data: JSON.stringify(opt),
+      dataType: 'json',
+      type: opt.data.id ? 'PUT' : 'POST',
+      success: function(d) {
+        if (d.entity) {
+          if (opt.data.id) {
+            $.publish('entity/updated', d.entity);
+            if (item_type === 'entity') {
+              wb.utility.notify('Entity updated!', 'success');
+              wb.log.log({
+                operation: 'updated',
+                item: item.primary.entity_type,
+                tool: tool,
+                data: wb.log.logItem(item),
+              });
+            }
+          } else {
+            $.publish('entity/created', d.entity);
+            if (item_type === 'entity') {
+              wb.utility.notify('Entity created!', 'success');
+              wb.log.log({
+                operation: 'created',
+                item: item.primary.entity_type,
+                tool: tool,
+                data: wb.log.logItem(d.entity),
+              });
+            }
+          }
+          // d.entity is an array
+          // including the entity that is updated, and possiblity related entities (newly created) 
+          // just log the currently updated entity
+        }
+        if (d.relationship) {
+          if (opt.data.id) {
+            $.publish('relationship/updated', d.relationship);
+            if (item_type === 'relationship')
+              wb.utility.notify('relationship updated!', 'success');
+              wb.log.log({
+                operation: 'updated',
+                item: 'relationship',
+                tool: tool,
+                data: wb.log.logItem(item),
+              });
+          } else {
+            $.publish('relationship/created', d.relationship);
+            if (item_type === 'relationship')
+              wb.utility.notify('relationship created!', 'success');
+              wb.log.log({
+                operation: 'created',
+                item: 'relationship',
+                tool: tool,
+                data: wb.log.logItem(d.relationship),
+              });
+          }
+        }
+      },
+      error: function(d) {
+        wb.utility.notify('Operation failed', 'error');
+      }
     });
 
-    this.hide();
+    this.hide(opt.data.id ? 'update' : 'create');
   },
 
   _onClickCancel: function() {
-    this.hide();
+    this.hide('cancel');
   },
 
   serialize: function() {
@@ -239,13 +323,16 @@ $.widget('viz.vizeditor', {
             res['geometry'] = {};
             res['geometry']['geometry'] = [place.geometry.location.lng(), place.geometry.location.lat()];
             res['geometry']['address'] = place.formatted_address;
-          } else if (attr === 'people') {
+          } else if (attr === 'person') {
             if (value) value = value.split(',');
             else value = [];
             res[attr] = value;
-          } else if (attr === 'organizations') {
+          } else if (attr === 'organization') {
             if (value) value = value.split(',');
             else value = [];
+            res[attr] = value;
+          } else if (attr === 'repeated') {
+            value = $(row).find('.attr-value')[0].checked;
             res[attr] = value;
           } else {
             res[attr] = value;

@@ -31,11 +31,15 @@ class Action(models.Model):
 
     def serialize(self):
         return {
+            'id': self.id,
             'user': self.user.id,
             'operation': self.operation,
             'item': self.item,
             'tool': self.tool,
             'data': json.loads(self.data),
+            'public': self.public,
+            'group': self.group.id,
+            'case': self.case.id,
             'time': self.time.strftime('%m/%d/%Y-%H:%M:%S'),
         }
 
@@ -43,6 +47,7 @@ class Action(models.Model):
         # automatically send activity logs that are public
         # to all users in the group
         data = self.serialize()
-        sync.views.broadcast_activity(data, self.case, self.group, self.user)
+        if self.public:
+            sync.views.broadcast_activity(data, self.case, self.group, self.user)
 
         super(Action, self).save(*args, **kwargs)

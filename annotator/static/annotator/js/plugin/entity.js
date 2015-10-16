@@ -48,36 +48,45 @@ Annotator.Plugin.Entity = (function(_super) {
             load: this.updateAttrField,
             submit: this.setEntityAttr
         });
-        this.applyAllField = this.annotator.editor.addField({
-            type: 'checkbox',
-            label: Annotator._t('Apply to all data'),
-            submit: this.applyToAll
-        });
+        // this.applyAllField = this.annotator.editor.addField({
+        //     type: 'checkbox',
+        //     label: Annotator._t('Apply to all data'),
+        //     submit: this.applyToAll
+        // });
 
         this.subscribe('entity/type/update', function(value) {
           // do when the entity type is changed
           // put entity attributes in the list
+          var entity = self.annotation.entity;
+
+          if (value === 'relationship') $(self.entityNameField).addClass('hidden');
+          else $(self.entityNameField).removeClass('hidden');
+         
           var attribute_widget = $(self.attrField).find('.annotator-attribute-widget').data('instance');
           attribute_widget.reset();
           var attributes = wb.store.static[value];
           if (attributes) {
             for (var i = 0, len = attributes.length; i < len; i++) {
               var attr = attributes[i];
-              attribute_widget.add(attr, null, 'primary');
+              var val = null;
+              if (entity && entity.temp && attr in entity.temp) val = entity.temp[attr];
+              attribute_widget.add(attr, val, 'primary');
             }
           }
         });
 
-        this.subscribe('entity/name/update', function(value) {
+        $.subscribe('entity/name/update', function(e, value) {
             var entity = wb.store.items.entities[value];
             if (!self.annotation.entity) {
                 self.annotation.entity = {};
             }
-            self.annotation.entity.id = entity.primary.id;
-            self.annotation.entity.entity_type = entity.primary.entity_type;
-            self.annotation.entity.name = entity.primary.name;
-            self.updateEntityTypeField('', self.annotation);
-            self.updateAttrField('', self.annotation);
+            if (entity) {
+                self.annotation.entity.id = entity.meta.id;
+                self.annotation.entity.entity_type = entity.primary.entity_type;
+                self.annotation.entity.name = entity.primary.name;
+                self.updateEntityTypeField(self.entityTypeField, self.annotation);
+                self.updateAttrField(self.attrField, self.annotation);
+            }
         });
 
         $.subscribe('entity/change', function(e, entity) {
@@ -128,10 +137,17 @@ Annotator.Plugin.Entity = (function(_super) {
         $(field).find('.entity_name').autocomplete({
                 source: opts.opts,
                 placeholder: "Entity name or your annotation...",
+                minLength: 0,
+                focus: function(e, ui) {
+                    $(this).val(ui.item.label);
+                    return false;
+                },
                 select: function(e, ui) {
                     if (ui.item.value) {
+                        $(this).val(ui.item.label);
                         // update the attribute list to the attribute of the entity
                         $.publish('entity/name/update', ui.item.value);
+                        return false;
                     }
                 }
             })
@@ -141,17 +157,39 @@ Annotator.Plugin.Entity = (function(_super) {
 
     Entity.prototype.updateEntityNameField = function(field, annotation) {
         var name;
+        var opts = this.prepareSelectOptions();
+        this.annotation = annotation;
+        $(field).find('.entity_name').autocomplete('option', 'source', opts.opts);
         if (annotation.entity) {
             var entity;
             if (annotation.entity.entity_type === 'relationship')
               entity = wb.store.items.relationships[annotation.entity.id];
             else
               entity = wb.store.items.entities[annotation.entity.id];
-            name = entity.primary.name || entity.primary.relation;
+            if (!entity) {
+                // entity does not exist
+                // delete this outdated entity
+                name = annotation.quote;
+                delete annotation.entity;
+            }
+            else name = entity.primary.name || entity.primary.relation;
+            $(field).find('.entity_name').val(name);
         } else {
             name = annotation.quote;
+            var item = null;
+            opts.opts.forEach(function(d) {
+                if (d.label === name) {
+                    item = d;
+                    return false;
+                }
+            });
+            if (item) 
+                $(field).find('.entity_name').data('ui-autocomplete')._trigger('select', 'autocompleteselect', {item:item});
+            else
+                $(field).find('.entity_name').val(name);
+
+            // $(field).find('.entity_name').autocomplete('search', name);
         }
-        $(field).find('.entity_name').val(name);
     };
 
 
@@ -160,11 +198,7 @@ Annotator.Plugin.Entity = (function(_super) {
             annotation.entity = {};
         }
         var name = $(field).find('.entity_name').val();
-        if (name) {
-            annotation.entity.name = name;
-        } else {
-            alert ('Entity name is required!'); // TODO: more elegant form validation
-        }
+        annotation.entity.name = name || 'Unknown';
     },
 
     Entity.prototype.initEntityTypeField = function(field) {
@@ -192,8 +226,6 @@ Annotator.Plugin.Entity = (function(_super) {
     };
 
     Entity.prototype.updateEntityTypeField = function(field, annotation) {
-        this.annotation = annotation;
-
         var selectize = $(field).find('.entity_type').data('selectize');
         selectize.clear();
         if (annotation.entity && annotation.entity.entity_type) {
@@ -244,6 +276,8 @@ Annotator.Plugin.Entity = (function(_super) {
             for (var attr in entity.other) {
                 attribute_widget.add(attr, entity.other[attr], 'other');
             }
+        } else {
+            this.detectEntity();
         }
     };
 
@@ -255,6 +289,7 @@ Annotator.Plugin.Entity = (function(_super) {
             if (annotation.entity.entity_type === 'relationship')
               annotation.entity.attribute.relation = annotation.entity.attribute.relation || annotation.entity.name;
         }
+        delete annotation.entity.temp;
     };
 
     Entity.prototype.applyToAll = function(field, annotation) {
@@ -266,6 +301,7 @@ Annotator.Plugin.Entity = (function(_super) {
     };
 
     Entity.prototype.updateViewer = function(field, annotation) {
+        $(field).empty();
         if (annotation.entity) {
             var table = '<table id="annotator-viewer-table">';
             var entity;
@@ -273,6 +309,10 @@ Annotator.Plugin.Entity = (function(_super) {
               entity = wb.store.items.relationships[annotation.entity.id];
             else
               entity = wb.store.items.entities[annotation.entity.id];
+            if (!entity) {
+                // if entity does not exist
+                return $(field).append('<span>No entity exists (It might be deleted)</span>');
+            }
             var primary = entity.primary || entity;
             table += '<tr><th>' + this.capitalizeFirstLetter(primary.entity_type || 'relationship') + ':</th><td>' + (primary.name || primary.relation) + '</td></tr>';
             var attrs = wb.store.static[entity.primary.entity_type || 'relationship'];
@@ -288,16 +328,47 @@ Annotator.Plugin.Entity = (function(_super) {
                     table += '<tr><th>' + wb.utility.capfirst(attr) + ':</th><td>' + other[attr] + '</td></tr>';
                 }
             }
-            if (annotation.created_by) {
-              table += '<tr><th>Created by: </th><td>' + wb.info.users[annotation.created_by].name + '</td></tr>';
-            }
-            if (annotation.created_at) {
-              table += '<tr><th>Created at: </th><td>' + annotation.created_at + '</td></tr>';
-            }
+            wb.store.static.meta.forEach(function(attr) {
+                if (annotation[attr]) {
+                    table += '<tr><th>' + attr + ': </th><td>' + wb.utility.parseEntityAttr(attr, annotation[attr]) + '</td></tr>';
+                }
+            });
+
             table += '</table>';
             $(field).append($(table));
         } else {
-            return field.remove();
+            return $(field).append('<span>No entity exists (It might be deleted)</span>');
+        }
+    };
+
+    Entity.prototype.detectEntity = function() {
+        this.annotation.entity = this.annotation.entity || {};
+        this.annotation.entity.temp = this.annotation.entity.temp || {};
+        var entity_temp = this.annotation.entity.temp;
+        var highlights = this.annotation.highlights;
+        for (var i = 0, len = highlights.length; i < len; i++) {
+            var hl = highlights[i];
+            if ($(hl.parentElement).hasClass('annotator-hl')) {
+                var entities = findEntity($(hl.parentElement), []);
+
+                for (var j = 0; j < entities.length; j++) {
+                    var ent = entities[j];
+                    if (entity_temp[ent.entity_type]) entity_temp[ent.entity_type].push(ent.id)
+                    else entity_temp[ent.entity_type] = [ent.id];
+                }
+            }
+        }
+
+        function findEntity($el, entities) {
+            if ($el.hasClass('annotator-hl')) {
+               var ann = $el.data('annotation');
+               if (ann) {
+                    var ent = ann.entity;
+                    if (ent.id && ent.entity_type) entities.push(ent);
+                    return findEntity($el.parent(), entities);
+               }
+            }
+            else return entities;
         }
     };
 

@@ -1,13 +1,12 @@
 .viz.message .messageArea {
-  margin: 0 auto -40px;
-  height: 100%;
-  padding-bottom: 60px;
+  margin: 0;
+  height: calc(100% - 60px);
 }
 
-.viz.message .inputMessage #message_content {
+.viz.message .inputMessage {
   -moz-appearance: textfield;
   -webkit-appearance: textfield;
-  bottom: 0;
+  bottom: 1px;
   height: 60px;
   left: 0;
   right: 0;
@@ -16,15 +15,27 @@
   background-color: -moz-field;
   border: 1px solid darkgray;
   box-shadow: 1px 1px 1px 0 lightgray inset;
-  margin-top: 5px;
-  padding: 6px 12px;
+  margin: 0;
+  padding: 0;
   width: 100%;
+  outline: 0px solid transparent;
+}
+.viz.message .inputMessage #message_content {
+  height: 60px;
+}
+.viz.message .inputMessage button {
+  font-size: 14px;
+  height: 60px;
+}
+
+.viz.message .inputMessage #message_content:focus {
+  outline: 0px solid transparent;
 }
 
 .viz.message ul.messages {
   /* overflow-y: scroll; */
   margin: 0;
-  padding: 10px 20px 10px 20px;
+  padding: 5px;
   list-style: none;
   height: 100%;
   overflow-y: scroll;
@@ -35,17 +46,22 @@
 }
 
 .viz.message li.message .timestamp {
-  float: left;
   padding-right: 15px;
   text-align: right;
   font-size: 60%;
 }
 .viz.message li.message .username {
-  float: left;
   padding-right: 15px;
   text-align: right;
+  padding-left: 5px;
+  color: #aaa;
+}
+.viz.message .messagebody {
+  display: block;
+  padding-left: 15px;
 }
 .viz.message [contentEditable=true]:empty:before{
-  content:attr(data-placeholder)
+  content:attr(data-placeholder);
+  color: #aaa;
 }
 

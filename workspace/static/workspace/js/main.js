@@ -4,42 +4,34 @@ $('#progressbar').show().progressbar({ value: false });
 
 // load data
 wb.store.loadItems(GLOBAL_URL.data, {
-  case: wb.info.case,
-  group: wb.info.group
+  case: CASE,
+  group: GROUP
 });
 
 // initialize viewer
 wb.viewer = $('<div>').appendTo('body').vizviewer().data('instance');
 wb.editor = $('<div>').appendTo('body').vizeditor().data('instance');
 
-
-// get all users in this group
-$.get(GLOBAL_URL.users, {
-  case: wb.info.case,
-  group: wb.info.group
-}, function(users) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    user.color = wb.utility.randomColor();
-    wb.info.users[user.id] = user;
-  }
-
-  // change the color of the user name in nav bar
-  var mycolor = wb.info.users[wb.info.user].color;
-  $('.nav #username').css('color', mycolor);
-  
-  // after users are loaded, join room and fetch users online
-  $.publish('users/loaded');
+$.get(GLOBAL_URL.case_info, {
+  case: CASE,
+  group: GROUP
+}, function(res) {
+  res.case.start_date = wb.utility.Date(res.case.start_date);
+  res.case.end_date = wb.utility.Date(res.case.end_date);
+  wb.info.case = res.case;
+  wb.info.group = res.group;
+  wb.info.othergroups = res.othergroups;
 });
 
 
 $(function() {
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
-
+  $('#case-info').click(onCaseInfo);
   $('.viz-opts').click(onVizSelect);
 
-  $('body').on('click', 'a.entity, span.entity', onClickEntity);
+  $('body').on('mouseover', '.wb-item', onMouseOverEntity);
+  $('body').on('click', '.wb-item', onClickEntity);
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
@@ -66,13 +58,104 @@ $(function() {
     wb.viewer.hide();
   }
 
-  function onClickEntity(e) {
+  function onMouseOverEntity(e) {
     var ent = $(e.target).data('entity');
     if (ent) {
-      var entity = wb.store.items.entities[ent.id];
+      var entity = wb.store.items.entities[ent.id || ent]; // ent could be an object or an id only
       wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'));
+    } else {
+      var rel = $(e.target).data('relationship');
+      if (rel) {
+        var relationship = wb.store.items.relationships[rel.id || rel];
+        wb.viewer.data(relationship, 'relationship').show(wb.utility.mousePosition(e, 'body'), 'reference');
+      }
     }
     e.stopPropagation();
+  }
+
+  function onClickEntity(e) {
+    $(e.target).toggleClass('filtered');
+    var tofilter = $(e.target).hasClass('filtered');
+    var ent = $(e.target).data('entity');
+    if (ent) {
+      ent = wb.store.items.entities[ent.id || ent];
+      if ($.isEmptyObject(ent)) return false;
+
+      if (tofilter) {
+        var i = wb.store.shelf_by.entities.indexOf(ent.meta.id);
+        if (i < 0) wb.store.shelf_by.entities.push(ent.meta.id);
+        wb.filter.add(ent.primary.entity_type + ': ' + ent.primary.name, {
+          id: ent.meta.id,
+          item: ent.primary.entity_type,
+          tool: 'reference'
+        });
+        wb.log.log({
+            operation: 'filtered',
+            item: ent.primary.entity_type,
+            tool: 'reference',
+            data: wb.log.logItem(ent),
+            public: false
+        });
+      } else {
+        $('.filter-div .filter-item').filter(function(i, item) {
+          var d = $(item).find('a').data();
+          return d.tool === 'reference' && d.id === ent.meta.id && d.item === ent.primary.entity_type;
+        }).remove();
+        var i = wb.store.shelf_by.entities.indexOf(ent.meta.id);
+        if (i >= 0) wb.store.shelf_by.entities.splice(i, 1);
+        wb.log.log({
+            operation: 'defiltered',
+            item: ent.primary.entity_type,
+            tool: 'reference',
+            data: wb.log.logItem(ent),
+            public: false
+        });
+      }
+    } else {
+      var rel = $(e.target).data('relationship');
+      if (rel) {
+        rel = wb.store.items.relationships[rel.id || rel];
+        if ($.isEmptyObject(rel)) return false;
+        if (tofilter) {
+          var i = wb.store.shelf_by.relationships.indexOf(rel.meta.id);
+          if (i < 0) wb.store.shelf_by.relationships.push(rel.meta.id);
+          wb.filter.add('relationship: ' + rel.primary.relation, {
+            id: rel.meta.id,
+            item: 'relationship',
+            tool: 'reference'
+          });
+          wb.log.log({
+              operation: 'filtered',
+              item: 'relationship',
+              tool: 'reference',
+              data: wb.log.logItem(rel),
+              public: false
+          });
+        } else {
+          $('.filter-div .filter-item').filter(function(i, item) {
+            var d = $(item).find('a').data();
+            return d.tool === 'reference' && d.id === rel.meta.id && d.item === 'relationship';
+          }).remove();
+          var i = wb.store.shelf_by.relationships.indexOf(rel.meta.id);
+          if (i >= 0) wb.store.shelf_by.relationships.splice(i, 1);
+          wb.log.log({
+              operation: 'defiltered',
+              item: 'relationship',
+              tool: 'reference',
+              data: wb.log.logItem(rel),
+              public: false
+          });
+        }
+      }
+    }
+    $.publish('data/filter');
+  }
+
+  function onCaseInfo() {
+    $('<div>').vizcaseinfo({
+      title: 'Case',
+      tool: 'case',
+    });
   }
 
   function onVizSelect(e) {
@@ -85,40 +168,50 @@ $(function() {
         viz = $('<div>').vizentitytable({
             title: viz_name,
             entity: viz_name,
+            tool: viz_name + ' table'
         });
     } else if (viz_name === 'dataentry') {
         viz = $('<div>').vizdataentrytable({
-            title: 'Data Entry',
+            title: 'Documents',
+            tool: 'document'
         });
     } else if (viz_name === 'timeline') {
         viz = $('<div>').viztimeline({
             title: 'Timeline',
+            tool: 'timeline'
         });
     } else if (viz_name === 'map') {
         viz = $('<div>').vizmap({
             title: 'Map',
+            tool: 'map'
         });
     } else if (viz_name === 'network') {
         viz = $('<div>').viznetwork({
             title: 'Network',
+            tool: 'network'
         });
     } else if (viz_name === 'notepad') {
         viz = $('<div>').viznotepad({
             title: 'Notepad',
+            tool: 'notepad',
             url: GLOBAL_URL.notepad,
         });
     } else if (viz_name === 'message') {
       viz = $('<div>').vizmessage({
-        title: 'Message'
+        title: 'Message',
+        tool: 'message'
       });
+      $(this).find('.unread').text('');
     } else if (viz_name === 'history') {
       viz = $('<div>').vizhistory({
         title: 'History',
+        tool: 'history',
         url: GLOBAL_URL.history
       });
     } else if (viz_name === 'annotation') {
       viz = $('<div>').vizannotationtable({
         title: 'Annotations',
+        tool: 'annotation table',
       });
     }
   }

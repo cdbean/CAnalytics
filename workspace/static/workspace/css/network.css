@@ -13,7 +13,7 @@ circle.selected {
     stroke-width: dpx;
 }
 path.dragline,
-path.link {
+.link path {
     fill: none;
     stroke: #ccc;
     stroke-width: 2px;
@@ -23,9 +23,7 @@ path.link {
 .linkarrow {
     fill: #ccc;
 }
-path.link.hidden {
-    stroke-width: 0;
-}
+
 circle.node:hover {
     stroke-width: 1.5px;
     cursor: pointer; ;
@@ -45,7 +43,9 @@ path.dragline {
     width: 100%;
     background-color: #ECEDF7;
 }
-
+.network-filterbar ul {
+  padding: 0;
+}
 .network-filterbar li {
     display: inline;
     margin: 20px 10px;
@@ -161,9 +161,9 @@ path.dragline {
   position: absolute;
   margin-top: 70px;
   margin-left: 5px;
-  max-width: 100px;
-  height: 100%;
-  overflow: scroll;
+  max-width: 20em;
+  /*height: 100%;*/
+  overflow: auto;
   padding:0;
 }
 

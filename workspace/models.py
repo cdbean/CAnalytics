@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from model_utils.managers import InheritanceManager
 from django.contrib.auth.models import User, Group
 from datetime import datetime
+from tinymce.models import HTMLField
 
 
 # Create your models here.
@@ -60,6 +61,8 @@ class Case(models.Model):
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     location = models.GeometryField(null=True, blank=True)
+    address  = models.CharField(max_length=200, blank=True)
+    pin = models.CharField(max_length=4)
 
     objects = models.GeoManager()
 
@@ -99,7 +102,7 @@ class Dataset(models.Model):
 
 class DataEntry(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
-    content = models.TextField()
+    content = HTMLField()
     date  = models.DateTimeField(null=True, blank=True)
     dataset = models.ForeignKey(Dataset, null=True, blank=True)
 
@@ -110,6 +113,7 @@ class DataEntry(models.Model):
         attr['dataset'] = self.dataset.id
         attr['name'] = self.name
         attr['date']    = ''
+        attr['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
         if self.date != None:
             attr['date']  = self.date.strftime('%m/%d/%Y-%H:%M:%S')
         return attr
@@ -124,7 +128,7 @@ class DataEntry(models.Model):
 
 class Entity(models.Model):
     name          = models.CharField(max_length=1000)
-    priority      = models.FloatField(default=5, null=True, blank=True)  # ranging from 0-9
+    priority      = models.CharField(max_length=10, null=True, blank=True)  # Low, High, Medium
     entity_type    = models.CharField(max_length=50, blank=True)
     note          = models.TextField(blank=True, null=True)
     attributes    = models.ManyToManyField(Attribute, blank=True, null=True)
@@ -181,9 +185,8 @@ class Person(Entity):
     gender       = models.CharField(max_length=10, null=True, blank=True)
     nationality  = models.CharField(max_length=50, null=True, blank=True)
     alias        = models.ForeignKey('self', null=True, blank=True)  # TODO: the person could be an alias to another person
-    ethnicity    = models.CharField(max_length=50, null=True, blank=True)
-    race         = models.CharField(max_length=10, null=True, blank=True)
-    religion     = models.CharField(max_length=50, null=True, blank=True)
+    job          = models.CharField(max_length=50, null=True, blank=True)
+    age          = models.CharField(max_length=50, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""
@@ -193,11 +196,8 @@ class Person(Entity):
 
 
 class Organization(Entity):
-    people      = models.ManyToManyField(Person, null=True, blank=True)
+    person      = models.ManyToManyField(Person, null=True, blank=True)
     category    = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
-    nationality = models.CharField(max_length=50, blank=True, null=True)
-    ethnicity   = models.CharField(max_length=50, null=True, blank=True)
-    religion    = models.CharField(max_length=50, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""
@@ -207,8 +207,8 @@ class Organization(Entity):
 
 
 class Event(Entity):
-    people       = models.ManyToManyField(Person, null=True, blank=True)
-    organizations = models.ManyToManyField(Organization, null=True, blank=True)
+    person       = models.ManyToManyField(Person, null=True, blank=True)
+    organization = models.ManyToManyField(Organization, null=True, blank=True)
     location     = models.ForeignKey(Location, null=True, blank=True)
     category     = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     start_date   = models.DateTimeField(null=True, blank=True)
@@ -217,8 +217,11 @@ class Event(Entity):
     repeated_until = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        """auto fill entity_type"""
+        # auto fill entity_type
         self.entity_type = 'event'
+        # if repeated is not set, clear repeated_until as well
+        if not self.repeated:
+            self.repeated_until = None
         super(Event, self).save(*args, **kwargs)
 
 
@@ -242,7 +245,7 @@ class Relationship(models.Model):
     note   = models.TextField(null=True, blank=True)
     relation  = models.CharField(max_length=500, blank=True)
     confidence  = models.FloatField(null=True, blank=True)
-    priority    = models.FloatField(default=5, null=True, blank=True)  # priority defaults to 5, ranging from 0-9
+    priority    = models.CharField(max_length=10, null=True, blank=True)  # L, M, H
     dataentry  = models.ForeignKey(DataEntry, null=True, blank=True)
     attributes = models.ManyToManyField(Attribute, null=True, blank=True)
     created_at   = models.DateTimeField(default=datetime.now, verbose_name='created at')

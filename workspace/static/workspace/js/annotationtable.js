@@ -15,11 +15,44 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
             .on('filter', function(selected) {
               wb.store.shelf_by.annotations = selected;
               $.publish('data/filter', '#' + this.element.attr('id'));
-              $('.viz.dataentry').data('instance').highlight(selected[selected.length - 1])
+              var viz = $('.viz.dataentry').data('instance');
+              if (viz) viz.highlight(selected[selected.length - 1])
+
+              $('.filter-div .filter-item').filter(function(i, item) {
+                return $(item).find('a').data('tool') === 'annotation table';
+              }).remove();
+
+              var selected_anns = [];
+              selected.forEach(function(d) {
+                var ann = wb.store.items.annotations[d];
+                selected_anns.push(ann);
+                wb.filter.add('annotation: ' + ann.quote,  {
+                  item: 'annotation',
+                  id: d,
+                  tool: 'annotation table'
+                });
+              });
+              if (selected_anns.length === 0) {
+                wb.log.log({
+                    operation: 'defiltered',
+                    item: 'annotations',
+                    tool: 'annotation table',
+                    public: false
+                });
+              } else {
+                wb.log.log({
+                    operation: 'filtered',
+                    item: 'annotations',
+                    tool: 'annotation table',
+                    data: wb.log.logAnnotations(selected_anns),
+                    public: false
+                });
+              }
             }.bind(this))
         ;
         this.updateData();
         this.updateView();
+        return this;
     },
 
     updateData: function() {
@@ -38,10 +71,12 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         }
         this.table.data(data);
         d3.select(this.element[0]).call(this.table);
+        return this;
     },
 
     updateView: function() {
       this.table.filter(wb.store.shelf.annotations);
+      return this;
     },
 
     reload: function() {

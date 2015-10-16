@@ -52,6 +52,13 @@ $.widget('custom.attribute_widget', {
 
         // this.sort();
     },
+
+    update: function(attr, value) {
+        var attr_input = this.content.find('.annotator-attribute-input[value="' + attr + '"]');
+        var value_input = attr_input.parent().find('.annotator-attribute-value');
+        this.styleInput(attr, value, value_input);
+    },
+
     reset: function() {
         this.element.empty();
         this._create();
@@ -81,11 +88,11 @@ $.widget('custom.attribute_widget', {
                   res['geometry']['geometry'] = null;
                   res['geometry']['address']= $(row).find('.annotator-attribute-value').val();
                 }
-              } else if (attr === 'people') {
+              } else if (attr === 'person') {
                 if (value) value = value.split(',');
                 else value = [];
                 res[attr] = value;
-              } else if (attr === 'organizations') {
+              } else if (attr === 'organization') {
                 if (value) value = value.split(',');
                 else value = [];
                 res[attr] = value;
@@ -107,7 +114,7 @@ $.widget('custom.attribute_widget', {
         input.datetimepicker({
           onShow: function() {
             var $input = $('.annotator-attribute-input[value=end_date]');
-            var date = $input.parent().next().children().val();
+            var date = $input.parent().next().children().val() || wb.info.case.start_date;
             this.setOptions({
               value: date
             });
@@ -117,21 +124,22 @@ $.widget('custom.attribute_widget', {
         input.datetimepicker({
           onShow: function() {
             var $input = $('.annotator-attribute-input[value=start_date]');
-            var date = $input.parent().next().children().val();
+            var date = $input.parent().next().children().val() || wb.info.case.end_date;
             this.setOptions({
               value: date
             });
           }
         });
       } else if (attr === 'repeated') {
-        var html = '<input class="annotator-attribute-value" type="checkbox" name="repeated" value="true">weekly';
-        input.replaceWith(html);
+        var html = '<input class="annotator-attribute-value" type="checkbox" name="repeated">weekly</input>';
+        var li = input.parent().empty();
+        $(html).appendTo(li).prop('checked', value);
 
       } else if (attr === 'repeated_until') {
         input.datetimepicker({
           onShow: function() {
             var $input = $('.annotator-attribute-input[value=end_date]');
-            var date = $input.parent().next().children().val();
+            var date = $input.parent().next().children().val() || wb.info.case.end_date;
             this.setOptions({
               value: date
             });
@@ -147,7 +155,7 @@ $.widget('custom.attribute_widget', {
       } else if (attr === 'priority') {
         // initialize as select drop down
         input.val(5)
-      } else if (attr === 'people') {
+      } else if (attr === 'person') {
         var opts = this.prepareSelectOptions('person');
         $(input).selectize({
             options: opts.opts,
@@ -157,7 +165,7 @@ $.widget('custom.attribute_widget', {
             create: true,
             closeAfterSelect: true
           });
-      } else if (attr === 'organizations') {
+      } else if (attr === 'organization') {
         var opts = this.prepareSelectOptions('organization');
         $(input).selectize({
             options: opts.opts,
@@ -175,6 +183,7 @@ $.widget('custom.attribute_widget', {
             valueField: 'value',
             searchField: 'label',
             create: true,
+            maxItems: 1,
             closeAfterSelect: true
         });
       } else if (attr === 'source' || attr === 'target') {
@@ -183,11 +192,25 @@ $.widget('custom.attribute_widget', {
             options: opts.opts,
             optgroups: opts.optgroups,
             optgroupField: 'entity_type',
+            maxItems: 1,
             labelField: 'label',
             valueField: 'value',
             searchField: 'label',
             create: false,
             closeAfterSelect: true
+        });
+      } else if (attr === 'relation') {
+        var opts = d3.values(wb.store.items.relationships).map(function(d) {
+          return {label: d.primary.relation, value: d.primary.relation};
+        });
+        $(input).selectize({
+          options: opts,
+          labelField: 'label',
+          valueField: 'value',
+          searchField: 'label',
+          create: true,
+          maxItems: 1,
+          closeAfterSelect: true
         });
       }
     },

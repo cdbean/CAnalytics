@@ -1,5 +1,5 @@
 /*
- *  File:         demo_table_jui.css
+ *  Modified for CAnalytics
  *  CVS:          $Id$
  *  Description:  CSS descriptions for DataTables demo pages
  *  Author:       Allan Jardine
@@ -30,6 +30,54 @@
 /*
  * jQuery UI specific styling
  */
+
+/*dataentry sidebar*/
+.ui-layout-pane {
+	padding: 0 !important;
+}
+ul.sidebar-nav {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+ul.sidebar-nav li {
+    text-indent: 5px;
+    line-height: 30px;
+}
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: #7F9FE2;
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    font-size: 14px;
+    line-height: 40px;
+    text-indent: 5px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: #fff;
+    background: none;
+}
+
+.badge {
+	text-indent: 0px;
+}
+/*end dataentry sidebar*/
 
 #tabs {
     font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
@@ -141,7 +189,7 @@ table thead th div.DataTables_sort_wrapper span {
 }
 
 .dataTables_info {
-	width: 50%;
+	/*width: 50%;*/
 	float: left;
 }
 
@@ -155,28 +203,28 @@ table thead th div.DataTables_sort_wrapper span {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables display
  */
-table {
+table.dataTable {
 	margin: 0 auto;
 	width: auto;
 	clear: both;
 	border-collapse: collapse;
 }
 
-table tfoot th {
+table.dataTable tfoot th {
 	padding: 3px 0px 3px 10px;
 	font-weight: bold;
 	font-weight: normal;
 }
 
-table tr.heading2 td {
+table.dataTable tr.heading2 td {
 	border-bottom: 1px solid #aaa;
 }
 
-table td {
+table.dataTable td {
 	padding: 3px 10px;
 }
 
-table td.center {
+table.dataTable td.center {
 	text-align: center;
 }
 
@@ -185,7 +233,7 @@ table td.center {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables sorting
  */
-
+/*
 .sorting_asc {
 	background: url('../images/sort_asc.png') no-repeat center right;
 }
@@ -205,7 +253,7 @@ table td.center {
 .sorting_desc_disabled {
 	background: url('../images/sort_desc_disabled.png') no-repeat center right;
 }
-
+*/
 
 
 

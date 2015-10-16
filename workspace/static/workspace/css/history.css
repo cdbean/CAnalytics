@@ -3,7 +3,7 @@ ul.history-list {
   margin: 0;
   padding: 10px 20px 10px 20px;
   list-style: none;
-  height: 100%;
+  height: calc(100% - 30px);
 }
 
 li.history-item {
@@ -11,18 +11,20 @@ li.history-item {
 }
 
 li.history-item .timestamp {
-  float: left;
   padding-right: 15px;
   text-align: right;
   cursor: pointer;
-  /* font-size: 60%; */
+  font-size: 60%; 
+  color: #aaa;
 }
 li.history-item .username {
-  float: left;
   padding-right: 15px;
   text-align: right;
 }
-
+li.history-item .content {
+  display: block;
+  padding-left: 5px;
+}
 
 li.history-item.active {
   background-color: #B0BED9 !important;

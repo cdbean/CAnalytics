@@ -4,21 +4,17 @@
 {% load drealtimetags %}
 
 {% block extrajs %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.js" charset="utf-8"></script>
-<script type="text/javascript" src="{% static 'lib/jquery-dialogextend-2.04/jquery.dialogextend.min.js' %}"></script>
-
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.min.js" charset="utf-8"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMvHihbbhhhr61dsroJomX8kjZNi8LE9M&v=3.exp&signed_in=false&libraries=places"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/OpenLayers-2.13.1/OpenLayers.js' %}"></script>
-
+{% compress js %}
+<script type="text/javascript" src="{% static 'lib/jquery-dialogextend-2.04/jquery.dialogextend.min.js' %}"></script>
 <!-- enjoyhint library -->
 <script src="{% static 'lib/enjoyhint/enjoyhint.js' %}"></script>
-
 <script src="{%static 'lib/datetimepicker/jquery.datetimepicker.js'%}"></script>
-
-<!-- google place search, api key generated using Dong's account -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMvHihbbhhhr61dsroJomX8kjZNi8LE9M&v=3.exp&signed_in=false&libraries=places"></script>
-
 <script src="{% static 'lib/selectize.js/selectize.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/jquery.dataTables.min.js' %}"></script>
+<!-- <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script> -->
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/plugin/ColReorderWithResize.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jEditable/jquery.jeditable.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/ckeditor-4.4.3/ckeditor.js' %}"></script>
@@ -29,7 +25,11 @@
 <script type="text/javascript" src="{% static 'lib/colorpicker/dist/js/bootstrap-colorpicker.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/etherpad-lite-jquery/js/etherpad.js' %}"></script>
 <!-- https://github.com/melanke/Watch.JS -->
-<script type="text/javascript" src="{% static 'lib/watch.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/watch.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/jquery-layout-1.4/jquery.layout.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/jquery-aceditable/jquery.aceditable.js' %}"></script>
+{% endcompress %}
+
 <!-- for sync -->
 {% ishout_js %}
 
@@ -43,7 +43,6 @@
 <script type="text/javascript" src="{% static 'workspace/js/utility.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/viz/table.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/viz/timeline.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/viz/timeline2.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/viewer.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/editor.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/vizbase.js' %}"></script>
@@ -58,6 +57,7 @@
 <script type="text/javascript" src="{% static 'workspace/js/message.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/history.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/help.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/caseinfo.js' %}"></script>
 <script type="text/javascript" src="{% static 'sync/js/sync.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/main.js' %}"></script>
 {% endcompress %}
@@ -87,8 +87,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-notify/bootstrap-notify.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/datetimepicker/jquery.datetimepicker.css' %}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/colorpicker/dist/css/bootstrap-colorpicker.css' %}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'lib/jquery-aceditable/jquery.aceditable.css' %}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/selectize.js/selectize.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/enjoyhint/enjoyhint.css' %}" rel="stylesheet">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery-layout-1.4/layout-default.css' %}"> -->
 <link rel="stylesheet" type="text/css" href="{% static 'annotator/css/annotator.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/viz.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/popup.css' %}">
@@ -98,7 +100,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/network.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/message.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/history.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'workspace/css/main.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'workspace/css/caseinfo.css' %}">
 {% endcompress %}
 
 {% endblock %}
@@ -148,7 +150,10 @@
         log: "{% url 'log:log' %}",
         entity_id: "{% url 'ws:entity_id' 0 %}",
         notepad: '{{notepad_url}}',
-        entity_attr: "{% url 'ws:entity_attr' %}"
+        entity_attr: "{% url 'ws:entity_attr' %}",
+        case_info: "{% url 'ws:case_info' %}",
+        case_page: "{% url 'ws:case_page' 9999 0 %}",
+        relationship_id: "{% url 'ws:relationship_id' 0 %}"
       }
 
   </script>
