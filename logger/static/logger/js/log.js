@@ -102,7 +102,7 @@ wb.log.logDocs = function(docs) {
 };
 
 wb.log.logDoc = function(doc) {
-  var de = wb.store.items.dataentries[doc];
+  var de = wb.store.items.dataentries[doc.id];
   var ds = wb.store.items.datasets[de.dataset];
   return JSON.stringify({id: de.id, name: de.name, dataset: {id: ds.id, name: ds.name}});
 };

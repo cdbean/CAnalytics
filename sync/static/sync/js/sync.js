@@ -84,7 +84,11 @@ $(function() {
       // if already exists, do nothing
       if (user.id in wb.info.users) continue;
       // else add to wb.info.users
-      user.color = wb.utility.randomColor(user.name);
+      // 
+      // remove user color, as it confuses with entity color
+      // assign a random color to user
+      // user.color = wb.utility.randomColor(user.name);
+      user.color = 'black';
       wb.info.users[user.id] = user;
     }
     // update the color of the user name in nav bar

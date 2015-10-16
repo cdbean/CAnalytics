@@ -25,6 +25,7 @@ $.get(GLOBAL_URL.case_info, {
 
 
 $(function() {
+  $(window).unload(onBeforeUnload);
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
   $('#case-info').click(onCaseInfo);
@@ -47,6 +48,8 @@ $(function() {
     $.cookie('hinted', true);
   }
 
+  function onBeforeUnload() {
+  }
 
   function onRemoveFilter(e) {
     var item = $(e.target).parent();

@@ -46,10 +46,10 @@
 .annotator-hl {
 	background: rgba(255, 255, 10, 0.3);
 }
-
 .annotator-hl-event {
     background: rgba(23, 190, 207, .5);
 }
+
 .annotator-hl-location {
     background: rgba(227, 119, 194, .5);
 }
