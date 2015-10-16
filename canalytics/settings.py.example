@@ -128,6 +128,8 @@ NOTEPAD_URL = 'http://127.0.0.1:9001'
 # URL and port of ishout, set it to whatever port that has not been used
 ISHOUT_CLIENT_ADDR = 'localhost:5500'
 
+LOGFILE = os.path.join(BASE_DIR, 'activity.log')
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

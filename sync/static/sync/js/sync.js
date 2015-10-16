@@ -61,7 +61,7 @@ $(function() {
         }
         if (el) {
           $('<span class="user-thumb">.</span>').appendTo(el.parent().find('.user-monitor'))
-            .css('color', u.color);
+            .css('color', '#ff7f0e');
         }
         // show indicator in view title bar
         $('.viz').each(function(i, v) {
@@ -88,7 +88,7 @@ $(function() {
       // remove user color, as it confuses with entity color
       // assign a random color to user
       // user.color = wb.utility.randomColor(user.name);
-      user.color = 'black';
+      user.color = '#ff7f0e';
       wb.info.users[user.id] = user;
     }
     // update the color of the user name in nav bar
