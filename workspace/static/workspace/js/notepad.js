@@ -20,8 +20,9 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
           'showChat': false,
           'host': this.options.url,
           'showControls': true,
+          'nocolor': true,
           'userName': wb.info.users[wb.info.user].name,
-          'userColor': wb.info.users[wb.info.user].color,
+          // 'userColor': wb.info.users[wb.info.user].color,
           width: '100%',
           height: '100%',
           plugins: {'autocomp': 'true', 'copy_paste_images': 'true', 'tables2': 'false'}

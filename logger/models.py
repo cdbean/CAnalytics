@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 
 from django.contrib.auth.models import User, Group
-from workspace.models import Case
+from workspace.models import Case, Entity, Relationship
 import sync
 
 
@@ -51,3 +51,27 @@ class Action(models.Model):
             sync.views.broadcast_activity(data, self.case, self.group, self.user)
 
         super(Action, self).save(*args, **kwargs)
+
+
+class DoEntity(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True)
+    operation = models.CharField(max_length=200)
+    entity = models.ForeignKey(Entity)
+    tool = models.CharField(max_length=50, null=True, blank=True)
+    data = models.TextField(null=True, blank=True)  # json format
+    time = models.DateTimeField(default=datetime.now)
+    case = models.ForeignKey(Case)
+    group = models.ForeignKey(Group)
+
+
+class DoRelationship(models.Model):
+    user = models.ForeignKey(User, null=True, blank=True)
+    operation = models.CharField(max_length=200)
+    relationship = models.ForeignKey(Relationship)
+    tool = models.CharField(max_length=50, null=True, blank=True)
+    data = models.TextField(null=True, blank=True)  # json format
+    time = models.DateTimeField(default=datetime.now)
+    case = models.ForeignKey(Case)
+    group = models.ForeignKey(Group)
+
+

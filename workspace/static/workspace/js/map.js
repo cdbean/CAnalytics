@@ -17,7 +17,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
                 featureover: function(e) {
                     this.highlight(e.feature);
                     // console.log(this.events.getMousePosition(e))
-                },
+                }.bind(this),
                 featureout: function(e) {
                     this.unhighlight(e.feature);
                 }.bind(this)
@@ -179,8 +179,6 @@ $.widget("viz.vizmap", $.viz.vizbase, {
           }
         }
         var entity = wb.store.items.entities[feature.attributes.id];
-
-        wb.viewer.data(entity, 'entity').show(pos, 'network');
 
         var primary = entity.primary;
         var popup = '<div id="map-popup" class="entity-tooltip"><table>';
