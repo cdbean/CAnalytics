@@ -56,10 +56,14 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       $('#message-btn .unread').text('');
     });
 
-    var sources = d3.values(wb.store.items.entities).map(function(d) {
+    var sources = d3.values(wb.store.items.entities).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
       return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
     });
-    var s1 = d3.values(wb.store.items.relationships).map(function(d) {
+    var s1 = d3.values(wb.store.items.relationships).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
       return {'name': d.primary.relation, 'id': d.meta.id, 'entity_type': 'relationship'};
     });
     sources = sources.concat(s1);
@@ -70,15 +74,32 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       noresultsmsg: 'No matches',
       jsonterm: 'name',
       formatResult: function(row) {
+        var item, item_type;
         if (row['entity_type'] === 'relationship') {
           var classname = 'wb-relationship';
           var data = 'data-relationship=' + row['id'];
+          item = wb.store.items.relationships[row['id']];
+          item_type = 'relationship';
         } else {
           var classname = 'wb-entity ' + row['entity_type'];
           var data = 'data-entity=' + row['id'];
+          item = wb.store.items.entities[row['id']];
+          item_type = item.primary.entity_type;
         }
+        wb.log.log({
+          operation: 'referred',
+          item: item_type,
+          tool: 'message',
+          data: wb.log.logItem(item),
+          public: false
+        });
         return '<a contenteditable="false" class="wb-item ' + classname + '" '
         + data + ' href="#" tabindex="-1">' + row['name'] + '</a> ';
+      }
+    });
+    this.element.find('#message_content').droppable({
+      drop: function(e, ui) {
+        $(this).html(ui.draggable.text());
       }
     });
   },
@@ -169,9 +190,17 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   },
 
   updateData: function() {
-    var sources = d3.values(wb.store.items.entities).map(function(d) {
+    var sources = d3.values(wb.store.items.entities).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
       return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
     });
+    var s1 = d3.values(wb.store.items.relationships).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
+      return {'name': d.primary.relation, 'id': d.meta.id, 'entity_type': 'relationship'};
+    });
+    sources = sources.concat(s1);
     this.element.find('#message_content').setOptions({data: sources});
   },
 

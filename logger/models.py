@@ -50,6 +50,41 @@ class Action(models.Model):
         if self.public:
             sync.views.broadcast_activity(data, self.case, self.group, self.user)
 
+        if self.item in ['person', 'location', 'event', 'organization', 'resource']:
+            d = json.loads(self.data)
+            try:
+                ent = Entity.objects.get(id=d['id'])
+            except:
+                pass
+            else:
+                DoEntity.objects.create(user=self.user, operation=self.operation,entity=ent,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
+        elif self.item == 'relationship':
+            d = json.loads(self.data)
+            try:
+                rel = Relationship.objects.get(id=d['id'])
+            except:
+                pass
+            else:
+                DoRelationship.objects.create(user=self.user, operation=self.operation,relationship=rel,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
+        elif self.item == 'entities':
+            ds = json.loads(self.data)
+            for d in ds:
+                try:
+                    ent = Entity.objects.get(id=d['meta']['id'])
+                except:
+                    pass
+                else:
+                    DoEntity.objects.create(user=self.user, operation=self.operation,entity=ent,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
+        elif self.item == 'relationships':
+            ds = json.loads(self.data)
+            for d in ds:
+                try:
+                    rel = Relationship.objects.get(id=d['id'])
+                except:
+                    pass
+                else:
+                    DoRelationship.objects.create(user=self.user, operation=self.operation,relationship=rel,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
+
         super(Action, self).save(*args, **kwargs)
 
 
@@ -60,8 +95,26 @@ class DoEntity(models.Model):
     tool = models.CharField(max_length=50, null=True, blank=True)
     data = models.TextField(null=True, blank=True)  # json format
     time = models.DateTimeField(default=datetime.now)
+    public = models.NullBooleanField(null=True, blank=True)
     case = models.ForeignKey(Case)
     group = models.ForeignKey(Group)
+
+    def __unicode__(self):
+        return (self.time.strftime('%m/%d/%Y-%H:%M:%S') + ' ' + self.user.username + ' ' + self.operation
+               + ' ' + self.entity.__unicode__())
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user': self.user.id,
+            'operation': self.operation,
+            'tool': self.tool,
+            'data': json.loads(self.data),
+            'public': self.public,
+            'group': self.group.id,
+            'case': self.case.id,
+            'time': self.time.strftime('%m/%d/%Y-%H:%M:%S'),
+        }
 
 
 class DoRelationship(models.Model):
@@ -73,5 +126,21 @@ class DoRelationship(models.Model):
     time = models.DateTimeField(default=datetime.now)
     case = models.ForeignKey(Case)
     group = models.ForeignKey(Group)
+    public = models.NullBooleanField(null=True, blank=True)
 
+    def __unicode__(self):
+        return (self.time.strftime('%m/%d/%Y-%H:%M:%S') + ' ' + self.user.username + ' ' + self.operation
+               + ' ' + self.relationship.__unicode__())
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user': self.user.id,
+            'operation': self.operation,
+            'tool': self.tool,
+            'data': json.loads(self.data),
+            'public': self.public,
+            'group': self.group.id,
+            'case': self.case.id,
+            'time': self.time.strftime('%m/%d/%Y-%H:%M:%S'),
+        }

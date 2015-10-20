@@ -31,7 +31,7 @@ def get_field_value(instance, field_name):
 def get_model_attr(instance):
     attr = {'primary': {}, 'meta': {}, 'other': {}}
     # these fields are special
-    meta_attr = ['id', 'created_by', 'created_at', 'last_edited_by', 'last_edited_at']
+    meta_attr = ['id', 'created_by', 'created_at', 'last_edited_by', 'last_edited_at', 'deleted']
     excludes = ['attributes', 'entity_ptr', 'case', 'group'] + meta_attr
     primary = attr['primary']
     for field_name in instance._meta.get_all_field_names():
@@ -138,11 +138,12 @@ class Entity(models.Model):
     last_edited_at = models.DateTimeField(auto_now=True)
     group         = models.ForeignKey(Group)
     case          = models.ForeignKey(Case)
+    deleted       = models.NullBooleanField(default=False, null=True, blank=True)
 
     objects = InheritanceManager()
 
     def __unicode__(self):
-        return self.name
+        return self.entity_type + ' ' + self.name
 
     def findTargets(self):
         res = []
@@ -254,9 +255,10 @@ class Relationship(models.Model):
     last_edited_at  = models.DateTimeField(auto_now=True)
     group      = models.ForeignKey(Group)
     case        = models.ForeignKey(Case)
+    deleted       = models.NullBooleanField(default=False, null=True, blank=True)
 
     def __unicode__(self):
-        return self.source.name + '-' + self.target.name
+        return 'relation: ' + self.relation + ' of ' + self.source.name + '->' + self.target.name
 
     def serialize(self):
         res = get_model_attr(self)

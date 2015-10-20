@@ -109,20 +109,21 @@ Annotator.Plugin.Store = (function(_super) {
 
                 if (entity.length) {
                     $.publish('entity/created', entity);
+
                     wb.log.log({
-                        operation: 'created',
-                        item: 'entities',
+                        operation: entity[0].meta.id in wb.store.items.entities ? 'updated' : 'created',
+                        item: entity[0].primary.entity_type,
                         tool: 'document',
-                        data: wb.log.logItems(entity)
+                        data: wb.log.logItem(entity[0])
                     });
                 }
                 if (relationship.length) {
                     $.publish("relationship/created", relationship);
                     wb.log.log({
-                        operation: 'created',
-                        item: 'relationships',
+                        operation: relationship[0].meta.id in wb.store.items.relationships ? 'updated' : 'created',
+                        item: 'relationship',
                         tool: 'document',
-                        data: wb.log.logItems(relationship)
+                        data: wb.log.logItem(relationship[0])
                     });
                 }
 
@@ -133,6 +134,7 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(annotation),
+                    public: false
                 });
             });
         } else {
@@ -178,18 +180,18 @@ Annotator.Plugin.Store = (function(_super) {
                     $.publish('relationship/updated', relationship);
                     wb.log.log({
                         operation: 'updated',
-                        item: 'relationships',
+                        item: 'relationship',
                         tool: 'document',
-                        data: wb.log.logItems(relationship)
+                        data: wb.log.logItem(relationship[0])
                     });
                 }
                 if (entity.length) {
                     $.publish('entity/updated', entity);
                     wb.log.log({
                         operation: 'updated',
-                        item: 'entities',
+                        item: entity[0].primary.entity_type,
                         tool: 'document',
-                        data: wb.log.logItems(entity)
+                        data: wb.log.logItem(entity[0])
                     });
                 }
                 _this.updateAnnotation(annotation, ann);
@@ -200,6 +202,7 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(ann),
+                    public: false,
                 });
             }));
         }
@@ -219,26 +222,8 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(annotation),
+                    public: false
                 });
-
-                if (entity && entity.deleted) {
-                    wb.log.log({
-                        operation: 'deleted',
-                        item: entity.primary.entity_type,
-                        tool: 'document',
-                        data: wb.log.logItem(entity)
-                    });
-                    $.publish('entity/deleted', entity);
-                }
-                if (relationship && relationship.deleted) {
-                    wb.log.log({
-                        operation: 'deleted',
-                        item: 'relationship',
-                        tool: 'document',
-                        data: wb.log.logItem(relationship)
-                    });
-                    $.publish('relationship/deleted', relationship);
-                }
 
                 _this.unregisterAnnotation(annotation);
                 $.publish('annotation/deleted', annotation);

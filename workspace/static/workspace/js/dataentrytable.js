@@ -70,6 +70,8 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           <ul id="ds-list" class="sidebar-nav"> \
             <li class="sidebar-brand"> Datasets </li> \
           </ul> \
+          <ul id="ann-list" class="sidebar-nav"> \
+          </ul> \
         </div> \
       '
       var el = $(html).appendTo(this.element);
@@ -88,6 +90,10 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       el.find('#ds-list').append(str);
       $('#ds-list input:checkbox', el).change(this._onDatasetChecked);
       // el.find('.ui-layout-center').resize(this.resize.bind(this));
+      el.find('#ann-list').on('click', 'a', function(e) {
+        var item = $(e.target).data('annotation');
+        if (item) this.highlight(item);
+      }.bind(this))
     },
 
     _onDatasetChecked: function() {
@@ -123,6 +129,23 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
     updateView: function() {
       this.table.filter(wb.store.shelf.dataentries);
+
+      var el = this.element.find('#ann-list');
+      el.empty();
+      if ($('.filter-div .filter-item').length) { // ugly way, but works. If a filter is applied, show ann list
+        el.append('<li class="sidebar-brand">Annotations</li>');
+        wb.store.shelf.annotations.forEach(function(d) {
+          var ann = wb.store.items.annotations[d];
+          if (!ann || ann.meta.deleted) return;
+          var li = '<li><a href="#">';
+          // var prev = ann.highlights[0].previousSibling.nodeValue.split(' ').pop();
+          // var next = ann.highlights[0].nextSibling.nodeValue.split(' ')[0];
+          // li += prev + ' ' + ann.quote + ' ' + next;
+          li += ann.quote;
+          li += '</a></li>';
+          $(li).appendTo(el).find('a').data('annotation', ann.id);
+        });
+      }
     },
 
     highlight: function(item) {
@@ -169,7 +192,9 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
               'case': CASE,
               'group': GROUP
             },
-            loadFromLocal: _.values(wb.store.items.annotations)
+            loadFromLocal: _.values(wb.store.items.annotations).filter(function(d) {
+              return !d.meta.deleted;
+            })
         });
         ele.annotator('addPlugin', 'Entity');
     },

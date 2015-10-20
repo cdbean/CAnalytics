@@ -36,6 +36,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       var data = [];
       for (var d in wb.store.items.entities) {
         var entity = wb.store.items.entities[d];
+        if (entity.meta.deleted) continue;
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
             if (entity.primary.repeated) {

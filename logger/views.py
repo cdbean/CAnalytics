@@ -1,12 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 import json
 import csv
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User, Group
 from canalytics.settings import LOGFILE
-from workspace.models import DataEntry, Case
-from logger.models import Action
+from workspace.models import DataEntry, Case, Relationship, Entity
+from logger.models import Action, DoEntity, DoRelationship
 
 # Create your views here.
 def logs(request):
@@ -78,3 +78,25 @@ def serverlog(data):
         public=data['public']
     )
     return act.serialize()
+
+
+def entity_log(request, id):
+    res = []
+    try:
+        ent = Entity.objects.get(id=id)
+    except:
+        return HttpResponseBadRequest()
+    logs = DoEntity.objects.filter(entity=ent, public=True)
+    res = [l.serialize() for l in logs]
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+def relationship_log(request, id):
+    res = []
+    try:
+        rel = Relationship.objects.get(id=id)
+    except:
+        return HttpResponseBadRequest()
+    logs = DoRelationship.objects.filter(relationship=rel, public=True)
+    res = [l.serialize() for l in logs]
+    return HttpResponse(json.dumps(res), content_type='application/json')

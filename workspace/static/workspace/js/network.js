@@ -761,6 +761,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // first add all entities as nodes 
         for (var d in wb.store.items.entities) {
           var ent = wb.store.items.entities[d];
+          if (ent.meta.deleted) continue;
           if (ent.meta.id in this.nodeMap) {
             this.nodes[this.nodeMap[ent.meta.id]].temp_exist = true;
           } else {
@@ -786,6 +787,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // add relationships as links
         for (var d in wb.store.items.relationships) {
           var rel = wb.store.items.relationships[d];
+          if (rel.meta.deleted) continue;
           if (rel.meta.id in this.linkMap) {
             this.links[this.linkMap[rel.meta.id]].temp_exist = true;
           } else {

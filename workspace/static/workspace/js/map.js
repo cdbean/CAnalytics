@@ -132,6 +132,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         var point_feas = [], line_feas = [];
         for (var d in wb.store.items.entities) {
           var entity = wb.store.items.entities[d];
+          if (entity.meta.deleted) continue;
           if (entity.primary.entity_type === 'location') {
             var geometry = entity.primary.geometry;
             if (geometry) {

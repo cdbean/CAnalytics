@@ -15,11 +15,15 @@ $.widget('viz.vizviewer', {
       <h4 class="title"></h4> \
       <ul class="attr-list"> \
       </ul> \
+      <ul class="history-list"> \
+      </ul> \
     ';
     var controls = ' \
       <span class="viewer-controls"> \
         <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-trash"></span></button> \
         <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
+        <button type="button" title="restore" class="close restore"><span class="glyphicon glyphicon-repeat"></span></button> \
+        <button type="button" title="history" class="close history"><span class="glyphicon glyphicon-time"></span></button> \
       </span> \
     '
     this.element.append(html);
@@ -29,6 +33,11 @@ $.widget('viz.vizviewer', {
 
     this.element.on('click', '.delete', this._onClickDelete.bind(this));
     this.element.on('click', '.edit', this._onClickEdit.bind(this));
+    this.element.on('click', '.restore', this._onClickRestore.bind(this));
+    this.element.on('click', '.history', this._onClickHistory.bind(this));
+    this.element.click(function(e) {
+      e.stopPropagation();
+    })
     return this;
   },
 
@@ -42,11 +51,21 @@ $.widget('viz.vizviewer', {
 
     this.item = d;
     this.item_type = type; // item_type: 'entity' or 'relationship'
+    this.deleted = d.meta.deleted;
 
     if (type === 'entity')
       type = d.primary.entity_type;
 
-    this.addTitle(type, d.primary.name || d.primary.relation);
+    var title = d.primary.name || d.primary.relation;
+
+    this.element.find('.close').removeClass('hidden');
+    if (this.deleted) {
+      this.addTitle('deleted ' + type, title);
+      this.element.find('.close.delete, .close.edit').addClass('hidden');
+    } else {
+      this.addTitle(type, title);
+      this.element.find('.close.restore').addClass('hidden');
+    }
 
     var attrs = wb.store.static[type];
     for (var i = 0, len = attrs.length; i < len; i++) {
@@ -134,7 +153,93 @@ $.widget('viz.vizviewer', {
   clearFields: function() {
     this.element.find('.title').text('');
     this.element.find('.attr-list').empty();
+    this.element.find('.history-list').empty();
     return this;
+  },
+
+  _onClickHistory: function() {
+    this.element.find('.attr-list').empty();
+    var url;
+    if (this.item_type === 'relationship') url = GLOBAL_URL.relationship_history.replace('0', this.item.meta.id);
+    if (this.item_type === 'entity') url = GLOBAL_URL.entity_history.replace('0', this.item.meta.id);
+
+    var el = this.element.find('.history-list');
+    $.get(url, function(res) {
+      res.forEach(function(d) {
+        $('<li class="history-item"><span class="timestamp"></span><span class="operation"></span> by <span class="username"></span></li>')
+          .appendTo(el)
+          .find('.timestamp').text(d.time).end()
+          .find('.operation').text(d.operation).end()
+          .find('.username').text(wb.info.users[d.user].name || 'Unknown')
+      });
+    });
+  },
+
+  _onClickRestore: function() {
+    var item = this.item;
+    var item_type = this.item_type;
+    var tool = this.tool;
+    if (this.item_type === 'relationship') {
+      $.ajax({
+        url: GLOBAL_URL.relationship_id.replace('0', this.item.meta.id),
+        data: {
+          case: CASE,
+          group: GROUP
+        },
+        type: 'RESTORE',
+        success: function(res) {
+          wb.utility.notify('Relationship restored', 'success');
+          wb.log.log({
+            operation: 'restored',
+            item: 'relationship',
+            tool: tool,
+            data: wb.log.logItem(res.relationship),
+          });
+          $.publish('relationship/restored', res.relationship);
+          // if res includes entity, it means an entity has been updated due to the deletion of the relationship
+          if (!$.isEmptyObject(res.entity)) {
+            $.publish('entity/updated', res.entity);
+          } 
+          if (!$.isEmptyObject(res.annotation)) {
+            $.publish('annotation/restored', res.annotation);
+          }
+        }, 
+        error: function(e) {
+          console.log(e);
+          wb.utility.notify('Sorry, failed to delete the relationship');
+        }
+      });
+    } else {
+      $.ajax({
+        url: GLOBAL_URL.entity_id.replace('0', this.item.meta.id),
+        data: {
+          case: CASE,
+          group: GROUP
+        },
+        type: 'RESTORE',
+        success: function(res) {
+          wb.utility.notify('Entity restored', 'success');
+          $.publish('entity/restored', res.entity);
+          wb.log.log({
+            operation: 'restored',
+            item: res.entity.primary.entity_type,
+            tool: tool,
+            data: wb.log.logItem(res.entity),
+          });
+          if (!$.isEmptyObject(res.relationship)) {
+            $.publish('relationship/restored', res.relationship);
+          }
+          if (!$.isEmptyObject(res.annotation)) {
+            $.publish('annotation/restored', res.annotation);
+          }
+        },
+        error: function(e) {
+          console.log(e);
+          wb.utility.notify('Sorry, failed to delete the entity');
+        }
+      });
+    }
+    this.hide();
   },
 
   _onClickEdit: function() {

@@ -13,15 +13,18 @@
   $.subscribe('entity/created', onEntitiesCreated);
   $.subscribe('entity/updated', onEntitiesUpdated);
   $.subscribe('entity/deleted', onEntitiesDeleted);
+  $.subscribe('entity/restored', onEntitiesRestored);
   $.subscribe('entity/attribute/update', onEntityAttrUpdated);
 
   $.subscribe('relationship/created', onRelationshipsCreated);
   $.subscribe('relationship/updated', onRelationshipsUpdated);
   $.subscribe('relationship/deleted', onRelationshipsDeleted);
+  $.subscribe('relationship/restored', onRelationshipsRestored);
 
   $.subscribe('annotation/created', onAnnotationsCreated);
   $.subscribe('annotation/updated', onAnnotationsUpdated);
   $.subscribe('annotation/deleted', onAnnotationsDeleted);
+  $.subscribe('annotation/restored', onAnnotationsRestored);
 
   $.subscribe('message/new', onNewMessage);
   $.subscribe('action/new', onNewAction);
@@ -33,7 +36,7 @@
   $.subscribe('user/tool', onUserTool);
 
   function onUserTool(e, d) {
-    if (ishout) {
+    if (window.ishout) {
       ishout.rooms.forEach(function(r) {
         ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
       });
@@ -119,6 +122,11 @@
     wb.store.removeItems(entities, 'entities');
   }
 
+  function onEntitiesRestored() {
+    var entities = [].slice.call(arguments, 1);
+    wb.store.restoreItems(entities, 'entities');
+  }
+
   function onEntityAttrUpdated(ent, attr) {
 
   }
@@ -140,6 +148,11 @@
   function onRelationshipsDeleted() {
     var rels = [].slice.call(arguments, 1);
     wb.store.removeItems(rels, 'relationships');
+  }
+
+  function onRelationshipsRestored() {
+    var rels = [].slice.call(arguments, 1);
+    wb.store.restoreItems(rels, 'relationships');
   }
 
 
@@ -175,6 +188,16 @@
     $('.viz.dataentry').not('.history').each(function() {
       var viz = $(this).data('instance');
       if (viz) viz.deleteAnnotations(anns);
+    });
+  }
+
+  function onAnnotationsRestored() {
+    var anns = [].slice.call(arguments, 1);
+    wb.store.restoreItems(anns, 'annotations');
+    // render annotation--update annotation in dataentry table
+    $('.viz.dataentry').not('.history').each(function() {
+      var viz = $(this).data('instance');
+      if (viz) viz.addAnnotations(anns);
     });
   }
 

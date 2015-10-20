@@ -110,6 +110,14 @@ wb.viz.table = function() {
           }
           child += '</table>';
           table.fnOpen(tr, child, 'details');
+
+          wb.log.log({
+            operation: 'read',
+            item: ent.primary.entity_type,
+            tool: 'table',
+            data: wb.log.logItem(ent),
+            public: false
+          });
         }
       }
     }

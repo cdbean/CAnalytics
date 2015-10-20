@@ -74,6 +74,15 @@ ul.sidebar-nav li {
     background: none;
 }
 
+#ann-list {
+	line-height: 15px;
+	overflow-x: auto;
+}
+#ann-list li {
+	white-space: nowrap;
+}
+
+
 .badge {
 	text-indent: 0px;
 }
