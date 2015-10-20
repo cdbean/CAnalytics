@@ -111,18 +111,18 @@ Annotator.Plugin.Store = (function(_super) {
                     $.publish('entity/created', entity);
                     wb.log.log({
                         operation: 'created',
-                        item: 'entities',
+                        item: entity[0].primary.entity_type,
                         tool: 'document',
-                        data: wb.log.logItems(entity)
+                        data: wb.log.logItem(entity[0])
                     });
                 }
                 if (relationship.length) {
                     $.publish("relationship/created", relationship);
                     wb.log.log({
                         operation: 'created',
-                        item: 'relationships',
+                        item: 'relationship',
                         tool: 'document',
-                        data: wb.log.logItems(relationship)
+                        data: wb.log.logItem(relationship[0])
                     });
                 }
 
@@ -178,18 +178,18 @@ Annotator.Plugin.Store = (function(_super) {
                     $.publish('relationship/updated', relationship);
                     wb.log.log({
                         operation: 'updated',
-                        item: 'relationships',
+                        item: 'relationship',
                         tool: 'document',
-                        data: wb.log.logItems(relationship)
+                        data: wb.log.logItem(relationship[0])
                     });
                 }
                 if (entity.length) {
                     $.publish('entity/updated', entity);
                     wb.log.log({
                         operation: 'updated',
-                        item: 'entities',
+                        item: entity[0].primary.entity_type,
                         tool: 'document',
-                        data: wb.log.logItems(entity)
+                        data: wb.log.logItem(entity[0])
                     });
                 }
                 _this.updateAnnotation(annotation, ann);

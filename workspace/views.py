@@ -247,7 +247,9 @@ def entity(request, id=0):
             anns = r.annotation_set.all()
             res['annotation'] += [a.serialize() for a in anns]
 
-        entity.delete()
+        entity.update(deleted=True)
+        rels.update(deleted=True)
+        anns.delete()
         sync_item('delete', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
 
