@@ -78,41 +78,48 @@ $.widget('viz.vizbase', {
         var width = $(window).width(),
             height = $(window).height();
 
-        var viz = $('.viz').parent(),
+        var viz = $('.viz'),
             n = viz.length;
         if (n < 4 && n > 1) { // one row
             $(viz).each(function(i, el) {
-                $(el).css({
-                    position: 'fixed',
-                    top: '60px',
-                    left: width / n * i,
-                    width: width / n
+                $(el).dialog('option', {
+                    width: width/n, 
+                    height: height-100,
+                    position: {
+                        my: 'left top',
+                        at: 'left+' + width/n*i + ' top+100',
+                        of: window
+                    }
                 });
+                $(el).data('instance').resize();
             });
-            $('.viz').css('height', height - 100);
         } else if (n >=4) { // two rows
             var row = 2;
             var col = Math.ceil(n / 2);
             $(viz).each(function(i, el) {
-                if (i < n/2) 
-                    $(el).css({
-                        position: 'fixed', 
-                        top: '60px',
-                        left: width / col * (i % col),
-                        width: width / col,
-                        height: (height - 100)/2
+                if (i < n/2) {
+                    $(el).dialog('option', {
+                        width: width/col, 
+                        height: (height-100)/2,
+                        position: {
+                            my: 'left top',
+                            at: 'left+' + width/col*(i%col) + ' top+100',
+                            of: window
+                        }
                     });
-                else
-                    $(el).css({
-                        position: 'fixed',
-                        bottom: '0px',
-                        left: width / col * (i % col),
-                        width: width / col,
-                        height: (height - 100)/2
+                } else {
+                    $(el).dialog('option', {
+                        width: width/col, 
+                        height: (height-100)/2,
+                        position: {
+                            my: 'left bottom',
+                            at: 'left+' + width/col*(i%col) + ' bottom',
+                            of: window
+                        }
                     });
+                }
+                $(el).data('instance').resize();
             });
-            $('.viz').css('height', (height - 60)/2);
         }
-        $('.viz').data('instance').resize();
     }
 })

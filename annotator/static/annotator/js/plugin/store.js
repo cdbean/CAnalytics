@@ -109,8 +109,9 @@ Annotator.Plugin.Store = (function(_super) {
 
                 if (entity.length) {
                     $.publish('entity/created', entity);
+
                     wb.log.log({
-                        operation: 'created',
+                        operation: entity[0].meta.id in wb.store.items.entities ? 'updated' : 'created',
                         item: entity[0].primary.entity_type,
                         tool: 'document',
                         data: wb.log.logItem(entity[0])
@@ -119,7 +120,7 @@ Annotator.Plugin.Store = (function(_super) {
                 if (relationship.length) {
                     $.publish("relationship/created", relationship);
                     wb.log.log({
-                        operation: 'created',
+                        operation: relationship[0].meta.id in wb.store.items.relationships ? 'updated' : 'created',
                         item: 'relationship',
                         tool: 'document',
                         data: wb.log.logItem(relationship[0])
