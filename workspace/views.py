@@ -207,6 +207,7 @@ def entity(request, id=0):
     if request.method == 'POST':
         # client cannot create an entity directly now
         # they have to create an entity by creating the annotation
+        print 'POST request'
         pass
     if request.method == 'PUT':
         res = {'entity': [], 'relationship': []}
@@ -235,22 +236,47 @@ def entity(request, id=0):
         case = Case.objects.get(id=data['case'])
         group = Group.objects.get(id=data['group'])
         try:
-            entity = Entity.objects.get(id=int(id), case=case, group=group)
+            entity = Entity.objects.filter(id=int(id), case=case, group=group).select_subclasses()[0]
         except:
             return HttpResponse('Error: entity not found')
+        entity.deleted=True
+        entity.save()
         res['entity'] = entity.serialize()
         rels = entity.relates_as_source.all() | entity.relates_as_target.all()
+        rels.update(deleted=True)
         res['relationship'] = [r.serialize() for r in rels]
         anns = entity.annotation_set.all()
+        anns.update(deleted=True)
         res['annotation'] = [a.serialize() for a in anns]
         for r in rels:
             anns = r.annotation_set.all()
             res['annotation'] += [a.serialize() for a in anns]
 
-        entity.update(deleted=True)
-        rels.update(deleted=True)
-        anns.delete()
         sync_item('delete', 'entity', res, case, group, request.user)
+        return HttpResponse(json.dumps(res), content_type='application/json')
+    if request.method == 'RESTORE':
+        res = {}
+        data = QueryDict(request.body)
+        case = Case.objects.get(id=data['case'])
+        group = Group.objects.get(id=data['group'])
+        try:
+            entity = Entity.objects.filter(id=int(id), case=case, group=group).select_subclasses()[0]
+        except:
+            return HttpResponse('Error: entity not found')
+        entity.deleted=False
+        entity.save()
+        res['entity'] = entity.serialize()
+        rels = entity.relates_as_source.all() | entity.relates_as_target.all()
+        rels.update(deleted=False)
+        res['relationship'] = [r.serialize() for r in rels]
+        anns = entity.annotation_set.all()
+        anns.update(deleted=False)
+        res['annotation'] = [a.serialize() for a in anns]
+        for r in rels:
+            anns = r.annotation_set.all()
+            res['annotation'] += [a.serialize() for a in anns]
+
+        sync_item('restore', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -289,6 +315,8 @@ def relationship(request, id=0):
         return update_relationship(request, id)
     elif request.method == 'DELETE':
         return delete_relationship(request, id)
+    elif request.method == 'RESTORE':
+        return restore_relationship(request, id)
 
 
 def relationships(request):
@@ -329,6 +357,8 @@ def delete_relationship(request, id):
         rel = Relationship.objects.get(id=int(id), case=case, group=group)
     except:
         return HttpResponse('Error: relationship not found')
+    rel.deleted = True
+    rel.save()
     res['relationship'] = rel.serialize()
     if rel.relation == 'involve':
         source = Entity.objects.filter(id=rel.source.id).select_subclasses()[0]
@@ -339,10 +369,38 @@ def delete_relationship(request, id):
             if target.entity_type == 'organization': source.organization.remove(target)
         elif source.entity_type == 'organization':
             if target.entity_type == 'person': source.person.remove(target)
-        res['entity'] = source.serialize()
+        res['entity'] = [source.serialize(), target.serialize()]
     anns = rel.annotation_set.all()
+    anns.update(deleted=True)
     res['annotation'] = [a.serialize() for a in anns]
-    rel.delete()
+    sync_item('delete', 'relationship', res, case, group, request.user)
+    return HttpResponse(json.dumps(res), content_type='application/json')
+
+def restore_relationship(request, id):
+    res = {}
+    data = QueryDict(request.body)
+    case = Case.objects.get(id=data['case'])
+    group = Group.objects.get(id=data['group'])
+    try:
+        rel = Relationship.objects.get(id=int(id), case=case, group=group)
+    except:
+        return HttpResponse('Error: relationship not found')
+    rel.deleted = False
+    rel.save()
+    res['relationship'] = rel.serialize()
+    if rel.relation == 'involve':
+        source = Entity.objects.filter(id=rel.source.id).select_subclasses()[0]
+        target = Entity.objects.filter(id=rel.target.id).select_subclasses()[0]
+        if source.entity_type == 'event':
+            if target.entity_type == 'person': source.person.add(target)
+            if target.entity_type == 'location': source.location = target
+            if target.entity_type == 'organization': source.organization.add(target)
+        elif source.entity_type == 'organization':
+            if target.entity_type == 'person': source.person.add(target)
+        res['entity'] = [source.serialize(), target.serialize()]
+    anns = rel.annotation_set.all()
+    anns.update(deleted=False)
+    res['annotation'] = [a.serialize() for a in anns]
     sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 

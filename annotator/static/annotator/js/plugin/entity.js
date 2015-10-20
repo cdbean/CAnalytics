@@ -329,8 +329,8 @@ Annotator.Plugin.Entity = (function(_super) {
                 }
             }
             wb.store.static.meta.forEach(function(attr) {
-                if (annotation[attr]) {
-                    table += '<tr><th>' + attr + ': </th><td>' + wb.utility.parseEntityAttr(attr, annotation[attr]) + '</td></tr>';
+                if (annotation.meta[attr]) {
+                    table += '<tr><th>' + attr + ': </th><td>' + wb.utility.parseEntityAttr(attr, annotation.meta[attr]) + '</td></tr>';
                 }
             });
 

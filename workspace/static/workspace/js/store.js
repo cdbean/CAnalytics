@@ -88,8 +88,22 @@ wb.store = {
 
     items.forEach(function(d) {
       var id = d.id || d.meta.id;
-      if (id in _this.items[type])
-        delete _this.items[type][id];
+      if (id in _this.items[type]) {
+        if (type === 'entities' || type === 'relationships' || type === 'annotations')
+          _this.items[type][id] = d;
+        else
+          delete _this.items[type][id];
+      }
+    });
+  },
+
+  restoreItems: function(items, type) {
+    var _this = this;
+    if (items.constructor !== Array)
+      items = [items];
+
+    items.forEach(function(d) {
+      _this.items[type][d.id || d.meta.id] = d;
     });
   },
 

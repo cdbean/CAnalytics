@@ -169,7 +169,9 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
               'case': CASE,
               'group': GROUP
             },
-            loadFromLocal: _.values(wb.store.items.annotations)
+            loadFromLocal: _.values(wb.store.items.annotations).filter(function(d) {
+              return !d.meta.deleted;
+            })
         });
         ele.annotator('addPlugin', 'Entity');
     },

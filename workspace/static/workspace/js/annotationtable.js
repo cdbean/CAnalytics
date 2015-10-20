@@ -60,6 +60,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
 
         for (var d in wb.store.items.annotations) {
           var ann = wb.store.items.annotations[d];
+          if (ann.meta.deleted) continue;
           var entity = ann.entity;
           if (entity.entity_type === 'relationship')
             entity = wb.store.items.relationships[entity.id];
@@ -87,6 +88,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
     resize: function() {
         this._super('resize');
         this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
+        this.table.resize();
     },
 
     highlight: function(item) {

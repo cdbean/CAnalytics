@@ -58,7 +58,7 @@ class Action(models.Model):
                 pass
             else:
                 DoEntity.objects.create(user=self.user, operation=self.operation,entity=ent,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
-        else if self.item == 'relationship':
+        elif self.item == 'relationship':
             d = json.loads(self.data)
             try:
                 rel = Relationship.objects.get(id=d['id'])
@@ -66,7 +66,7 @@ class Action(models.Model):
                 pass
             else:
                 DoRelationship.objects.create(user=self.user, operation=self.operation,relationship=rel,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
-        else if self.item == 'entities':
+        elif self.item == 'entities':
             ds = json.loads(self.data)
             for d in ds:
                 try:
@@ -75,7 +75,7 @@ class Action(models.Model):
                     pass
                 else:
                     DoEntity.objects.create(user=self.user, operation=self.operation,entity=ent,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
-        else if self.item == 'relationships':
+        elif self.item == 'relationships':
             ds = json.loads(self.data)
             for d in ds:
                 try:

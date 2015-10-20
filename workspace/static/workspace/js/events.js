@@ -13,11 +13,13 @@
   $.subscribe('entity/created', onEntitiesCreated);
   $.subscribe('entity/updated', onEntitiesUpdated);
   $.subscribe('entity/deleted', onEntitiesDeleted);
+  $.subscribe('entity/restored', onEntitiesRestored);
   $.subscribe('entity/attribute/update', onEntityAttrUpdated);
 
   $.subscribe('relationship/created', onRelationshipsCreated);
   $.subscribe('relationship/updated', onRelationshipsUpdated);
   $.subscribe('relationship/deleted', onRelationshipsDeleted);
+  $.subscribe('relationship/restored', onRelationshipsRestored);
 
   $.subscribe('annotation/created', onAnnotationsCreated);
   $.subscribe('annotation/updated', onAnnotationsUpdated);
@@ -33,7 +35,7 @@
   $.subscribe('user/tool', onUserTool);
 
   function onUserTool(e, d) {
-    if (ishout) {
+    if (window.ishout) {
       ishout.rooms.forEach(function(r) {
         ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
       });
@@ -119,6 +121,11 @@
     wb.store.removeItems(entities, 'entities');
   }
 
+  function onEntitiesRestored() {
+    var entities = [].slice.call(arguments, 1);
+    wb.store.restoreItems(entities, 'entities');
+  }
+
   function onEntityAttrUpdated(ent, attr) {
 
   }
@@ -140,6 +147,11 @@
   function onRelationshipsDeleted() {
     var rels = [].slice.call(arguments, 1);
     wb.store.removeItems(rels, 'relationships');
+  }
+
+  function onRelationshipsRestored() {
+    var rels = [].slice.call(arguments, 1);
+    wb.store.restoreItems(rels, 'relationships');
   }
 
 

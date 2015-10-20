@@ -76,6 +76,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
 
         for (var d in wb.store.items.entities) {
           var entity = wb.store.items.entities[d];
+          if (entity.meta.deleted) continue;
           if (entity && entity.primary.entity_type === entity_type) {
             // the two null values are for the two special columns
             var row = [entity.meta.id, '<img src="' + GLOBAL_URL.static + '/workspace/img/details_open.png' + '" class="control"></img>', entity.primary.name || ''];

@@ -56,10 +56,14 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       $('#message-btn .unread').text('');
     });
 
-    var sources = d3.values(wb.store.items.entities).map(function(d) {
+    var sources = d3.values(wb.store.items.entities).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
       return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
     });
-    var s1 = d3.values(wb.store.items.relationships).map(function(d) {
+    var s1 = d3.values(wb.store.items.relationships).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
       return {'name': d.primary.relation, 'id': d.meta.id, 'entity_type': 'relationship'};
     });
     sources = sources.concat(s1);
@@ -91,6 +95,11 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         });
         return '<a contenteditable="false" class="wb-item ' + classname + '" '
         + data + ' href="#" tabindex="-1">' + row['name'] + '</a> ';
+      }
+    });
+    this.element.find('#message_content').droppable({
+      drop: function(e, ui) {
+        $(this).html(ui.draggable.text());
       }
     });
   },
@@ -181,9 +190,17 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   },
 
   updateData: function() {
-    var sources = d3.values(wb.store.items.entities).map(function(d) {
+    var sources = d3.values(wb.store.items.entities).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
       return {'name': d.primary.name, 'id': d.meta.id, 'entity_type': d.primary.entity_type};
     });
+    var s1 = d3.values(wb.store.items.relationships).filter(function(d) {
+      return !d.meta.deleted;
+    }).map(function(d) {
+      return {'name': d.primary.relation, 'id': d.meta.id, 'entity_type': 'relationship'};
+    });
+    sources = sources.concat(s1);
     this.element.find('#message_content').setOptions({data: sources});
   },
 
