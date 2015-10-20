@@ -24,10 +24,12 @@ $(function() {
   ishout.on('entity.create', onEntityCreated);
   ishout.on('entity.update', onEntityUpdated);
   ishout.on('entity.delete', onEntityDeleted);
+  ishout.on('entity.restore', onEntityRestored);
 
   ishout.on('relationship.create', onRelationshipCreated);
   ishout.on('relationship.update', onRelationshipUpdated);
   ishout.on('relationship.delete', onRelationshipDeleted);
+  ishout.on('relationship.restore', onRelationshipRestored);
 
   ishout.on('annotation.create', onAnnotationCreated);
   ishout.on('annotation.update', onAnnotationUpdated);
@@ -145,6 +147,19 @@ $(function() {
                       + data.entity.primary.name);
   }
 
+  function onEntityRestored(data) {
+    if (data.user === wb.info.user) return;
+
+    $.publish('entity/restored', data.entity);
+    if (!$.isEmptyObject(data.relationship)) $.publish('relationship/restored', data.relationship);
+    if (!$.isEmptyObject(data.annotation)) $.publish('annotation/restored', data.annotation);
+    wb.utility.notify(wb.info.users[data.user].name
+                      + ' restored  '
+                      + data.entity.primary.entity_type
+                      + ' '
+                      + data.entity.primary.name);
+  }
+
   function onRelationshipCreated(data) {
     if (data.user === wb.info.user) return;
     if (!$.isEmptyObject(data.relationship)) {
@@ -188,6 +203,22 @@ $(function() {
 
     wb.utility.notify(wb.info.users[data.user].name
                       + ' deleted relationship '
+                      + data.relationship.primary.relation
+                      + ' between '
+                      + wb.store.items.entities[data.relationship.primary.source].primary.name
+                      + ' and '
+                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+  }
+
+  function onRelationshipRestored(data) {
+    if (data.user === wb.info.user) return;
+    $.publish('relationship/restored', data.relationship);
+    // if data includes entity, it means that entity has been updated due to the deletion of the relationship
+    if (!$.isEmptyObject(data.entity)) $.publish('entity/updated', data.entity);
+    if (!$.isEmptyObject(data.annotation)) $.publish('annotation/restored', data.annotation);
+
+    wb.utility.notify(wb.info.users[data.user].name
+                      + ' restored relationship '
                       + data.relationship.primary.relation
                       + ' between '
                       + wb.store.items.entities[data.relationship.primary.source].primary.name

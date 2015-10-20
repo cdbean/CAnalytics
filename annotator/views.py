@@ -91,20 +91,12 @@ def del_ann(annotation):
         deleted entity (json)
         deleted relationship (json)
     """
-    ann = {}
-    ent = {}
-    rel = {}
+    annotation.deleted = True
+    annotation.save()
     relationship = annotation.relationship
     entity = annotation.entity
-    if entity:
-        # if no other annotation or relationship refers to this entity, delete it
-        if entity.annotation_set.count() == 0 and entity.relates_as_source.count() == 0 and entity.relates_as_target.count() == 0:
-            entity.update(deleted=True)
-    elif relationship:
-        if relationship.annotation_set.count() == 0:
-            relationship.update(deleted=True)
 
-    return ann, ent, rel
+    return annotation 
 
 
 
@@ -197,11 +189,8 @@ def del_annotation(request, id):
     group = annotation.group
     case = annotation.case
 
-    ann, ent, rel = del_ann(annotation)
+    ann = del_ann(annotation)
     res['annotation'] = ann.serialize()
-    res['entity'] = ent.serialize()
-    res['relationship'] = rel.serialize()
-    ann.delete()
 
     sync_item('delete', 'annotation', res, case, group, request.user)
 

@@ -143,7 +143,7 @@ class Entity(models.Model):
     objects = InheritanceManager()
 
     def __unicode__(self):
-        return self.name
+        return self.entity_type + ' ' + self.name
 
     def findTargets(self):
         res = []

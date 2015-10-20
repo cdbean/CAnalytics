@@ -15,12 +15,15 @@ $.widget('viz.vizviewer', {
       <h4 class="title"></h4> \
       <ul class="attr-list"> \
       </ul> \
+      <ul class="history-list"> \
+      </ul> \
     ';
     var controls = ' \
       <span class="viewer-controls"> \
         <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-trash"></span></button> \
         <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
         <button type="button" title="restore" class="close restore"><span class="glyphicon glyphicon-repeat"></span></button> \
+        <button type="button" title="history" class="close history"><span class="glyphicon glyphicon-time"></span></button> \
       </span> \
     '
     this.element.append(html);
@@ -31,6 +34,10 @@ $.widget('viz.vizviewer', {
     this.element.on('click', '.delete', this._onClickDelete.bind(this));
     this.element.on('click', '.edit', this._onClickEdit.bind(this));
     this.element.on('click', '.restore', this._onClickRestore.bind(this));
+    this.element.on('click', '.history', this._onClickHistory.bind(this));
+    this.element.click(function(e) {
+      e.stopPropagation();
+    })
     return this;
   },
 
@@ -146,7 +153,26 @@ $.widget('viz.vizviewer', {
   clearFields: function() {
     this.element.find('.title').text('');
     this.element.find('.attr-list').empty();
+    this.element.find('.history-list').empty();
     return this;
+  },
+
+  _onClickHistory: function() {
+    this.element.find('.attr-list').empty();
+    var url;
+    if (this.item_type === 'relationship') url = GLOBAL_URL.relationship_history.replace('0', this.item.meta.id);
+    if (this.item_type === 'entity') url = GLOBAL_URL.entity_history.replace('0', this.item.meta.id);
+
+    var el = this.element.find('.history-list');
+    $.get(url, function(res) {
+      res.forEach(function(d) {
+        $('<li class="history-item"><span class="timestamp"></span><span class="operation"></span> by <span class="username"></span></li>')
+          .appendTo(el)
+          .find('.timestamp').text(d.time).end()
+          .find('.operation').text(d.operation).end()
+          .find('.username').text(wb.info.users[d.user].name || 'Unknown')
+      });
+    });
   },
 
   _onClickRestore: function() {

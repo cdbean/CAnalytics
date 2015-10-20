@@ -133,6 +133,7 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(annotation),
+                    public: false
                 });
             });
         } else {
@@ -200,6 +201,7 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(ann),
+                    public: false,
                 });
             }));
         }
@@ -219,26 +221,8 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'annotation',
                     tool: 'document',
                     data: wb.log.logAnnotation(annotation),
+                    public: false
                 });
-
-                if (entity && entity.deleted) {
-                    wb.log.log({
-                        operation: 'deleted',
-                        item: entity.primary.entity_type,
-                        tool: 'document',
-                        data: wb.log.logItem(entity)
-                    });
-                    $.publish('entity/deleted', entity);
-                }
-                if (relationship && relationship.deleted) {
-                    wb.log.log({
-                        operation: 'deleted',
-                        item: 'relationship',
-                        tool: 'document',
-                        data: wb.log.logItem(relationship)
-                    });
-                    $.publish('relationship/deleted', relationship);
-                }
 
                 _this.unregisterAnnotation(annotation);
                 $.publish('annotation/deleted', annotation);

@@ -50,7 +50,7 @@ class Action(models.Model):
         if self.public:
             sync.views.broadcast_activity(data, self.case, self.group, self.user)
 
-        if self.item == 'entity':
+        if self.item in ['person', 'location', 'event', 'organization', 'resource']:
             d = json.loads(self.data)
             try:
                 ent = Entity.objects.get(id=d['id'])
@@ -101,7 +101,20 @@ class DoEntity(models.Model):
 
     def __unicode__(self):
         return (self.time.strftime('%m/%d/%Y-%H:%M:%S') + ' ' + self.user.username + ' ' + self.operation
-               + ' ' + self.entity.name)
+               + ' ' + self.entity.__unicode__())
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user': self.user.id,
+            'operation': self.operation,
+            'tool': self.tool,
+            'data': json.loads(self.data),
+            'public': self.public,
+            'group': self.group.id,
+            'case': self.case.id,
+            'time': self.time.strftime('%m/%d/%Y-%H:%M:%S'),
+        }
 
 
 class DoRelationship(models.Model):
@@ -119,3 +132,15 @@ class DoRelationship(models.Model):
         return (self.time.strftime('%m/%d/%Y-%H:%M:%S') + ' ' + self.user.username + ' ' + self.operation
                + ' ' + self.relationship.__unicode__())
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user': self.user.id,
+            'operation': self.operation,
+            'tool': self.tool,
+            'data': json.loads(self.data),
+            'public': self.public,
+            'group': self.group.id,
+            'case': self.case.id,
+            'time': self.time.strftime('%m/%d/%Y-%H:%M:%S'),
+        }

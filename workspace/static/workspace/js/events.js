@@ -24,6 +24,7 @@
   $.subscribe('annotation/created', onAnnotationsCreated);
   $.subscribe('annotation/updated', onAnnotationsUpdated);
   $.subscribe('annotation/deleted', onAnnotationsDeleted);
+  $.subscribe('annotation/restored', onAnnotationsRestored);
 
   $.subscribe('message/new', onNewMessage);
   $.subscribe('action/new', onNewAction);
@@ -187,6 +188,16 @@
     $('.viz.dataentry').not('.history').each(function() {
       var viz = $(this).data('instance');
       if (viz) viz.deleteAnnotations(anns);
+    });
+  }
+
+  function onAnnotationsRestored() {
+    var anns = [].slice.call(arguments, 1);
+    wb.store.restoreItems(anns, 'annotations');
+    // render annotation--update annotation in dataentry table
+    $('.viz.dataentry').not('.history').each(function() {
+      var viz = $(this).data('instance');
+      if (viz) viz.addAnnotations(anns);
     });
   }
 

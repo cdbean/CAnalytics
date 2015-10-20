@@ -83,7 +83,7 @@ Annotator = (function(_super) {
         this.viewer = new Annotator.Viewer({
             readOnly: this.options.readOnly
         });
-        this.viewer.hide().on("edit", this.onEditAnnotation).on("delete", this.onDeleteAnnotation)
+        this.viewer.hide().on("edit", this.onEditAnnotation).on("delete", this.deleteAnnotation.bind(this))
             // .addField({
             //     load: function(field, annotation) {
             //         if (annotation.text) {
@@ -287,6 +287,7 @@ Annotator = (function(_super) {
             }
         }
         this.publish('annotationDeleted', [annotation]);
+        this.viewer.hide();
         return annotation;
     };
 
