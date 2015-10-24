@@ -128,7 +128,7 @@ $(function() {
       $.publish('relationship/updated', data.relationship);
 
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated ' + wb.utility.toString(entity, 'entity');
+                      + ' updated ' + wb.utility.toString(entity, 'entity'));
   }
 
   function onEntityDeleted(data) {
@@ -138,7 +138,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) $.publish('relationship/deleted', data.relationship);
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/deleted', data.annotation);
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' deleted ' + wb.utiltiy.toString(entity, 'entity');
+                      + ' deleted ' + wb.utiltiy.toString(entity, 'entity'));
   }
 
   function onEntityRestored(data) {
@@ -148,7 +148,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) $.publish('relationship/restored', data.relationship);
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/restored', data.annotation);
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' restored ' + wb.utiltiy.toString(entity, 'entity');
+                      + ' restored ' + wb.utiltiy.toString(entity, 'entity'));
   }
 
   function onRelationshipCreated(data) {
@@ -156,7 +156,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) {
       $.publish('relationship/created', data.relationship);
       wb.utility.notify(wb.info.users[data.user].name
-                      + ' created relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
+                      + ' created relationship ' + wb.utiltiy.toString(data.relationship, 'relationship'));
     }
     if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
@@ -168,7 +168,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) {
       $.publish('relationship/updated', data.relationship);
       wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
+                      + ' updated relationship ' + wb.utiltiy.toString(data.relationship, 'relationship'));
     }
     if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
@@ -183,7 +183,7 @@ $(function() {
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/deleted', data.annotation);
 
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' deleted relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
+                      + ' deleted relationship ' + wb.utiltiy.toString(data.relationship, 'relationship'));
   }
 
   function onRelationshipRestored(data) {
@@ -194,7 +194,7 @@ $(function() {
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/restored', data.annotation);
 
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' restored relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
+                      + ' restored relationship ' + wb.utiltiy.toString(data.relationship, 'relationship'));
   }
 
   function onAnnotationCreated(data) {
@@ -207,13 +207,13 @@ $(function() {
     if (!$.isEmptyObject(entity)) {
       wb.utility.notify(wb.info.users[data.user].name
                         + entity[0].meta.id in wb.store.items.entities ? 'updated' : 'created' 
-                        + wb.utility.toString(entity[0], 'entity');
+                        + wb.utility.toString(entity[0], 'entity'));
       $.publish('entity/created', entity);
     }
     if (!$.isEmptyObject(relationship)) {
       wb.utility.notify(wb.info.users[data.user].name
                         + relationship[0].meta.id in wb.store.items.relationships ? 'updated' : 'created' 
-                        + wb.utility.toString(relationship[0], 'relationship');
+                        + wb.utility.toString(relationship[0], 'relationship'));
       $.publish('relationship/created', relationship);
     }
   }
@@ -228,12 +228,12 @@ $(function() {
     if (!$.isEmptyObject(entity)) {
       $.publish('entity/updated', entity);
       wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated ' + wb.utility.toString(entity[0], 'entity');
+                      + ' updated ' + wb.utility.toString(entity[0], 'entity'));
     }
     if (!$.isEmptyObject(relationship)) {
       $.publish('relationship/updated', relationship);
       wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated relationship ' + wb.utiltiy.toString(relationship[0], 'relationship');
+                      + ' updated relationship ' + wb.utiltiy.toString(relationship[0], 'relationship'));
     }
   }
 

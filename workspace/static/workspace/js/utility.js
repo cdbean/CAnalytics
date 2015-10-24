@@ -146,7 +146,7 @@ wb.utility = {};
                       + ' between '
                       + wb.store.items.entities[data.relationship.primary.source].primary.name
                       + ' and '
-                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+                      + wb.store.items.entities[data.relationship.primary.target].primary.name;
     }
-  }
+  };
 })();
