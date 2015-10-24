@@ -97,7 +97,7 @@ class Dataset(models.Model):
         return attr
 
     def __unicode__(self):
-        return self.name
+        return self.case.name + ': ' + self.name
 
 
 class DataEntry(models.Model):
@@ -120,9 +120,9 @@ class DataEntry(models.Model):
 
 
     def __unicode__(self):
-        return self.name
+        return self.dataset.case.name + ': ' + self.dataset.name + ': '+ self.name
 
-    class meta:
+    class Meta:
         verbose_name_plural = 'Data Entries'
 
 

@@ -338,12 +338,14 @@ def create_relationship(request):
 
 
 def update_relationship(request, id):
-    res = {}
+    res = {'relationship': {}, 'entity': []}
     data = json.loads(request.body)
     case = Case.objects.get(id=data['case'])
     group = Group.objects.get(id=data['group'])
     rel, created, new_ents, updated_ents = get_or_create_relationship(data['data'], case, group, request.user)
     res['relationship'] = rel.serialize()
+    res['entity'] += [e.serialize() for e in new_ents]
+    res['entity'] += [e.serialize() for e in updated_ents]
     sync_item('update', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 

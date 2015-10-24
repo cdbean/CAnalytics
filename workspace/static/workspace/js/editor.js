@@ -248,7 +248,7 @@ $.widget('viz.vizeditor', {
       dataType: 'json',
       type: opt.data.id ? 'PUT' : 'POST',
       success: function(d) {
-        if (d.entity) {
+        if (!$.isEmptyObject(d.entity)) {
           if (opt.data.id) {
             $.publish('entity/updated', d.entity);
             if (item_type === 'entity') {
@@ -276,10 +276,10 @@ $.widget('viz.vizeditor', {
           // including the entity that is updated, and possiblity related entities (newly created) 
           // just log the currently updated entity
         }
-        if (d.relationship) {
+        if (!$.isEmptyObject(d.relationship)) {
           if (opt.data.id) {
             $.publish('relationship/updated', d.relationship);
-            if (item_type === 'relationship')
+            if (item_type === 'relationship') {
               wb.utility.notify('relationship updated!', 'success');
               wb.log.log({
                 operation: 'updated',
@@ -287,9 +287,10 @@ $.widget('viz.vizeditor', {
                 tool: tool,
                 data: wb.log.logItem(item),
               });
+            }
           } else {
             $.publish('relationship/created', d.relationship);
-            if (item_type === 'relationship')
+            if (item_type === 'relationship') {
               wb.utility.notify('relationship created!', 'success');
               wb.log.log({
                 operation: 'created',
@@ -297,6 +298,7 @@ $.widget('viz.vizeditor', {
                 tool: tool,
                 data: wb.log.logItem(d.relationship),
               });
+            }
           }
         }
       },

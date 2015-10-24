@@ -140,13 +140,13 @@ wb.utility = {};
 
   wb.utility.toString = function(item, type) {
     if (type === 'entity') {
-      return item.primary.entity_type + ' ' + data.entity.primary.name;
+      return item.primary.entity_type + ' ' + item.primary.name;
     } else if (type === 'relationship') {
       return item.primary.relation
                       + ' between '
-                      + wb.store.items.entities[data.relationship.primary.source].primary.name
+                      + wb.store.items.entities[item.primary.source].primary.name
                       + ' and '
-                      + wb.store.items.entities[data.relationship.primary.target].primary.name;
+                      + wb.store.items.entities[item.primary.target].primary.name;
     }
   };
 })();
