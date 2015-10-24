@@ -158,7 +158,8 @@ $.widget('viz.vizviewer', {
   },
 
   _onClickHistory: function() {
-    this.element.find('.attr-list').empty();
+    this.element.find('.attr-list').empty().end()
+      .find('.history-list').empty();
     var url;
     if (this.item_type === 'relationship') url = GLOBAL_URL.relationship_history.replace('0', this.item.meta.id);
     if (this.item_type === 'entity') url = GLOBAL_URL.entity_history.replace('0', this.item.meta.id);
@@ -320,5 +321,6 @@ $.widget('viz.vizviewer', {
         }
       });
     }
+    this.hide();
   },
 });

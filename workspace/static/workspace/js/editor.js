@@ -208,6 +208,7 @@ $.widget('viz.vizeditor', {
     var opts = [], optgroups = [];
     for (var key in wb.store.items.entities) {
       var entity = wb.store.items.entities[key];
+      if (entity.meta.deleted) continue;
       if (group) {
         if (entity.primary.entity_type !== group) continue;
       }

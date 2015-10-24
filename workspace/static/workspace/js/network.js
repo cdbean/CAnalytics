@@ -104,9 +104,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         this.chart = this.svg.append('g');
 
-        this.link = this.chart.selectAll(".link");
-        this.node = this.chart.selectAll(".node");
-
         // line displayed when dragging new nodes
         this.drag_line = this.chart.append('svg:path')
             .attr('class', 'dragline hidden')
@@ -129,11 +126,12 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                     targetX = d.target.x - (targetPadding * normX),
                     targetY = d.target.y - (targetPadding * normY);
 //                    return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
-                return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
+                if (d.linknum > 1) return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
+                else return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
             })
         ;
 
-        this.node.attr("transform", function(d) {
+        this.chart.selectAll('.node').attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")";
         });
     },
@@ -429,7 +427,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             _this.restart();
         });
 
-        this.node.on("mousedown", function(d) {
+        this.chart.selectAll('.node').on("mousedown", function(d) {
             // select node
             _this.force.stop();
             _this.mousedown_node = d;
@@ -444,7 +442,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 .attr('d', 'M' + _this.mousedown_node.x + ',' + _this.mousedown_node.y + 'L' + _this.mousedown_node.x + ',' + _this.mousedown_node.y);
         });
 
-        this.node.on("mouseup", function(d) {
+        this.chart.selectAll('.node').on("mouseup", function(d) {
             if(!_this.mousedown_node) return;
 
             // needed by FF
@@ -584,12 +582,12 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var _this = this;
 
         this.zoom.on('zoom', zoomed);
-        this.node.call(this.drag
+        this.chart.selectAll('.node').call(this.drag
             .on("dragstart", dragstarted)
             .on("drag", dragged)
             .on("dragend", dragend)
         );
-        this.node
+        this.chart.selectAll('.node')
             .on('mouseover', this.onMouseOverNode.bind(this))
             .on('mouseout', this.onMouseOutNode.bind(this))
             .on('click', this.onClickNode.bind(this))
@@ -618,7 +616,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     exitAllModes: function() {
         // exit draw mode
         this.svg.on("mousemove", null).on("mouseup", null);
-        this.node.on("mousemove", null).on("mouseup", null).on("mousedown", null);
+        this.chart.selectAll('.node').on("mousemove", null).on("mouseup", null).on("mousedown", null);
         // exit zoom mode
         this.zoom.on('zoom', null);
 //        this.svg.select('g.zoom').remove();
@@ -626,7 +624,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.svg.select('.brush').remove();
         this.svg.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
         // exit drag mode
-        this.node.on('mousedown.drag', null);
+        this.chart.selectAll('.node').on('mousedown.drag', null);
     },
 
     showLinkEditor: function(l) {
@@ -789,7 +787,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           var rel = wb.store.items.relationships[d];
           if (rel.meta.deleted) continue;
           if (rel.meta.id in this.linkMap) {
-            this.links[this.linkMap[rel.meta.id]].temp_exist = true;
+            var k = this.linkMap[rel.meta.id];
+            this.links[k].temp_exist = true;
+            this.links[k].source = this.nodeMap[rel.primary.source];
+            this.links[k].target = this.nodeMap[rel.primary.target];
+            this.links[k].relation = rel.primary.relation;
           } else {
             var source = this.nodeMap[rel.primary.source];
             var target = this.nodeMap[rel.primary.target];
@@ -837,8 +839,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         //any links with duplicate source and target get an incremented 'linknum'
         for (var i=0; i < links_temp.length; i++) {
           if (i != 0 &&
-            links_temp[i].source.id == links_temp[i-1].source.id &&
-            links_temp[i].target.id == links_temp[i-1].target.id) {
+            links_temp[i].source == links_temp[i-1].source &&
+            links_temp[i].target == links_temp[i-1].target) {
               links_temp[i].linknum = links_temp[i-1].linknum + 1;
           }
           else {
@@ -904,14 +906,15 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     restart: function() {
         var _this = this;
 
-        this.link = this.link.data(this.links);
-        var link_g = this.link.enter().append("g").attr("class", "link");
+        var link_d = this.chart.selectAll('.link').data(this.links);
+        var link_g = link_d.enter().append("g").attr("class", "link");
         link_g.append('path')
             .attr('id', function(d) {
               return 'path-' + d.id; 
             })
             .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
             .style('marker-end', function(d) { return 'url(#end-arrow)'; })
+        this.chart.selectAll('.link path')
             .on("mouseover", this.onMouseOverLink.bind(this))
             .on("mouseout", this.onMouseOutLink.bind(this))
             .on('click', this.onClickLink.bind(this))
@@ -934,11 +937,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // this.link.append('svg:title')
         //     .text(function(d) { return d.rel; })
         // ;
-        this.link.exit().remove();
+        link_d.exit().remove();
 
-        this.node = this.node.data(this.nodes, function(d) { return d.id; });
+        var node_d = this.chart.selectAll('.node').data(this.nodes, function(d) { return d.id; });
 
-        var g = this.node.enter().append("svg:g").attr('class', 'node');
+        var g = node_d.enter().append("svg:g").attr('class', 'node');
 
         g.append("svg:circle")
             .attr('r', 12)
@@ -960,7 +963,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             })
             .style("-webkit-user-select", "none"); // disable text selection when dragging mouse
 
-        this.node.exit().remove();
+        node_d.exit().remove();
 
 
         // calculate the link length
@@ -1008,7 +1011,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     onClickNode: function(d) {
       if (d3.event.defaultPrevented) return;
       var highlighted;
-      this.node.each(function(o) {
+      this.chart.selectAll('.node').each(function(o) {
         if (o.id === d.id) {
           // whether the svg has class active
           // jquery hasClass() failed on svg
@@ -1044,7 +1047,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     onClickLink: function(d) {
       var highlighted;
-      this.link.each(function(o) {
+      this.chart.selectAll('.link').each(function(o) {
         if (o.id === d.id) {
           highlighted = /active/.test($(this).attr('class'));
           return false;

@@ -173,3 +173,7 @@ a.wb-entity:hover:after {
   margin-left: 5px;
 }
 
+.ui-autocomplete.ui-menu {
+  /*z-index: 9999;*/
+}
+

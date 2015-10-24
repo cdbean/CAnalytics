@@ -128,10 +128,7 @@ $(function() {
       $.publish('relationship/updated', data.relationship);
 
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated  '
-                      + entity.primary.entity_type
-                      + ' '
-                      + entity.primary.name);
+                      + ' updated ' + wb.utility.toString(entity, 'entity');
   }
 
   function onEntityDeleted(data) {
@@ -141,10 +138,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) $.publish('relationship/deleted', data.relationship);
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/deleted', data.annotation);
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' deleted  '
-                      + data.entity.primary.entity_type
-                      + ' '
-                      + data.entity.primary.name);
+                      + ' deleted ' + wb.utiltiy.toString(entity, 'entity');
   }
 
   function onEntityRestored(data) {
@@ -154,10 +148,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) $.publish('relationship/restored', data.relationship);
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/restored', data.annotation);
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' restored  '
-                      + data.entity.primary.entity_type
-                      + ' '
-                      + data.entity.primary.name);
+                      + ' restored ' + wb.utiltiy.toString(entity, 'entity');
   }
 
   function onRelationshipCreated(data) {
@@ -165,12 +156,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) {
       $.publish('relationship/created', data.relationship);
       wb.utility.notify(wb.info.users[data.user].name
-                      + ' created relationship '
-                      + data.relationship.primary.relation
-                      + ' between '
-                      + wb.store.items.entities[data.relationship.primary.source].primary.name
-                      + ' and '
-                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+                      + ' created relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
     }
     if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
@@ -182,12 +168,7 @@ $(function() {
     if (!$.isEmptyObject(data.relationship)) {
       $.publish('relationship/updated', data.relationship);
       wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated relationship '
-                      + data.relationship.primary.relation
-                      + ' between '
-                      + wb.store.items.entities[data.relationship.primary.source].primary.name
-                      + ' and '
-                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+                      + ' updated relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
     }
     if (!$.isEmptyObject(data.entity)) {
       $.publish('entity/updated', data.entity);
@@ -202,12 +183,7 @@ $(function() {
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/deleted', data.annotation);
 
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' deleted relationship '
-                      + data.relationship.primary.relation
-                      + ' between '
-                      + wb.store.items.entities[data.relationship.primary.source].primary.name
-                      + ' and '
-                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+                      + ' deleted relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
   }
 
   function onRelationshipRestored(data) {
@@ -218,12 +194,7 @@ $(function() {
     if (!$.isEmptyObject(data.annotation)) $.publish('annotation/restored', data.annotation);
 
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' restored relationship '
-                      + data.relationship.primary.relation
-                      + ' between '
-                      + wb.store.items.entities[data.relationship.primary.source].primary.name
-                      + ' and '
-                      + wb.store.items.entities[data.relationship.primary.target].primary.name);
+                      + ' restored relationship ' + wb.utiltiy.toString(data.relationship, 'relationship');
   }
 
   function onAnnotationCreated(data) {
@@ -233,16 +204,18 @@ $(function() {
     var relationship = data.relationship || data.relationships;
 
     $.publish('annotation/created', annotation);
-    if (!$.isEmptyObject(entity))
+    if (!$.isEmptyObject(entity)) {
+      wb.utility.notify(wb.info.users[data.user].name
+                        + entity[0].meta.id in wb.store.items.entities ? 'updated' : 'created' 
+                        + wb.utility.toString(entity[0], 'entity');
       $.publish('entity/created', entity);
-    if (!$.isEmptyObject(relationship))
+    }
+    if (!$.isEmptyObject(relationship)) {
+      wb.utility.notify(wb.info.users[data.user].name
+                        + relationship[0].meta.id in wb.store.items.relationships ? 'updated' : 'created' 
+                        + wb.utility.toString(relationship[0], 'relationship');
       $.publish('relationship/created', relationship);
-
-    var length = annotation.length || 1;
-    var quote = annotation.quote || annotation[0].quote;
-    wb.utility.notify(wb.info.users[data.user].name
-                      + ' created ' + length + ' annotation on '
-                      + quote);
+    }
   }
 
   function onAnnotationUpdated(data) {
@@ -252,17 +225,16 @@ $(function() {
     var relationship = data.relationship || data.relationships;
 
     $.publish('annotation/updated', annotation);
-    if (!$.isEmptyObject(entity))
+    if (!$.isEmptyObject(entity)) {
       $.publish('entity/updated', entity);
-    if (!$.isEmptyObject(relationship))
+      wb.utility.notify(wb.info.users[data.user].name
+                      + ' updated ' + wb.utility.toString(entity[0], 'entity');
+    }
+    if (!$.isEmptyObject(relationship)) {
       $.publish('relationship/updated', relationship);
-
-    var length = annotation.length || 1;
-    var quote = annotation.quote || annotation[0].quote;
-    wb.utility.notify(wb.info.users[data.user].name
-                      + ' updated ' + length + ' annotation on '
-                      + quote
-                    );
+      wb.utility.notify(wb.info.users[data.user].name
+                      + ' updated relationship ' + wb.utiltiy.toString(relationship[0], 'relationship');
+    }
   }
 
   function onAnnotationDeleted(data) {
@@ -280,7 +252,7 @@ $(function() {
     var length = annotation.length || 1;
     var quote = annotation.quote || annotation[0].quote;
     wb.utility.notify(wb.info.users[data.user].name
-                      + ' deleted ' + length + ' annotation on '
+                      + ' deleted annotation on '
                       + quote
                     );
   }

@@ -85,16 +85,14 @@ def update_ann(annotation, data, case, group, user):
 
 
 def del_ann(annotation):
-    """delete an annotation and possibility related entities and relationships
+    """delete an annotation
     return:
-        the deleted annotation (json)
+        the deleted annotation
         deleted entity (json)
         deleted relationship (json)
     """
     annotation.deleted = True
     annotation.save()
-    relationship = annotation.relationship
-    entity = annotation.entity
 
     return annotation 
 

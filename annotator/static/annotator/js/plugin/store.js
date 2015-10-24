@@ -108,23 +108,22 @@ Annotator.Plugin.Store = (function(_super) {
                 _this.updateAnnotation(annotation, ann);
 
                 if (entity.length) {
-                    $.publish('entity/created', entity);
-
                     wb.log.log({
                         operation: entity[0].meta.id in wb.store.items.entities ? 'updated' : 'created',
                         item: entity[0].primary.entity_type,
                         tool: 'document',
                         data: wb.log.logItem(entity[0])
                     });
+                    $.publish('entity/created', entity);
                 }
                 if (relationship.length) {
-                    $.publish("relationship/created", relationship);
                     wb.log.log({
                         operation: relationship[0].meta.id in wb.store.items.relationships ? 'updated' : 'created',
                         item: 'relationship',
                         tool: 'document',
                         data: wb.log.logItem(relationship[0])
                     });
+                    $.publish("relationship/created", relationship);
                 }
 
                 $.publish('annotation/created', annotation);
