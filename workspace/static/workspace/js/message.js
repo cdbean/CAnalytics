@@ -14,8 +14,8 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       <div class="messageArea"> \
         <nav> \
           <ul class="pager"> \
-            <li><a class="prev" href="#">Older</a></li> \
-            <li><a class="next" href="#">Later</a></li> \
+            <li><a class="prev" href="#">Previous</a></li> \
+            <li><a class="next" href="#">Next</a></li> \
           </ul> \
         </nav> \
         <ul class="messages"></ul> \
@@ -32,7 +32,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
 
     this.element.append(message_html);
 
-    this.loadMessages(0);
+    this.loadMessages(0); // show last page
 
     this._initialize();
   },
@@ -131,6 +131,8 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       for (var i = 0, len = data.items.length; i < len; i++) {
         _this.loadMessage(data.items[i]);
       }
+      // message is ordered from latest to oldest
+      // so data.previous refers to later messages 
       if (data.has_previous) 
         $('.pager .prev', this.element).removeClass('hidden')
           .data('page', data.previous_page);

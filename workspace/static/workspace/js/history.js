@@ -18,8 +18,8 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     var html = '\
       <nav> \
         <ul class="pager"> \
-          <li><a class="prev" href="#">Older</a></li> \
-          <li><a class="next" href="#">Later</a></li> \
+          <li><a class="prev" href="#">Previous</a></li> \
+          <li><a class="next" href="#">Next</a></li> \
         </ul> \
       </nav> \
       <ul class="history-list"></ul> \

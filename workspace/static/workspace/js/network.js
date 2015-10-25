@@ -111,7 +111,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     _tick: function() {
-        this.chart.selectAll('.link path').attr('d', function(d) {
+        this.chart.selectAll('path.link').attr('d', function(d) {
                 d.linknum = d.linknum || 1;
                 var deltaX = d.target.x - d.source.x,
                     deltaY = d.target.y - d.source.y,
@@ -180,18 +180,29 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }
       });
 
+
       var list_html = ' \
-                      <ul class="rel-list"> \
-                      </ul> \
+                      <div class="rel-div"> \
+                        <input type="checkbox" id="label-control" checked> Show link labels \
+                        <ul class="rel-list"> \
+                        </ul> \
+                      </div> \
       ';
       $(list_html).appendTo(this.element)
         .on('click', 'input[type=checkbox]', this.onFilterRel.bind(this))
         .on('mouseover', '.rel-item', this.onMouseOverRel.bind(this))
         .on('mouseout', '.rel-item', this.onMouseOutRel.bind(this));
-    },
+      this.element.find('#label-control').click(this.onShowLinkLabel.bind(this));
+  },
+
+  onShowLinkLabel: function() {
+    this.svg.selectAll('.link-text').classed('hidden', function(d) {
+      return !d3.select(this).classed('hidden');
+    });
+  },
 
   onMouseOutRel: function(e) {
-    this.svg.selectAll('.link path').transition().style('stroke', '#ccc');
+    this.svg.selectAll('path.link').transition().style('stroke', '#ccc');
   },
 
   onMouseOverRel: function(e) {
@@ -789,8 +800,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           if (rel.meta.id in this.linkMap) {
             var k = this.linkMap[rel.meta.id];
             this.links[k].temp_exist = true;
-            this.links[k].source = this.nodeMap[rel.primary.source];
-            this.links[k].target = this.nodeMap[rel.primary.target];
             this.links[k].relation = rel.primary.relation;
           } else {
             var source = this.nodeMap[rel.primary.source];
@@ -907,27 +916,28 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var _this = this;
 
         var link_d = this.chart.selectAll('.link').data(this.links);
-        var link_g = link_d.enter().append("g").attr("class", "link");
-        link_g.append('path')
-            .attr('id', function(d) {
-              return 'path-' + d.id; 
-            })
-            .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
-            .style('marker-end', function(d) { return 'url(#end-arrow)'; })
-        this.chart.selectAll('.link path')
-            .on("mouseover", this.onMouseOverLink.bind(this))
-            .on("mouseout", this.onMouseOutLink.bind(this))
-            .on('click', this.onClickLink.bind(this))
+        var link_g = link_d.enter().append("svg:path").attr("class", "link")
+          .attr('id', function(d) {
+            return 'path-' + d.id; 
+          })
+          .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
+          .style('marker-end', function(d) { return 'url(#end-arrow)'; })
+          .on("mouseover", this.onMouseOverLink.bind(this))
+          .on("mouseout", this.onMouseOutLink.bind(this))
+          .on('click', this.onClickLink.bind(this))
         ;
-        var text = link_g.append('text')
+        link_d.exit().remove();
+        var text_d = this.chart.selectAll('.link-text').data(this.links);
+        text_d.enter()
+          .append('svg:text')
           .attr('class', 'link-text')
-          .attr('x', 6)
-          .attr('dy', 15);
-        text.append('textpath')
-          .attr("stroke", "black")
+          .attr('dy', -5)
+          .append('textPath')
+          // .attr("stroke", "black")
           .attr("xlink:href", function(d) {
             return '#path-' + d.id;
           })
+          .attr('startOffset', '50%')
           .text(function(d) {
             return d.relation;
           });
@@ -937,7 +947,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // this.link.append('svg:title')
         //     .text(function(d) { return d.rel; })
         // ;
-        link_d.exit().remove();
+        text_d.exit().remove();
 
         var node_d = this.chart.selectAll('.node').data(this.nodes, function(d) { return d.id; });
 
