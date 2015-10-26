@@ -83,7 +83,7 @@ Annotator = (function(_super) {
         this.viewer = new Annotator.Viewer({
             readOnly: this.options.readOnly
         });
-        this.viewer.hide().on("edit", this.onEditAnnotation).on("delete", this.deleteAnnotation.bind(this))
+        this.viewer.hide().on("edit", this.onEditAnnotation).on("delete", this.onDeleteAnnotation.bind(this))
             // .addField({
             //     load: function(field, annotation) {
             //         if (annotation.text) {
@@ -233,7 +233,9 @@ Annotator = (function(_super) {
                 if (e instanceof Range.RangeError) {
                     this.publish('rangeNormalizeFail', [annotation, r, e]);
                 } else {
-                    throw e;
+                    // throw e;
+                    // if somehow error occurs, ignore this annotation
+                    return;
                 }
             }
         }
@@ -246,22 +248,41 @@ Annotator = (function(_super) {
         if (this.selectedRanges && this.selectedRanges.length > 0) {
         }
 
+        var existing_anns = this.plugins.Store.annotations;
         for (_j = 0, _len1 = normedRanges.length; _j < _len1; _j++) {
             normed = normedRanges[_j];
             annotation.quote.push($.trim(normed.text()));
+            annotation.quote = annotation.quote.join(' / ');
 
             var relativeRoot = $(normed.commonAncestor).parents('tr.odd, tr.even');
             annotation.anchor = annotation.anchor || relativeRoot.data("id");
             // Calculate xpath from each table row
             // annotation.ranges.push(normed.serialize(this.wrapper[0], '.annotator-hl'));
             annotation.ranges.push(normed.serialize(relativeRoot[0], '.annotator-hl'));
+            // when setting up a new annotation, avoid setting up repeated annotations
+            if (!annotation.id) {
+                var existed = false;
+                for (var i = 0; i < existing_anns.length; i++) {
+                    var exist_ann = existing_anns[i];
+                    if (annotation.anchor === exist_ann.anchor
+                        && annotation.quote === exist_ann.quote
+                        && annotation.ranges[0].start === exist_ann.ranges[0].start 
+                        && annotation.ranges[0].end === exist_ann.ranges[0].end
+                        && annotation.ranges[0].startOffset === exist_ann.ranges[0].startOffset 
+                        && annotation.ranges[0].endOffset === exist_ann.ranges[0].endOffset) {
+                      existed = true;
+                      break;
+                    }
+                }
+                if (existed) return;
+            }
+
             var cssClass = 'annotator-hl ';
             if (annotation.entity) {
                 cssClass += 'annotator-hl-' + annotation.entity.entity_type;
             }
             $.merge(annotation.highlights, this.highlightRange(normed, cssClass));
         }
-        annotation.quote = annotation.quote.join(' / ');
         $(annotation.highlights).data('annotation', annotation);
         return annotation;
     };
@@ -601,7 +622,7 @@ Annotator = (function(_super) {
                     $(this).dialog("destroy");
                 }
             }
-        })
+        });
     };
 
     Annotator.prototype.onCreateAllAnnotations = function(annotation) {
@@ -626,12 +647,15 @@ Annotator = (function(_super) {
 
         var new_anns = [];
         while(range.findText(searchTerm, options)) {
-          // TODO: skip text that has been annotated
+          // skip text that has been annotated
           // the flowing code does not work
           // var existed = false;
           // for (var i = 0; i < existing_anns.length; i++) {
           //   var exist_ann = existing_anns[i];
-          //   if (range.startOffset === exist_ann.ranges[0].startOffset 
+          //   if (ann.anchor === exist_ann.anchor
+          //       && range.start === exist_ann.ranges[0].start 
+          //       && range.end === exist_ann.ranges[0].end
+          //       && range.startOffset === exist_ann.ranges[0].startOffset 
           //       && range.endOffset === exist_ann.ranges[0].endOffset) {
           //     existed = true;
           //     break;
@@ -644,13 +668,16 @@ Annotator = (function(_super) {
           $.extend(new_ann.ranges[0], range.nativeRange);
           new_ann.quote = annotation.quote;
           new_ann.entity = annotation.entity;
+          new_ann.anchor = annotation.anchor;
           // this.setupAnnotation(new_ann);
           new_anns.push(new_ann);
 
           range.collapse(false);
         }
-        new_anns.forEach(function(ann) {
-            this.setupAnnotation(ann);
+        // for some range, it will "somehow" error
+        // for these wrong ranges, setupAnnotation will return nothing
+        new_anns = new_anns.filter(function(ann) {
+            return this.setupAnnotation(ann);
         }.bind(this));
 
         this.deleteAnnotation(annotation); // delete the temporary annotation

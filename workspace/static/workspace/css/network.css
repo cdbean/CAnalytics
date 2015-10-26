@@ -5,8 +5,11 @@
 .node.dim text {
   fill-opacity: .2;
 }
-.link.dim {
+.linkg.dim path {
   stroke-opacity: .2;
+}
+.linkg.dim text {
+  fill-opacity: .2;
 }
 circle.selected {
     stroke: #3276b1 !important;

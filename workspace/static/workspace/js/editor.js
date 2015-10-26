@@ -149,7 +149,9 @@ $.widget('viz.vizeditor', {
           closeAfterSelect: true
       });
     } else if (attr === 'relation') {
-        var opts = d3.values(wb.store.items.relationships).map(function(d) {
+        var opts = d3.values(wb.store.items.relationships).filter(function(d) {
+          return !d.meta.deleted;
+        }).map(function(d) {
           return {label: d.primary.relation, value: d.primary.relation};
         });
         $(input).selectize({

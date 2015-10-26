@@ -88,9 +88,32 @@ Annotator.Plugin.Store = (function(_super) {
             }
 
             $.publish('annotation/created', annotations);
+            wb.log.log({
+                operation: 'created',
+                item: 'annotations',
+                tool: 'document',
+                data: wb.log.logAnnotations(annotations),
+                public: false
+            });
 
-            if (entities.length) $.publish("entity/created", entities);
-            if (relationships.length) $.publish("relationship/created", relationships);
+            if (entities.length) {
+                wb.log.log({
+                    operation: entities[0].meta.id in wb.store.items.entities ? 'updated' : 'created',
+                    item: entities[0].primary.entity_type,
+                    tool: 'document',
+                    data: wb.log.logItem(entities[0])
+                });
+                $.publish("entity/created", entities);
+            }
+            if (relationships.length) {
+                wb.log.log({
+                    operation: relationships[0].meta.id in wb.store.items.relationships ? 'updated' : 'created',
+                    item: 'relationship',
+                    tool: 'document',
+                    data: wb.log.logItem(relationships[0])
+                });
+                $.publish("relationship/created", relationships);
+            }
             // Annotator.showNotification(Annotator._t("Added " + annotations.length + " new annotations!"), Annotator.Notification.SUCCESS);
             wb.utility.notify(annotations.length + ' annotations added!', 'success');
         });
@@ -150,18 +173,37 @@ Annotator.Plugin.Store = (function(_super) {
                 relationships = data.relationships
             ;
 
-            $.publish('annotation/updated', anns);
-            anns.forEach(function(ann) {
-                _this.updateAnnotation(annotation, ann);
+            anns.forEach(function(ann, i) {
+                $.publish('annotation/updated', anns);
+                _this.updateAnnotation(annotations[i], ann);
             });
-            if (relationships && relationships.length > 0) {
+            if (!$.isEmptyObject(relationships)) {
                 $.publish('relationship/updated', relationships);
+                wb.log.log({
+                    operation: 'updated',
+                    item: 'relationship',
+                    tool: 'document',
+                    data: wb.log.logItem(relationships[0])
+                });
             }
             if (entities.length){
                 // if entity type does not change; only attributes change
                 $.publish('entity/updated', entities);
+                wb.log.log({
+                    operation: 'updated',
+                    item: entities[0].primary.entity_type,
+                    tool: 'document',
+                    data: wb.log.logItem(entities[0])
+                });
             }
 
+            wb.log.log({
+                operation: 'updated',
+                item: 'annotations',
+                tool: 'document',
+                data: wb.log.logAnnotations(anns),
+                public: false,
+            });
             // Annotator.showNotification(Annotator._t("Updated " + to_update.length + " annotations!"), Annotator.Notification.SUCCESS);
             wb.utility.notify(annotations.length + ' annotations updated!', 'success');
         });
@@ -243,12 +285,17 @@ Annotator.Plugin.Store = (function(_super) {
                     entity = data.entity,
                     relationship = data.relationship;
 
+                wb.log.log({
+                    operation: 'deleted',
+                    item: 'annotations',
+                    tool: 'document',
+                    data: wb.log.logAnnotations(annotations),
+                    public: false
+                });
                 annotations.forEach(function(ann) {
                     _this.unregisterAnnotation(ann);
                 });
                 $.publish('annotation/deleted', annotations);
-                if (entity && entity.deleted) $.publish('entity/deleted', entity);
-                if (relationship && relationship.deleted) $.publish('relationship/deleted', relationship);
                 // Annotator.showNotification(Annotator._t("Deleted " + to_delete.length + " annotations!"), Annotator.Notification.SUCCESS);
                 wb.utility.notify(annotations.length + ' annotations deleted', 'success');
             });

@@ -211,7 +211,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     var value = tar.val();
     var isvisible = tar[0].checked;
     var display = isvisible ? '' : 'none';
-    this.svg.selectAll('.link path').transition().style('stroke', function(d) {
+    this.svg.selectAll('path.link').transition().style('stroke', function(d) {
       var rel = wb.store.items.relationships[d.id];
       if (rel.primary.relation === value) return 'steelblue';
       else return '#ccc';
@@ -915,22 +915,22 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     restart: function() {
         var _this = this;
 
-        var link_d = this.chart.selectAll('.link').data(this.links);
-        var link_g = link_d.enter().append("svg:path").attr("class", "link")
+        var link_d = this.chart.selectAll('.linkg').data(this.links);
+        var link_g = link_d.enter().append("g").attr("class", "linkg")
+          .on("mouseover", this.onMouseOverLink.bind(this))
+          .on("mouseout", this.onMouseOutLink.bind(this))
+          .on('click', this.onClickLink.bind(this));
+        link_g.append('path')
+          .attr('class', 'link')
           .attr('id', function(d) {
             return 'path-' + d.id; 
           })
           .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
           .style('marker-end', function(d) { return 'url(#end-arrow)'; })
-          .on("mouseover", this.onMouseOverLink.bind(this))
-          .on("mouseout", this.onMouseOutLink.bind(this))
-          .on('click', this.onClickLink.bind(this))
         ;
-        link_d.exit().remove();
-        var text_d = this.chart.selectAll('.link-text').data(this.links);
-        text_d.enter()
-          .append('svg:text')
+        link_g.append('svg:text')
           .attr('class', 'link-text')
+          .attr('dx', -20)
           .attr('dy', -5)
           .append('textPath')
           // .attr("stroke", "black")
@@ -947,7 +947,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // this.link.append('svg:title')
         //     .text(function(d) { return d.rel; })
         // ;
-        text_d.exit().remove();
+        link_d.exit().remove();
 
         var node_d = this.chart.selectAll('.node').data(this.nodes, function(d) { return d.id; });
 
@@ -1057,7 +1057,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     onClickLink: function(d) {
       var highlighted;
-      this.chart.selectAll('.link').each(function(o) {
+      this.chart.selectAll('.linkg').each(function(o) {
         if (o.id === d.id) {
           highlighted = /active/.test($(this).attr('class'));
           return false;
@@ -1078,7 +1078,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     highlightLink: function(d) {
       var container = d3.select(this.element[0]);
-      container.selectAll('.link').classed('dim', function(o) {
+      container.selectAll('.linkg').classed('dim', function(o) {
         if (o.id !== d.id) {
           d3.select(this).classed('active', false);
           return true;
@@ -1104,7 +1104,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         'dim': false,
         'active': false
       });
-      container.selectAll('.link').classed({
+      container.selectAll('.linkg').classed({
         'dim': false,
         'active': false
       });

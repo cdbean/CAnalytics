@@ -62,6 +62,10 @@ wb.log.logAnnotation = function(ann) {
   return JSON.stringify(a);
 };
 
+wb.log.logAnnotations = function(anns) {
+  return '[' + anns.map(wb.log.logAnnotation).join(',') + ']';
+};
+
 // dump entity or relationship
 wb.log.logItem = function(item) {
   var geo = null; 

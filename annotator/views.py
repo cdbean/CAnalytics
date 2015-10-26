@@ -163,10 +163,9 @@ def update_annotation(request, id):
     res['entity'] += [e.serialize() for e in ents if e is not None]
 
     for r in del_rels:
-        r_info = r.serialize()
-        r_info['deleted'] = True
-        res['relationship'].append(r_info)
-        r.delete()
+        r.deleted = True
+        r.save()
+        res['relationship'].append(r.serialize())
 
     sync_item('update', 'annotation', res, case, group, request.user)
 
@@ -245,7 +244,6 @@ def post_annotations(request):
 
 def update_annotations(request):
     res = {'annotations': [], 'entities': [], 'relationships': []}
-    log_anns = []
     data = json.loads(request.body)
 
     group = data.get('group', '')
@@ -265,13 +263,11 @@ def update_annotations(request):
         res['annotations'].append(annotation.serialize())
         res['relationships'] += [r.serialize() for r in rels if r is not None]
         res['entities'] += [e.serialize() for e in ents if e is not None]
-        log_anns.append({'id': annotation.id, 'name': annotation.quote})
 
         for r in del_rels:
-            r_info = r.serialize()
-            r_info['deleted'] = True
-            res['relationships'].append(r_info)
-            r.delete()
+            r.deleted = True
+            r.save()
+            res['relationships'].append(r.serialize())
 
     sync_item('update', 'annotation', res, case, group, request.user)
 
@@ -280,7 +276,6 @@ def update_annotations(request):
 
 def del_annotations(request):
     res = {'annotations': [], 'entity': {}, 'relationship': {}}
-    log_anns = []
     data = json.loads(request.body)
     group = data.get('group', '')
     case = data.get('case', '')
@@ -294,15 +289,8 @@ def del_annotations(request):
 
     for ann_data in annotations:
         annotation = Annotation.objects.get(id=ann_data['id'])
-        ann_info, ent_info, rel_info = del_ann(annotation)
-
-        res['annotations'].append(ann_info)
-        log_anns.append({'id': ann_info['id'], 'name': ann_info['quote']})
-
-    # entity and relationship are the same for all annotation
-    # record it for the last annotation
-    res['entity'] = ent_info
-    res['relationship'] = rel_info
+        ann = del_ann(annotation)
+        res['annotations'].append(ann.serialize())
 
     sync_item('delete', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
