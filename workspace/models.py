@@ -69,6 +69,9 @@ class Case(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta: 
+        ordering = ['name']
+
 
 class Attribute(models.Model):
     attr = models.CharField(max_length=255)
@@ -98,6 +101,8 @@ class Dataset(models.Model):
 
     def __unicode__(self):
         return self.case.name + ': ' + self.name
+    class Meta: 
+        ordering = ['name']
 
 
 class DataEntry(models.Model):
@@ -123,6 +128,7 @@ class DataEntry(models.Model):
         return self.dataset.case.name + ': ' + self.dataset.name + ': '+ self.name
 
     class Meta:
+        ordering = ['name']
         verbose_name_plural = 'Data Entries'
 
 
