@@ -14,6 +14,7 @@ from sync.views import sync_item
 import sync.views as sync
 
 # Create your views here.
+@login_required
 def cases_page(request):
     if request.method == 'GET':
         return render(request, 'cases.html')
