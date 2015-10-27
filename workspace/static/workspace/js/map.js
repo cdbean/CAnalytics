@@ -200,6 +200,13 @@ $.widget("viz.vizmap", $.viz.vizbase, {
                 null,
                 true
         );
+        wb.log.log({
+            operation: 'read',
+            item: 'location',
+            tool: 'map',
+            data: wb.log.logItem(entity),
+            public: false
+        });
 
         this.map.addPopup(feature.popup, true);
     },

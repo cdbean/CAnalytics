@@ -25,7 +25,8 @@ $.get(GLOBAL_URL.case_info, {
 
 
 $(function() {
-  $(window).unload(onBeforeUnload);
+  // $(window).unload(onBeforeUnload);
+  window.onbeforeunload = onBeforeUnload;
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
   $('#case-info').click(onCaseInfo);

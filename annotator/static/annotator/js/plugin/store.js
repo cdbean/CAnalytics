@@ -110,7 +110,8 @@ Annotator.Plugin.Store = (function(_super) {
                     operation: relationships[0].meta.id in wb.store.items.relationships ? 'updated' : 'created',
                     item: 'relationship',
                     tool: 'document',
-                    data: wb.log.logItem(relationships[0])
+                    data: wb.log.logItem(relationships[0]),
+                    public: relationship[0].primary.relation === 'involve' ? false : true // involve relationship is implicit, do not show
                 });
                 $.publish("relationship/created", relationships);
             }
@@ -144,7 +145,8 @@ Annotator.Plugin.Store = (function(_super) {
                         operation: relationship[0].meta.id in wb.store.items.relationships ? 'updated' : 'created',
                         item: 'relationship',
                         tool: 'document',
-                        data: wb.log.logItem(relationship[0])
+                        data: wb.log.logItem(relationship[0]),
+                        public: relationship[0].primary.relation === 'involve' ? false : true // involve relationship is implicit, do not show
                     });
                     $.publish("relationship/created", relationship);
                 }

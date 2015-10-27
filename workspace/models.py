@@ -128,7 +128,7 @@ class DataEntry(models.Model):
         return self.dataset.case.name + ': ' + self.dataset.name + ': '+ self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ['dataset', 'name']
         verbose_name_plural = 'Data Entries'
 
 

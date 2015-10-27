@@ -837,19 +837,19 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // make a copy of the links first
         var links_temp = JSON.parse(JSON.stringify(this.links));
         links_temp.sort(function(a, b) {
-          if (a.source > b.source) {return 1;}
-          else if (a.source < b.source) {return -1;}
+          if ((a.source.id || a.source) > (b.source.id || b.source)) {return 1;}
+          else if ((a.source.id || a.source) < (b.source.id || b.source)) {return -1;}
           else {
-              if (a.target > b.target) {return 1;}
-              if (a.target < b.target) {return -1;}
+              if ((a.target.id || a.target) > (b.target.id || b.target)) {return 1;}
+              if ((a.target.id || a.target) < (b.target.id || b.target)) {return -1;}
               else {return 0;}
           }
         });
         //any links with duplicate source and target get an incremented 'linknum'
         for (var i=0; i < links_temp.length; i++) {
           if (i != 0 &&
-            links_temp[i].source == links_temp[i-1].source &&
-            links_temp[i].target == links_temp[i-1].target) {
+            (links_temp[i].source.id || links_temp[i].source) == (links_temp[i-1].source.id || links_temp[i-1].source) &&
+            (links_temp[i].target.id || links_temp[i].target) == (links_temp[i-1].target.id || links_temp[i-1].target)) {
               links_temp[i].linknum = links_temp[i-1].linknum + 1;
           }
           else {
