@@ -83,7 +83,11 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         }.bind(this)
       });
       var str = '';
-      d3.values(wb.store.items.datasets).forEach(function(ds) {
+      d3.values(wb.store.items.datasets).sort(function(a, b) {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      }).forEach(function(ds) {
         str += '<li><a href="#" id="ds-' + ds.id + '"><label><input type="checkbox" checked> ' + ds.name 
         + ' <span class="badge">' + ds.dataentries.length + '</span></label></a>';
       });
@@ -114,12 +118,20 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     updateData: function() {
       var data = [];
 
-      for (var d in wb.store.items.dataentries) {
-        var de = wb.store.items.dataentries[d];
-        if (de) {
-          data.push([de.id, wb.store.items.datasets[de.dataset].name + '-<br>' + de.name , de.content, de.date]);
+      d3.values(wb.store.items.dataentries).sort(function(a, b) {
+        // sort by dataset name first
+        var a_ds = wb.store.items.datasets[a.dataset];
+        var b_ds = wb.store.items.datasets[b.dataset];
+        if (a_ds.name < b_ds.name) return -1;
+        else if (a_ds.name > b_ds.name) return 1;
+        else {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
         }
-      }
+      }).forEach(function(de) {
+        data.push([de.id, wb.store.items.datasets[de.dataset].name + ': <br>' + de.name , de.content, de.date]);
+      });
 
       this.table.data(data);
       d3.select(this.element[0]).select('#table-body').call(this.table);
