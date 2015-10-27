@@ -27,7 +27,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
             var de = wb.store.items.dataentries[d];
             selected_docs.push(de);
             wb.filter.add('document: ' + de.name, {
-              item: 'documents',
+              item: 'document',
               id: de.id,
               tool: 'document table',
               public: false

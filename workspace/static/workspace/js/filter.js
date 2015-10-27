@@ -27,7 +27,7 @@ wb.filter.remove = function(item, data) {
       var i = wb.store.shelf_by.annotations.indexOf(data.id);
       wb.store.shelf_by.annotations.splice(i, 1);
       logdata = wb.log.logAnnotation(wb.store.items.annotations[data.id]);
-    } else if (data.item === 'dataentry') {
+    } else if (data.item === 'document') {
       var i = wb.store.shelf_by.dataentries.indexOf(data.id);
       wb.store.shelf_by.dataentries.splice(i, 1);
       logdata = wb.log.logDoc(wb.store.items.dataentries[data.id]);

@@ -274,7 +274,7 @@ Annotator = (function(_super) {
                       break;
                     }
                 }
-                if (existed) return;
+                if (existed) return annotation;
             }
 
             var cssClass = 'annotator-hl ';
