@@ -86,13 +86,6 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
           item = wb.store.items.entities[row['id']];
           item_type = item.primary.entity_type;
         }
-        wb.log.log({
-          operation: 'referred',
-          item: item_type,
-          tool: 'message',
-          data: wb.log.logItem(item),
-          public: false
-        });
         return '<a contenteditable="false" class="wb-item ' + classname + '" '
         + data + ' href="#" tabindex="-1">' + row['name'] + '</a> ';
       }
@@ -107,6 +100,28 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
   sendMessage: function() {
     this.element.parent().removeClass('highlighted');
     var el = this.element.find('#message_content');
+    // find entities that are referred in the message
+    el.find('a.wb-item').each(function(i, d) {
+      var item, item_type;
+      if ($(d).hasClass('wb-entity')) {
+        var id = $(d).data('entity');
+        item = wb.store.items.entities[id];
+        item_type = item.primary.entity_type;
+      } else if ($(d).hasClass('wb-relationship')) {
+        var id = $(d).data('relationship');
+        item = wb.store.items.relationships[id];
+        item_type = 'relationship';
+      }
+      if (item) {
+        wb.log.log({
+          operation: 'referred',
+          item: item_type,
+          tool: 'message',
+          data: wb.log.logItem(item),
+          public: false
+        });
+      } 
+    });
     var msg = el.html();
     el.html('');
     $.post(GLOBAL_URL.message, {
