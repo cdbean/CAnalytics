@@ -668,7 +668,7 @@ Annotator = (function(_super) {
           $.extend(new_ann.ranges[0], range.nativeRange);
           new_ann.quote = annotation.quote;
           new_ann.entity = annotation.entity;
-          new_ann.anchor = annotation.anchor;
+          
           // this.setupAnnotation(new_ann);
           new_anns.push(new_ann);
 
