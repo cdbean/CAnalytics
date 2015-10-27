@@ -1005,7 +1005,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       this.showNodeInfoTimer = setTimeout(function() {
         var entity = wb.store.items.entities[d.id];
         wb.viewer.data(entity, 'entity').show(pos, 'network');
-      }, 1000);
+      }, 500);
     },
 
     onMouseOutNode: function(d) {

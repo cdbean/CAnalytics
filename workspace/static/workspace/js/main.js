@@ -34,6 +34,7 @@ $(function() {
   $('#case-sync').click(onSyncCase);
 
   $('body').on('mouseover', '.wb-item', onMouseOverEntity);
+  $('body').on('mouseout', '.wb-item', onMouseOutEntity);
   $('body').on('click', '.wb-item', onClickEntity);
   $('body').on('click', onClickOutside);
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
@@ -94,18 +95,29 @@ $(function() {
   }
 
   function onMouseOverEntity(e) {
-    var ent = $(e.target).data('entity');
-    if (ent) {
-      var entity = wb.store.items.entities[ent.id || ent]; // ent could be an object or an id only
-      wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'), 'name tag');
-    } else {
-      var rel = $(e.target).data('relationship');
-      if (rel) {
-        var relationship = wb.store.items.relationships[rel.id || rel];
-        wb.viewer.data(relationship, 'relationship').show(wb.utility.mousePosition(e, 'body'), 'name tag');
+    window.showViewerTimer = setTimeout(function() {
+      var ent = $(e.target).data('entity');
+      if (ent) {
+        var entity = wb.store.items.entities[ent.id || ent]; // ent could be an object or an id only
+        wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'), 'name tag');
+      } else {
+        var rel = $(e.target).data('relationship');
+        if (rel) {
+          var relationship = wb.store.items.relationships[rel.id || rel];
+          wb.viewer.data(relationship, 'relationship').show(wb.utility.mousePosition(e, 'body'), 'name tag');
+        }
       }
-    }
+    }, 500);
     e.stopPropagation();
+  }
+
+  function onMouseOutEntity(e) {
+    clearTimeout(window.showViewerTimer);
+    setTimeout(function() {
+      if (!$('.viewer:hover').length) {
+        wb.viewer.hide();
+      }
+    }, 300);
   }
 
   function onClickEntity(e) {
