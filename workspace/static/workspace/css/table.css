@@ -42,18 +42,21 @@ ul.sidebar-nav {
 }
 ul.sidebar-nav li {
     text-indent: 5px;
-    line-height: 30px;
+    line-height: 20px;
 }
 .sidebar-nav li a {
     display: block;
     text-decoration: none;
     color: #999999;
+    font-size: .8em;
 }.sidebar-nav li a:hover {
     text-decoration: none;
     color: #fff;
     background: #7F9FE2;
 }
-
+.sidebar-nav li a .badge {
+    font-size: .8em;
+}
 .sidebar-nav li a:active,
 .sidebar-nav li a:focus {
     text-decoration: none;
