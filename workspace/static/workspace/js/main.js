@@ -30,6 +30,7 @@ $(function() {
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
   $('#case-info').click(onCaseInfo);
   $('.viz-opts').click(onVizSelect);
+  $('#case-sync').click(onSyncCase);
 
   $('body').on('mouseover', '.wb-item', onMouseOverEntity);
   $('body').on('click', '.wb-item', onClickEntity);
@@ -49,6 +50,36 @@ $(function() {
   }
 
   function onBeforeUnload() {
+    wb.log.log({
+      operation: 'logout',
+      item: '',
+      tool: '',
+      public: false
+    });
+    // store tool windows size and position in cookie, for later restore
+    var tools = [];
+    $('.viz').each(function(v) {
+      var width = $(v).dialog('option', 'width');
+      var height = $(v).dialog('option', 'height');
+      var position_at = $(v).dialog('option', 'position');
+      var tool = $(v).data('instance').options.tool;
+      tools.push({
+        width: width,
+        height: height,
+        position_at: position_at,
+        tool: tool
+      });
+    });
+    $.cookie('tools', tools);
+  }
+
+  function onSyncCase() {
+    $('#progressbar').show().progressbar({ value: false });
+    // load data
+    wb.store.reloadItems(GLOBAL_URL.data, {
+      case: CASE,
+      group: GROUP
+    });
   }
 
   function onRemoveFilter(e) {

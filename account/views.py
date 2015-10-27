@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
+from django.contrib.auth import views
 from django.http import HttpResponse, HttpResponseBadRequest
 
 import json
@@ -56,6 +57,16 @@ def register(request):
 def logout(request):
     auth_logout(request)
     return redirect('account:login')
+
+
+def reset_password(request):
+    template_response = views.password_reset(request, post_reset_redirect='account:reset_password_done')
+    return template_response
+
+def reset_password_done(request):
+    template_response = views.password_reset_done(request)
+    return template_response
+
 
 def users(request):
     res = []

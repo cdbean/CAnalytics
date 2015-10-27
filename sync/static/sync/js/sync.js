@@ -40,40 +40,43 @@ $(function() {
   ishout.on('user.tool', onUserTool);
 
 
+  // show where collaborators are working on
   function onUserTool(d) {
-    var user = wb.info.users[d.user];
-    var tool = d.tool;
-    if (user && tool) {
-      $('.user-monitor').empty();
-      $('.user-icon').remove();
-      user_tool[user.id] = tool;
-      for (u in user_tool) {
-        if (wb.info.user == u) continue; // skip the current user
-        var t = user_tool[u];
-        u = wb.info.users[u];
-
-        // show indicator in page header
-        if (t.indexOf('table') > -1) {
-          var el = $('#table-dropdown, #' + t.replace(' ', '_') + '-btn');
-        } else if (t === 'document') {
-          var el = $('#dataentry-btn');
-        } 
-        else {
-          var el = $('#' + t + '-btn');
-        }
-        if (el) {
-          $('<span class="user-thumb">.</span>').appendTo(el.parent().find('.user-monitor'))
-            .css('color', '#ff7f0e');
-        }
-        // show indicator in view title bar
-        $('.viz').each(function(i, v) {
-          if ($(v).data('instance').options.tool === t) {
-            $('<span class="badge user-icon"></span>').appendTo($(v).parent().find('.ui-dialog-title'))
-              .text(u.name[0])
-              .css('color', u.color);
-          }
-        })
+    if (d) {
+      var user = wb.info.users[d.user];
+      var tool = d.tool;
+      if (user && tool) {
+        user_tool[user.id] = tool;
       }
+    }
+    $('.user-monitor').empty();
+    $('.user-icon').remove();
+    for (u in user_tool) {
+      if (wb.info.user == u) continue; // skip the current user
+      var t = user_tool[u];
+      u = wb.info.users[u];
+
+      // show indicator in page header
+      if (t.indexOf('table') > -1) {
+        var el = $('#table-dropdown, #' + t.replace(' ', '_') + '-btn');
+      } else if (t === 'document') {
+        var el = $('#dataentry-btn');
+      } 
+      else {
+        var el = $('#' + t + '-btn');
+      }
+      if (el) {
+        $('<span class="user-thumb">.</span>').appendTo(el.parent().find('.user-monitor'))
+          .css('color', '#ff7f0e');
+      }
+      // show indicator in view title bar
+      $('.viz').each(function(i, v) {
+        if ($(v).data('instance').options.tool === t) {
+          $('<span class="badge user-icon"></span>').appendTo($(v).parent().find('.ui-dialog-title'))
+            .text(u.name[0])
+            .css('color', u.color);
+        }
+      });
     }
   }
 
@@ -100,9 +103,14 @@ $(function() {
     $.publish('user/online', online_users);
 
     // remove user thumb in tool if the user is no longer online
+    var toupdate = false;
     for (u in user_tool) {
-      if (online_users.indexOf(u) < 0) delete user_tool[u];
+      if (online_users.indexOf(u) < 0) {
+        delete user_tool[u];
+        toupdate = true;
+      }
     }
+    if (toupdate) onUserTool(); // update collaborator workspace
   }
 
   function onNewMessage(data) {

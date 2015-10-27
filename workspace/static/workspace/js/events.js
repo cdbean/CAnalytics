@@ -81,6 +81,64 @@
 
   function onDataLoaded() {
     $('#progressbar').hide();
+    var tools = $.cookie('tools');
+    if (!$.isEmptyObject(tools)) {
+      restoreViz(tools);
+    }
+  }
+
+  function restoreViz(tools) {
+    tools.forEach(function(t) {
+      if (t === 'dataentry') {
+        $('<div>').vizdataentrytable({
+          title: 'Documents',
+          tool: 'document'
+        });
+      } else if (t === 'timeline') {
+        $('<div>').viztimeline({
+          title: 'Timeline',
+          tool: 'timeline'
+        });
+      } else if (t === 'map') {
+        $('<div>').vizmap({
+          title: 'Map',
+          tool: 'map'
+        });
+      } else if (t === 'network') {
+        $('<div>').viznetwork({
+          title: 'Network',
+          tool: 'network'
+        });
+      } else if (t === 'notepad') {
+        $('<div>').viznotepad({
+          title: 'Notepad',
+          tool: 'notepad',
+          url: GLOBAL_URL.notepad,
+        });
+      } else if (t === 'message') {
+        $('<div>').vizmessage({
+          title: 'Message',
+          tool: 'message'
+        });
+      } else if (t === 'history') {
+        $('<div>').vizhistory({
+          title: 'History',
+          tool: 'history',
+          url: GLOBAL_URL.history
+        });
+      } else if (t === 'annotation table') {
+        $('<div>').vizannotationtable({
+          title: 'Annotations',
+          tool: 'annotation table',
+        });
+      } else {
+        $('<div>').vizentitytable({
+            title: t.split(' ')[0],
+            entity: t.split(' ')[0],
+            tool: t
+        });
+      }
+    });
   }
 
   function onDataUpdated() {
