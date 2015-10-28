@@ -139,7 +139,7 @@ def rel_log_export_csv(modeladmin, request, queryset):
 			    smart_str(obj.tool),
 			    smart_str(obj.data),
 			])
-		except:
+		except Exception as e:
 			pass
 
     return response

@@ -3,8 +3,6 @@ from django.contrib import admin
 from sync import models
 
 
-# Register your models here.
-
 # ... export functions will go here ...
 def export_csv(modeladmin, request, queryset):
     import csv
@@ -26,7 +24,7 @@ def export_csv(modeladmin, request, queryset):
         smart_str(u"Content"),
     ])
     for obj in queryset:
-		try:
+        try:
 			writer.writerow([
 			    smart_str(obj.id),
 			    smart_str(obj.case.id),
@@ -39,7 +37,7 @@ def export_csv(modeladmin, request, queryset):
 			    smart_str(obj.sender.username),
 			    smart_str(obj.content),
 			])
-		except:
+        except Exception as e:
 			pass
 
     return response
