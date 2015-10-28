@@ -23,3 +23,6 @@ class Message(models.Model):
             'content': self.content,
             'sent_at': self.sent_at.strftime('%m/%d/%Y-%H:%M:%S')
         }
+
+    def __unicode__(self):
+        return self.sent_at.strftime('%m/%d/%Y-%H:%M:%S') + ' ' + self.sender.username + ' sent a message'

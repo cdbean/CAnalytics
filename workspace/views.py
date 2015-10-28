@@ -94,6 +94,7 @@ def cases(request):
         return redirect('ws:case_page', case=case.id, group=group.id)
 
 
+@login_required
 def join_case(request):
     if request.method == 'POST':
         try:
