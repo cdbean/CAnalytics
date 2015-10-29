@@ -103,6 +103,17 @@ Annotator.Plugin.Store = (function(_super) {
                     tool: 'document',
                     data: wb.log.logItem(entities[0])
                 });
+                // send log if other entities are 'implicitly' created
+                for (var i = 1; i < entities.length; i++) {
+                    if (! (entities[i].meta.id in wb.store.items.entities)) {
+                        wb.log.log({
+                            operation: 'created',
+                            item: entities[i].primary.entity_type,
+                            tool: 'document',
+                            data: wb.log.logItem(entities[i])
+                        });
+                    }
+                }
                 $.publish("entity/created", entities);
             }
             if (relationships.length) {
@@ -111,7 +122,7 @@ Annotator.Plugin.Store = (function(_super) {
                     item: 'relationship',
                     tool: 'document',
                     data: wb.log.logItem(relationships[0]),
-                    public: relationship[0].primary.relation === 'involve' ? false : true // involve relationship is implicit, do not show
+                    public: relationships[0].primary.relation === 'involve' ? false : true // involve relationship is implicit, do not show
                 });
                 $.publish("relationship/created", relationships);
             }
@@ -138,6 +149,17 @@ Annotator.Plugin.Store = (function(_super) {
                         tool: 'document',
                         data: wb.log.logItem(entity[0])
                     });
+                    // send log if other entities are 'implicitly' created
+                    for (var i = 1; i < entity.length; i++) {
+                        if (! (entity[i].meta.id in wb.store.items.entities)) {
+                            wb.log.log({
+                                operation: 'created',
+                                item: entity[i].primary.entity_type,
+                                tool: 'document',
+                                data: wb.log.logItem(entity[i])
+                            });
+                        }
+                    }
                     $.publish('entity/created', entity);
                 }
                 if (relationship.length) {
@@ -197,6 +219,17 @@ Annotator.Plugin.Store = (function(_super) {
                     tool: 'document',
                     data: wb.log.logItem(entities[0])
                 });
+                // send log if other entities are 'implicitly' created
+                for (var i = 1; i < entities.length; i++) {
+                    if (! (entities[i].meta.id in wb.store.items.entities)) {
+                        wb.log.log({
+                            operation: 'created',
+                            item: entities[i].primary.entity_type,
+                            tool: 'document',
+                            data: wb.log.logItem(entities[i])
+                        });
+                    }
+                }
             }
 
             wb.log.log({
@@ -236,6 +269,17 @@ Annotator.Plugin.Store = (function(_super) {
                         tool: 'document',
                         data: wb.log.logItem(entity[0])
                     });
+                    // send log if other entities are 'implicitly' created
+                    for (var i = 1; i < entity.length; i++) {
+                        if (! (entity[i].meta.id in wb.store.items.entities)) {
+                            wb.log.log({
+                                operation: 'created',
+                                item: entity[i].primary.entity_type,
+                                tool: 'document',
+                                data: wb.log.logItem(entity[i])
+                            });
+                        }
+                    }
                 }
                 _this.updateAnnotation(annotation, ann);
                 $.publish('annotation/updated', ann);
