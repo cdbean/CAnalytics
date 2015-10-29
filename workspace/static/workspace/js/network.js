@@ -887,7 +887,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       } 
       else d3.select(this.element[0]).selectAll('.placeholder').remove(); 
 
-      this.svg.selectAll('.link').attr('display', function(d) {
+      this.svg.selectAll('.linkg').attr('display', function(d) {
         if (wb.store.shelf.relationships.indexOf(d.id) > -1) {
           nodes.push(d.source.id);
           nodes.push(d.target.id);
