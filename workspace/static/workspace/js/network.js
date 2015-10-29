@@ -263,7 +263,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
               return this.style.display;
           }
       });
-      this.svg.selectAll('.link').transition().style('display', function(o) {
+      this.svg.selectAll('.linkg').transition().style('display', function(o) {
           var source_ent = wb.store.items.entities[o.source.id];
           var target_ent = wb.store.items.entities[o.target.id];
           if ((source_ent.primary.entity_type === value) || (target_ent.primary.entity_type === value)) {
