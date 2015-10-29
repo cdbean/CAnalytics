@@ -80,20 +80,20 @@
     // so window info can be broadcast 
     var tools = JSON.parse($.cookie('tools'));
     if (!$.isEmptyObject(tools)) {
-      var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
-        $(content).dialog({
-          title: 'Reopen windows?',
-          width: 'auto',
-          buttons: {
-            'No': function() {
-              $(this).dialog("destroy");
-            },
-            'Yes': function() {
-              $(this).dialog("destroy");
-              restoreViz(tools);
-            }
-          }
-        });
+      // var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
+      //   $(content).dialog({
+      //     title: 'Reopen windows?',
+      //     width: 'auto',
+      //     buttons: {
+      //       'No': function() {
+      //         $(this).dialog("destroy");
+      //       },
+      //       'Yes': function() {
+      //         $(this).dialog("destroy");
+      //         restoreViz(tools);
+      //       }
+      //     }
+      //   });
     }
 
   }
