@@ -177,19 +177,19 @@ Annotator.Plugin.Entity = (function(_super) {
             $(field).find('.entity_name').val(name);
         } else {
             name = annotation.quote;
-            var item = null;
-            opts.opts.forEach(function(d) {
-                if (d.label === name) {
-                    item = d;
-                    return false;
-                }
-            });
-            if (item) 
-                $(field).find('.entity_name').data('ui-autocomplete')._trigger('select', 'autocompleteselect', {item:item});
-            else
+            // var item = null;
+            // opts.opts.forEach(function(d) {
+            //     if (d.label === name) {
+            //         item = d;
+            //         return false;
+            //     }
+            // });
+            // if (item) 
+            //     $(field).find('.entity_name').data('ui-autocomplete')._trigger('select', 'autocompleteselect', {item:item});
+            // else
                 $(field).find('.entity_name').val(name);
 
-            // $(field).find('.entity_name').autocomplete('search', name);
+            $(field).find('.entity_name').autocomplete('search', name);
         }
     };
 
