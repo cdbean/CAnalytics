@@ -69,6 +69,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         <div class="ui-layout-west"> \
           <ul id="ds-list" class="sidebar-nav"> \
             <li class="sidebar-brand"> Datasets </li> \
+            <li><a href="#" id="ds-0"><label><input type="checkbox" checked> Select All</label></a> </li> \
           </ul> \
           <ul id="ann-list" class="sidebar-nav"> \
           </ul> \
@@ -92,7 +93,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         + ' <span class="badge">' + ds.dataentries.length + '</span></label></a>';
       });
       el.find('#ds-list').append(str);
-      $('#ds-list input:checkbox', el).change(this._onDatasetChecked);
+      $('#ds-list input:checkbox', el).change(this._onDatasetChecked.bind(this));
       // el.find('.ui-layout-center').resize(this.resize.bind(this));
       el.find('#ann-list').on('click', 'a', function(e) {
         var item = $(e.target).data('annotation');
@@ -100,11 +101,16 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       }.bind(this))
     },
 
-    _onDatasetChecked: function() {
+    _onDatasetChecked: function(e) {
+      var id = $(e.target).parent().parent().attr('id').split('-')[1];
+      var ds_cb = this.element.find('ul#ds-list input:checkbox');
+      if (id == 0) { // 'all' is clicked
+        ds_cb.prop('checked', $(e.target).prop('checked'));
+      }
       var ds = [];
-      $('ul#ds-list input:checkbox:checked').each(function() {
-        var id = $(this).parent().parent().attr('id').split('-')[1];
-        ds.push(parseInt(id));
+      ds_cb.filter(':checked').each(function() {
+        var id = + $(this).parent().parent().attr('id').split('-')[1];
+        if (id) ds.push(id);
       });
       wb.store.shelf_by.datasets = ds;
       $.publish('data/filter');

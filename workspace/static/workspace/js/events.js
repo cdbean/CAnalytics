@@ -150,7 +150,8 @@
           my: v.position_my,
           of: window
         }
-      })
+      });
+      $(viz).data('instance').resize();
     });
   }
 

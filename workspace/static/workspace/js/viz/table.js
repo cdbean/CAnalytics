@@ -19,7 +19,7 @@ wb.viz.table = function() {
                 table_str += '</tr></thead></table>';
                 var $table = $(table_str).appendTo(this);
 
-                table = $table.DataTable({
+                table = $table.dataTable({
                     'autoWidth': false, // auto resize table when window resizes
                     "bJQueryUI": true,
                     "bDestroy": true,
@@ -27,8 +27,11 @@ wb.viz.table = function() {
                     'bPaginate': false,
                     "sRowSelect": "multi", // for multi select with ctrl and shift
                     "sDom": "Rlfrtip", // enable column resizing
+                    "bStateSave": true, // save table state for restoration
                 });
-                if (title === 'dataentry' || title === 'annotation_table') $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
+
+                if (title === 'dataentry'); // do nothing
+                else if (title === 'annotation_table') $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
                 else $(table).on('click', 'tr.even>td:nth-child(2), tr.odd>td:nth-child(2)', onFilter);
                 $(table).on('click', '.control', onControl.bind(this));
             }
