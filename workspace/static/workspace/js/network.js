@@ -111,7 +111,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     },
 
     _tick: function() {
-        this.chart.selectAll('path.link').attr('d', function(d) {
+        this.chart.selectAll('.linkg').select('path').attr('d', function(d) {
                 d.linknum = d.linknum || 1;
                 var deltaX = d.target.x - d.source.x,
                     deltaY = d.target.y - d.source.y,
@@ -606,6 +606,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             .on('mouseout', this.onMouseOutNode.bind(this))
             .on('click', this.onClickNode.bind(this))
         ;
+        this.chart.selectAll('.linkg')
+          .on('mouseover', this.onMouseOverLink.bind(this))
+          .on('mouseout', this.onMouseOutLink.bind(this))
+          .on('click', this.onClickLink.bind(this));
 
         function dragstarted(d) {
             d3.event.sourceEvent.stopPropagation();
@@ -631,7 +635,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     exitAllModes: function() {
         // exit draw mode
         this.svg.on("mousemove", null).on("mouseup", null);
-        this.chart.selectAll('.node').on("mousemove", null).on("mouseup", null).on("mousedown", null);
+        this.chart.selectAll('.node')
+          .on("mousemove", null)
+          .on("mouseup", null)
+          .on("mousedown", null)
+          .on('mouseover', null)
+          .on('mouseout', null)
+          .on('click', null)
+        ;
+        this.chart.selectAll('.linkg')
+          .on('mouseover', null)
+          .on('mouseout', null)
         // exit zoom mode
         this.zoom.on('zoom', null);
 //        this.svg.select('g.zoom').remove();
@@ -928,10 +942,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var _this = this;
 
         var link_d = this.chart.selectAll('.linkg').data(this.links);
-        var link_g = link_d.enter().append("g").attr("class", "linkg")
-          .on("mouseover", this.onMouseOverLink.bind(this))
-          .on("mouseout", this.onMouseOutLink.bind(this))
-          .on('click', this.onClickLink.bind(this));
+        var link_g = link_d.enter().append("g").attr("class", "linkg");
         link_g.append('path')
           .attr('class', 'link')
           .attr('id', function(d) {

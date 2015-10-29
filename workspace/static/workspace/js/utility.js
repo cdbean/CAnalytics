@@ -119,18 +119,21 @@ wb.utility = {};
     if (attr === 'person' || attr === 'organization') {
       value = value || [];
       value = value.map(function(d) {
-        return wb.store.items.entities[d].primary.name;
+        var ent = wb.store.items.entities[d];
+        if (ent.meta.deleted) return '';
+        return ent.primary.name;
       });
       value = value.join(', ');
     } else if (attr === 'location') {
       if (value) {
         var l = wb.store.items.entities[value];
-        value = l.primary.name || l.primary.address;
+        if (l.meta.deleted) value = '';
+        else value = l.primary.name || l.primary.address;
       }
     } else if (attr === 'source' || attr === 'target') {
       if (value) {
         var e = wb.store.items.entities[value];
-        value = e.primary.name;
+        value = e.meta.deleted ? '' : e.primary.name;
       }
     } else if (attr === 'created_by' || attr === 'last_edited_by') {
       if (value) value = wb.info.users[value].name;

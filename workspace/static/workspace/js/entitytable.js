@@ -5,6 +5,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         this.options.extend.restore  = this.resize.bind(this);
         this.options.extend.help = this.help;
         this.element.addClass('entity');
+        this.element.addClass(this.options.entity);
         this._super('_create');
 
         // two empty title columns: for one collapse, the other for delete

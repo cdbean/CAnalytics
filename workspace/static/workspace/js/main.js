@@ -213,54 +213,81 @@ $(function() {
     var viz_form = viz_opt[1];
     var viz;
     if (viz_form === 'table') {
-        viz = $('<div>').vizentitytable({
-            title: viz_name,
-            entity: viz_name,
-            tool: viz_name + ' table'
-        });
+        var sel = $('.viz.entity.' + viz_name);
+        if (sel.length) sel.dialog('open');
+        else
+          viz = $('<div>').vizentitytable({
+              title: viz_name,
+              entity: viz_name,
+              tool: viz_name + ' table'
+          });
     } else if (viz_name === 'dataentry') {
-        viz = $('<div>').vizdataentrytable({
-            title: 'Documents',
-            tool: 'document'
-        });
+        var sel = $('.viz.dataentry');
+        if (sel.length) sel.dialog('open');
+        else
+          viz = $('<div>').vizdataentrytable({
+              title: 'Documents',
+              tool: 'document'
+          });
     } else if (viz_name === 'timeline') {
-        viz = $('<div>').viztimeline({
-            title: 'Timeline',
-            tool: 'timeline'
-        });
+        var sel = $('.viz.timeline');
+        if (sel.length) sel.dialog('open');
+        else
+          viz = $('<div>').viztimeline({
+              title: 'Timeline',
+              tool: 'timeline'
+          });
     } else if (viz_name === 'map') {
-        viz = $('<div>').vizmap({
-            title: 'Map',
-            tool: 'map'
-        });
+        var sel = $('.viz.map');
+        if (sel.length) sel.dialog('open');
+        else
+          viz = $('<div>').vizmap({
+              title: 'Map',
+              tool: 'map'
+          });
     } else if (viz_name === 'network') {
-        viz = $('<div>').viznetwork({
-            title: 'Network',
-            tool: 'network'
-        });
+        var sel = $('.viz.network');
+        if (sel.length) sel.dialog('open');
+        else
+          viz = $('<div>').viznetwork({
+              title: 'Network',
+              tool: 'network'
+          });
     } else if (viz_name === 'notepad') {
-        viz = $('<div>').viznotepad({
-            title: 'Notepad',
-            tool: 'notepad',
-            url: GLOBAL_URL.notepad,
-        });
+        var sel = $('.viz.notepad');
+        if (sel.length) sel.dialog('open');
+        else
+          viz = $('<div>').viznotepad({
+              title: 'Notepad',
+              tool: 'notepad',
+              url: GLOBAL_URL.notepad,
+          });
     } else if (viz_name === 'message') {
-      viz = $('<div>').vizmessage({
-        title: 'Message',
-        tool: 'message'
-      });
+      var sel = $('.viz.message');
+      if (sel.length) sel.dialog('open');
+      else
+        viz = $('<div>').vizmessage({
+          title: 'Message',
+          tool: 'message'
+        });
       $(this).find('.unread').text('');
     } else if (viz_name === 'history') {
-      viz = $('<div>').vizhistory({
-        title: 'History',
-        tool: 'history',
-        url: GLOBAL_URL.history
-      });
+      var sel = $('.viz.history');
+      if (sel.length) sel.dialog('open');
+      else 
+        viz = $('<div>').vizhistory({
+          title: 'History',
+          tool: 'history',
+          url: GLOBAL_URL.history
+        });
     } else if (viz_name === 'annotation') {
-      viz = $('<div>').vizannotationtable({
-        title: 'Annotations',
-        tool: 'annotation table',
-      });
+      var sel = $('.viz.annotation');
+      if (sel.length) sel.dialog('open');
+      else
+        viz = $('<div>').vizannotationtable({
+          title: 'Annotations',
+          tool: 'annotation table',
+        });
     }
   }
 

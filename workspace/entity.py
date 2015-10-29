@@ -235,14 +235,14 @@ def set_attr_location(entity, value, user, case, group):
             new_ents.append(location)
 
         if entity.location and entity.location != location:
-            del_rel = Relationship.objects.get(
+            del_rel = Relationship.objects.filter(
                 source=entity,
                 target=entity.location,
                 relation='involve',
                 case=case,
                 group=group
             )
-            del_rels.append(del_rel)
+            del_rels += del_rel
         else:
             entity.location = location
             rel = Relationship.objects.create(
@@ -257,14 +257,14 @@ def set_attr_location(entity, value, user, case, group):
             new_rels.append(rel)
     else:
         if entity.location:
-            del_rel = Relationship.objects.get(
+            del_rel = Relationship.objects.filter(
                 source=entity,
                 target=entity.location,
                 relation='involve',
                 case=case,
                 group=group
             )
-            del_rels.append(del_rel)
+            del_rels += del_rel
             entity.location = None
 
     return new_ents, new_rels, del_rels, updated_ents
@@ -297,7 +297,7 @@ def set_attr_people(entity, value, user, case, group):
                     entity.person.add(p)
                     updated_ents.append(p)
                 else:
-                    p = entity.person.create(name=p, case=case, group=group)
+                    p = entity.person.create(name=p, created_by=user, last_edited_by=user, case=case, group=group)
                     new_ents.append(p)
                 new_rel_people.append(p)
                 rel, created = Relationship.objects.get_or_create(
@@ -316,14 +316,14 @@ def set_attr_people(entity, value, user, case, group):
     for p in old_people:
         if p not in new_rel_people:
             entity.person.remove(p)
-            del_rel = Relationship.objects.get(
+            del_rel = Relationship.objects.filter(
                 source=entity,
                 target=p,
                 relation='involve',
                 case=case,
                 group=group
             )
-            del_rels.append(del_rel)
+            del_rels += del_rel
 
     return new_ents, new_rels, del_rels, updated_ents
 
@@ -355,7 +355,7 @@ def set_attr_organization(entity, value, user, case, group):
                     entity.organization.add(p)
                     updated_ents.append(p)
                 else:
-                    p = entity.organization.create(name=p, case=case, group=group)
+                    p = entity.organization.create(name=p, created_by=user, last_edited_by=user, case=case, group=group)
                     new_ents.append(p)
                 new_rel_org.append(p)
                 rel, created = Relationship.objects.get_or_create(

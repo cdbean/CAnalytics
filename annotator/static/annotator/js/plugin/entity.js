@@ -310,7 +310,7 @@ Annotator.Plugin.Entity = (function(_super) {
               entity = wb.store.items.relationships[annotation.entity.id];
             else
               entity = wb.store.items.entities[annotation.entity.id];
-            if (!entity) {
+            if (!entity || entity.meta.deleted) {
                 // if entity does not exist
                 return $(field).append('<span>No entity exists (It might be deleted)</span>');
             }

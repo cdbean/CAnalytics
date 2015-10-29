@@ -241,7 +241,7 @@ def entity(request, id=0):
             entity = Entity.objects.filter(id=int(id), case=case, group=group).select_subclasses()[0]
         except:
             return HttpResponse('Error: entity not found')
-        entity.deleted=True
+        entity.deletedi = True
         entity.save()
         res['entity'] = entity.serialize()
         rels = entity.relates_as_source.all() | entity.relates_as_target.all()
