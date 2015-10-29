@@ -89,8 +89,8 @@
               $(this).dialog("destroy");
             },
             'Yes': function() {
-              restoreViz(tools);
               $(this).dialog("destroy");
+              restoreViz(tools);
             }
           }
         });
