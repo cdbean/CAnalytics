@@ -69,7 +69,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         <div class="ui-layout-west"> \
           <ul id="ds-list" class="sidebar-nav"> \
             <li class="sidebar-brand"> Datasets </li> \
-            <li><a href="#" id="ds-0"><label><input type="checkbox" checked> Select All</label></a> </li> \
+            <li><a href="#" id="ds-0"><input type="checkbox" checked> Select All</a> </li> \
           </ul> \
           <ul id="ann-list" class="sidebar-nav"> \
           </ul> \
@@ -89,11 +89,12 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         if (a.name > b.name) return 1;
         return 0;
       }).forEach(function(ds) {
-        str += '<li><a href="#" id="ds-' + ds.id + '"><label><input type="checkbox" checked> ' + ds.name 
-        + ' <span class="badge">' + ds.dataentries.length + '</span></label></a>';
+        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name 
+        + ' <span class="badge">' + ds.dataentries.length + '</span></a>';
       });
       el.find('#ds-list').append(str);
       $('#ds-list input:checkbox', el).change(this._onDatasetChecked.bind(this));
+      $('#ds-list a', el).click(this._onDatasetClicked.bind(this));
       // el.find('.ui-layout-center').resize(this.resize.bind(this));
       el.find('#ann-list').on('click', 'a', function(e) {
         var item = $(e.target).data('annotation');
@@ -102,18 +103,32 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
     },
 
     _onDatasetChecked: function(e) {
-      var id = $(e.target).parent().parent().attr('id').split('-')[1];
+      var id = $(e.target).parent().attr('id').split('-')[1];
       var ds_cb = this.element.find('ul#ds-list input:checkbox');
       if (id == 0) { // 'all' is clicked
         ds_cb.prop('checked', $(e.target).prop('checked'));
       }
       var ds = [];
       ds_cb.filter(':checked').each(function() {
-        var id = + $(this).parent().parent().attr('id').split('-')[1];
+        var id = + $(this).parent().attr('id').split('-')[1];
         if (id) ds.push(id);
       });
       wb.store.shelf_by.datasets = ds;
       $.publish('data/filter');
+    },
+
+    _onDatasetClicked: function(e) {
+      // jump to the first dataentry in the dataset
+      // when clicking on checkbox, this function will also be triggered
+      // TODO: change html structure or event listener
+      var id = $(e.target).attr('id');
+      if (id) id = id.split('-')[1];
+      var ds = wb.store.items.datasets[id];
+      if (ds) {
+        var de = ds.dataentries[0];
+        if (de) 
+          wb.utility.scrollTo(this.element.find('#row-' + de), $('.dataTables_scrollBody', this.element));
+      }
     },
 
     _destroy: function() {
