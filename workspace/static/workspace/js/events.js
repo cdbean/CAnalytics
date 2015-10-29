@@ -74,70 +74,83 @@
           wb.info.users[id].color = color;
         })
       ;
+    }
 
+    // restore windows after users are loaded
+    // so window info can be broadcast 
+    var tools = JSON.parse($.cookie('tools'));
+    if (!$.isEmptyObject(tools)) {
+      restoreViz(tools);
     }
 
   }
 
   function onDataLoaded() {
     $('#progressbar').hide();
-    var tools = $.cookie('tools');
-    if (!$.isEmptyObject(tools)) {
-      restoreViz(tools);
-    }
   }
 
   function restoreViz(tools) {
-    tools.forEach(function(t) {
-      if (t === 'dataentry') {
-        $('<div>').vizdataentrytable({
+    var viz;
+    tools.forEach(function(v) {
+      var t = v.tool;
+      if (t === 'document') {
+        viz = $('<div>').vizdataentrytable({
           title: 'Documents',
           tool: 'document'
         });
       } else if (t === 'timeline') {
-        $('<div>').viztimeline({
+        viz = $('<div>').viztimeline({
           title: 'Timeline',
           tool: 'timeline'
         });
       } else if (t === 'map') {
-        $('<div>').vizmap({
+        viz = $('<div>').vizmap({
           title: 'Map',
           tool: 'map'
         });
       } else if (t === 'network') {
-        $('<div>').viznetwork({
+        viz = $('<div>').viznetwork({
           title: 'Network',
           tool: 'network'
         });
       } else if (t === 'notepad') {
-        $('<div>').viznotepad({
+        viz = $('<div>').viznotepad({
           title: 'Notepad',
           tool: 'notepad',
           url: GLOBAL_URL.notepad,
         });
       } else if (t === 'message') {
-        $('<div>').vizmessage({
+        viz = $('<div>').vizmessage({
           title: 'Message',
           tool: 'message'
         });
       } else if (t === 'history') {
-        $('<div>').vizhistory({
+        viz = $('<div>').vizhistory({
           title: 'History',
           tool: 'history',
           url: GLOBAL_URL.history
         });
       } else if (t === 'annotation table') {
-        $('<div>').vizannotationtable({
+        viz = $('<div>').vizannotationtable({
           title: 'Annotations',
           tool: 'annotation table',
         });
       } else {
-        $('<div>').vizentitytable({
+        viz = $('<div>').vizentitytable({
             title: t.split(' ')[0],
             entity: t.split(' ')[0],
             tool: t
         });
       }
+      viz.dialog('option', {
+        width: v.width,
+        height: v.height,
+        position: {
+          at: v.position_at,
+          my: v.position_my,
+          of: window
+        }
+      })
     });
   }
 

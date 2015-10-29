@@ -12,6 +12,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
 
     this._setupUI();
     this.loadData(0);
+    return this;
   },
 
   _setupUI: function() {
@@ -63,6 +64,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       var ele = _this.element.find('.history-list');
       wb.utility.scrollTo($('li.history-item:last', ele), ele)
     });
+    return this;
   },
 
   add: function(item) {
@@ -111,6 +113,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     }
 
     row.data('context', item)
+    return this;
   },
 
   jumpToContext: function(e) {
@@ -184,6 +187,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
         }
       }
     }
+    return this;
 
   },
 
@@ -192,18 +196,20 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
   },
 
   updateData: function() {
-
+    return this;
   },
   updateView: function() {
-
+    return this;
   },
 
   update: function() {
+    return this;
   },
 
   help: function() {
     var hint = new EnjoyHint({});
     hint.set(wb.help.history);
     hint.run();
+    return this;
   }
 });

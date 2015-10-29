@@ -27,6 +27,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
           height: '100%',
           plugins: {'autocomp': 'true', 'copy_paste_images': 'true', 'tables2': 'false'}
         });
+        return this;
     },
 
     resize: function() {
@@ -38,19 +39,21 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
         var height = $(id).height();
         $(id + '>iframe').css('width', width - 5);
         $(id + '>iframe').css('height', height - 5);
+        return this;
     },
 
     update: function() {
         // in accordance with other artifacts, useless here
+        return this;
     },
 
     updateData: function() {
         // in accordance with other artifacts, useless here
-
+        return this;
     },
 
     updateView: function() {
-
+        return this;
     },
 
     getContent: function() {
@@ -59,6 +62,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
             _this.editor.setData(res.content);
             _this.id = res.id;
         });
+        return this;
     },
 
     saveContent: function() {
@@ -71,6 +75,7 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
             });
             this.editor.resetDirty();
         }
+        return this;
     },
 
     showMessage: function(msg) {
@@ -81,15 +86,18 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
             })
         ;
         setTimeout(this.hideMessage.bind(this), 3000);
+        return this;
     },
 
     hideMessage: function() {
         this.element.find('.cke_bottom span.custom_message').empty();
+        return this;
     },
 
     help: function() {
       var hint = new EnjoyHint({});
       hint.set(wb.help.notepad);
       hint.run();
+      return this;
     }
 });

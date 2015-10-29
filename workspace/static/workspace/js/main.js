@@ -60,19 +60,20 @@ $(function() {
     });
     // store tool windows size and position in cookie, for later restore
     var tools = [];
-    $('.viz').each(function(v) {
+    $('.viz').each(function(i, v) {
       var width = $(v).dialog('option', 'width');
       var height = $(v).dialog('option', 'height');
-      var position_at = $(v).dialog('option', 'position');
+      var position = $(v).dialog('option', 'position');
       var tool = $(v).data('instance').options.tool;
       tools.push({
         width: width,
         height: height,
-        position_at: position_at,
+        position_my: position.my,
+        position_at: position.at,
         tool: tool
       });
     });
-    $.cookie('tools', tools);
+    $.cookie('tools', JSON.stringify(tools));
   }
 
   function onSyncCase() {

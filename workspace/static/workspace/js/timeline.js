@@ -73,10 +73,12 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       this.timeline.data(data);
       d3.select(this.element[0]).call(this.timeline);
+      return this;
     },
 
     updateView: function() {
       this.timeline.filter(wb.store.shelf.entities);
+      return this;
     },
 
     setupUI: function() {
@@ -104,12 +106,14 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
       this.timeline.width(width).height(height).redraw();
+      return this;
     },
 
     help: function() {
       var hint = new EnjoyHint({});
       hint.set(wb.help.timeline);
       hint.run();
+      return this;
     }
 });
 

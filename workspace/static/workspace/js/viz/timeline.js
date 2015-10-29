@@ -188,6 +188,8 @@ wb.viz.timeline = function() {
   }
 
   exports.redraw = function() {
+    if (!svg) return exports;
+    
     tracks = calculateTracks(data);
     width = outwidth - margin.left - margin.right;
     height = outheight - margin.top - margin.bottom;

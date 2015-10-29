@@ -35,6 +35,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     this.loadMessages(0); // show last page
 
     this._initialize();
+    return this;
   },
 
   _initialize: function() {
@@ -132,6 +133,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       if (res === 'success') {
       }
     });
+    return this;
   },
 
   loadMessages: function(page) {
@@ -163,6 +165,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       var ele = _this.element.find('ul.messages');
       wb.utility.scrollTo($('span.messagebody:last', ele), ele)
     });
+    return this;
   },
 
   loadMessage: function(msg) {
@@ -196,14 +199,15 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     if (msg.sender !== wb.info.user) {
       row.css('background-color', '#eee');
     }
+    return this;
   },
 
   reload: function() {
-
+    return this;
   },
 
   updateView: function() {
-
+    return this;
   },
 
   updateData: function() {
@@ -219,14 +223,17 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     });
     sources = sources.concat(s1);
     this.element.find('#message_content').setOptions({data: sources});
+    return this;
   },
 
   update: function() {
+    return this;
   },
 
   help: function() {
     var hint = new EnjoyHint({});
     hint.set(wb.help.message);
     hint.run();
+    return this;
   }
 });

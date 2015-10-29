@@ -102,6 +102,17 @@ $(function() {
 
     $.publish('user/online', online_users);
 
+    // broadcast the current focused tool when a new user joins
+    var focus_tool = '';
+    $('.viz').each(function(i, v) {
+      var $v = $(v).data('instance');
+      if ($v && $v.isFocus) {
+        focus_tool = $v.options.tool; 
+        return false;
+      }
+    });
+    if (focus_tool) $.publish('user/tool', focus_tool);
+
     // remove user thumb in tool if the user is no longer online
     var toupdate = false;
     for (u in user_tool) {

@@ -84,11 +84,13 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         this.element.empty();
         this.updateData();
         this.update();
+        return this;
     },
     resize: function() {
         this._super('resize');
         this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
         this.table.resize();
+        return this;
     },
 
     highlight: function(item) {
@@ -98,6 +100,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
           wb.utility.scrollTo(row, $(this).parents('.dataTables_scrollBody'));
         }
       });
+      return this;
     },
 
     help: function() {

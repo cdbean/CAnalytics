@@ -126,6 +126,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.mapControls = mapControls;
 
         this.updateView();
+        return this;
 
     },
     updateData: function() {
@@ -149,6 +150,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.linelayer.addFeatures(line_feas);
         this.pointlayer.addFeatures(point_feas);
         this.features = this.pointlayer.features.concat(this.linelayer.features);
+        return this;
     },
 
     updateView: function() {
@@ -161,11 +163,13 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         })
         this.linelayer.redraw();
         this.pointlayer.redraw();
+        return this;
 
     },
     reload: function() {
         this.updateData();
         this.update();
+        return this;
     },
     highlight: function (item) {
         var feature;
@@ -209,11 +213,13 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         });
 
         this.map.addPopup(feature.popup, true);
+        return this;
     },
     unhighlight: function(feature) {
         if (feature.popup) {
             this.map.removePopup(feature.popup);
         }
+        return this;
     },
 
     _showDetails: function(feature) {
@@ -282,10 +288,12 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             });
         }
         $.publish('data/filter', '#' + this.element.attr('id'));
+        return this;
     },
 
     resize: function() {
         this.map.updateSize();
+        return this;
     },
 
     destroy: function() {
@@ -297,6 +305,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
       var hint = new EnjoyHint({});
       hint.set(wb.help.map);
       hint.run();
+      return this;
     }
 });
 

@@ -67,6 +67,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         ;
         this.updateData();
         this.updateView();
+        return this;
     },
 
     updateData: function() {
@@ -91,21 +92,25 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         }
         this.table.data(data);
         d3.select(this.element[0]).call(this.table);
+        return this;
     },
 
     updateView: function() {
       this.table.filter(wb.store.shelf.entities);
+      return this;
     },
 
     reload: function() {
         this.element.empty();
         this.updateData();
         this.update();
+        return this;
     },
     resize: function() {
         this._super('resize');
         this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
         this.table.resize();
+        return this;
     },
 
     highlight: function(item) {
@@ -115,12 +120,14 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
           wb.utility.scrollTo(row, $(this).parents('.dataTables_scrollBody'));
         }
       });
+      return this;
     },
 
     help: function() {
       var hint = new EnjoyHint({});
       hint.set(wb.help.table);
       hint.run();
+      return this;
     }
 });
 

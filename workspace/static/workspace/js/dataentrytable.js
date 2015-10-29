@@ -58,7 +58,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this._setupAnnotator();
 
       this.updateView();
-
+      return this;
     },
 
     _setUI: function() {
@@ -135,7 +135,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
 
       this.table.data(data);
       d3.select(this.element[0]).select('#table-body').call(this.table);
-
+      return this;
     },
 
 
@@ -158,6 +158,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           $(li).appendTo(el).find('a').data('annotation', ann.id);
         });
       }
+      return this;
     },
 
     highlight: function(item) {
@@ -193,6 +194,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           }.bind(this), 1000);
         }
       }
+      return this;
     },
 
     _setupAnnotator: function() {
@@ -229,6 +231,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         var store = annotator.plugins['Store'];
         store.loadAnnotationsFromLocal(wb.store.items.annotations);
       }
+      return this;
     },
 
     addAnnotations: function(annotations) {
@@ -238,6 +241,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       }
       // add annotations to new data entries (ones that are unique to the current user)
       // this.applyAnnotation(annotations[0]);
+      return this;
     },
 
     applyAnnotation: function(annotation) {
@@ -294,6 +298,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         })
 
         annotator.publish('/annotations/created', [new_anns]);
+        return this;
     },
 
     addAnnotation: function(annotation) {
@@ -309,12 +314,14 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           store.updateAnnotation(store.annotations[i], annotation);
         }
       }
+      return this;
     },
 
     updateAnnotations: function(annotations) {
       for (var i = 0, len = annotations.length; i < len; i++) {
         this.updateAnnotation(annotations[i]);
       }
+      return this;
     },
 
     updateAnnotation: function(annotation) {
@@ -333,12 +340,14 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           store.updateAnnotation(store.annotations[i], annotation);
         }
       }
+      return this;
     },
 
     deleteAnnotations: function(annotations) {
       for (var i = 0, len = annotations.length; i < len; i++) {
         this.deleteAnnotation(annotations[i]);
       }
+      return this;
     },
 
     deleteAnnotation: function(annotation) {
@@ -352,6 +361,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
           store.unregisterAnnotation(store.annotations[i]);
         }
       }
+      return this;
     },
 
     resize: function() {
@@ -359,11 +369,13 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this.layout.resizeAll();
       this.element.find('.dataTables_scrollBody').css('height', (this.element.height() - 80))
       this.table.resize();
+      return this;
     },
 
     help: function() {
       var hint = new EnjoyHint({});
       hint.set(wb.help.dataentry);
       hint.run();
+      return this;
     }
 });

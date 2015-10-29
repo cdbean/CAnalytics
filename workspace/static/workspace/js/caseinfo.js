@@ -9,6 +9,7 @@ $.widget('viz.vizcaseinfo', $.viz.vizbase, {
     this.dateformat = d3.time.format('%b %d, %Y');
 
     this._setupUI();
+    return this;
   },
 
   _setupUI: function() {

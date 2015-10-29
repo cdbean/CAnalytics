@@ -92,6 +92,7 @@ $.widget('viz.vizviewer', {
     var str = wb.utility.capfirst(type);
     str += ': ' + name;
     this.element.find('.title').text(str);
+    return this;
   },
 
   // @attr: object {key: <attr-name>, value: <attr-value>}

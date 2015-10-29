@@ -50,10 +50,13 @@ $.widget('viz.vizbase', {
         $('<a class="ui-dialog-titlebar-help ui-corner-all ui-state-default" title="help" style="width: 19px; height: 18px; cursor: pointer"><span class="ui-icon ui-icon-help">?</span></a>')
             .appendTo(titlebar)
             .click(this.options.extend.help);
+
+        return this;
     },
     resize: function() {
         this.element.css("width", "auto");
         this.element.parents('.ui-dialog').css("height", 'auto');
+        return this;
     },
     _destroy: function() {
         $.publish("viz/close", this.element.attr("id"));
@@ -64,6 +67,10 @@ $.widget('viz.vizbase', {
     },
 
     onFocus: function() {
+        this.isFocus = true;
+        $('.viz').not(this.element).each(function(i, v) {
+            $(v).data('instance').isFocus = false;
+        });
         $.publish('user/tool', this.options.tool);
         wb.log.log({
             operation: 'focused',

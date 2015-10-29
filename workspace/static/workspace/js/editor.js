@@ -29,6 +29,7 @@ $.widget('viz.vizeditor', {
     this.element.on('click', '.attr-remove-btn', this._onClickRemove.bind(this));
     this.element.on('click', '.save', this._onClickSave.bind(this));
     this.element.on('click', '.cancel', this._onClickCancel.bind(this));
+    return this;
   },
 
   data: function(d, type) {

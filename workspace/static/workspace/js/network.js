@@ -21,7 +21,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         this.updateData();
         this.updateView();
-
+        return this;
     },
 
     _setupForceLayout: function() {
@@ -243,6 +243,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         + '</label></li>';
       $(html).appendTo(this.element.find('.rel-list'));
     }
+    return this;
   },
 
 
@@ -408,6 +409,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 this.setFilterMode();
                 break;
         }
+        return this;
     },
 
     setDrawMode: function() {
@@ -501,7 +503,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
             // _this.restart();
         });
-
+        return this;
     },
 
     setFilterMode: function() {
@@ -587,6 +589,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             }
             $.publish('data/filter', '#' + _this.element.attr("id"));
         }
+        return this;
     },
 
     setNormalMode: function() {
@@ -622,6 +625,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 "translate(" + d3.event.translate + ")"
                     + " scale(" + d3.event.scale + ")");
         }
+        return this;
     },
 
     exitAllModes: function() {
@@ -636,6 +640,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.svg.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
         // exit drag mode
         this.chart.selectAll('.node').on('mousedown.drag', null);
+        return this;
     },
 
     showLinkEditor: function(l) {
@@ -692,6 +697,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           .css('position', 'absolute')
           .css('display', 'block')
         ;
+        return this;
     },
 
     hideLinkInfo: function() {
@@ -701,6 +707,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             $('.network-viewer').data('link', null);
           }
         }, 300);
+        return this;
     },
 
     hideNodeInfo: function() {
@@ -710,6 +717,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             $('.network-viewer').data('node', null);
           }
         }, 300);
+        return this;
     },
 
     findNode: function(id) {
@@ -863,6 +871,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         if ($('.control.filter.selected').length) this.setMode('filter');
         else if ($('.control.draw.selected').length) this.setMode('draw');
         else this.setMode('normal');
+        return this;
     },
 
     updateView: function() {
@@ -899,17 +908,20 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       });
 
       this.showRelList(rels);
+      return this;
     },
 
     reload: function() {
         this.updateData();
         this.update();
+        return this;
     },
 
     resetMouseVars: function() {
         this.mousedown_node = null;
         this.mouseup_node = null;
         this.mousedown_link = null;
+        return this;
     },
 
     restart: function() {
@@ -982,6 +994,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         //                .gravity(100 * k)
 
         this.force.start();
+        return this;
     },
 
     resize: function() {
@@ -994,6 +1007,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         this.scaleY .range([0, this.width]).domain([0, this.width]);
         this.force.size([this.width, this.height]).resume();
         this.force.start();
+        return this;
     },
 
     onMouseOverNode: function(d) {
@@ -1074,6 +1088,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     highlight: function(item) {
       // highlight relationship
       this.highlightLink({id: +item});
+      return this;
     },
 
     highlightLink: function(d) {
@@ -1096,6 +1111,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           return false;
         }
       });
+      return this;
     },
 
     unhighlightLink: function() {
@@ -1108,7 +1124,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         'dim': false,
         'active': false
       });
-
+      return this;
     },
 
     highlightNode: function(nodeData) {
@@ -1151,6 +1167,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         })
 
         // d3.select(this).select('circle').attr('transform', 'scale(1.5)');
+        return this;
     },
 
     unhighlightNode: function() {
@@ -1165,6 +1182,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         'active': false
       });
       // d3.select(this).select('circle').attr('transform', '');
+      return this;
     },
 
     destroy: function() {
@@ -1175,6 +1193,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       var hint = new EnjoyHint({});
       hint.set(wb.help.network);
       hint.run();
+      return this;
     }
 });
 
