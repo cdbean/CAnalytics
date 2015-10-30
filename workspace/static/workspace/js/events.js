@@ -38,7 +38,8 @@
   function onUserTool(e, d) {
     if (window.ishout) {
       ishout.rooms.forEach(function(r) {
-        ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
+        if (ishout.socket)
+          ishout.socket.emit('user.tool', r.roomName, {user: wb.info.user, tool: d});
       });
     }
   }
@@ -75,31 +76,30 @@
         })
       ;
     }
-
-    // restore windows after users are loaded
-    // so window info can be broadcast 
-    var tools = JSON.parse($.cookie('tools'));
-    if (!$.isEmptyObject(tools)) {
-      // var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
-      //   $(content).dialog({
-      //     title: 'Reopen windows?',
-      //     width: 'auto',
-      //     buttons: {
-      //       'No': function() {
-      //         $(this).dialog("destroy");
-      //       },
-      //       'Yes': function() {
-      //         $(this).dialog("destroy");
-      //         restoreViz(tools);
-      //       }
-      //     }
-      //   });
-    }
-
   }
 
   function onDataLoaded() {
     $('#progressbar').hide();
+
+    // restore windows after data are loaded
+    // so window info can be broadcast 
+    var tools = JSON.parse($.cookie('tools'));
+    if (!$.isEmptyObject(tools)) {
+      var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
+      $(content).dialog({
+        title: 'Reopen windows?',
+        width: 'auto',
+        buttons: {
+          'No': function() {
+            $(this).dialog("destroy");
+          },
+          'Yes': function() {
+            $(this).dialog("destroy");
+            restoreViz(tools);
+          }
+        }
+      });
+    }
   }
 
   function restoreViz(tools) {
