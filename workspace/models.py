@@ -151,6 +151,9 @@ class Entity(models.Model):
     def __unicode__(self):
         return self.entity_type + ' ' + self.name
 
+    class Meta:
+        verbose_name_plural = 'Entities'
+
     def findTargets(self):
         res = []
         targets_id = list(Relationship.objects.filter(source=self).values_list("target", flat=True))

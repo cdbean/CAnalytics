@@ -133,9 +133,9 @@ def rel_log_export_csv(modeladmin, request, queryset):
 			    smart_str(obj.user.id),
 			    smart_str(obj.user.username),
 			    smart_str(obj.operation),
-			    smart_str(obj.entity.entity_type),
-			    smart_str(obj.entity.id),
-			    smart_str(obj.entity.name),
+			    smart_str('relationship'),
+			    smart_str(obj.relationship.id),
+			    smart_str(obj.relationship.relation),
 			    smart_str(obj.tool),
 			    smart_str(obj.data),
 			])
