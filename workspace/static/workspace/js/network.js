@@ -613,7 +613,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         function dragstarted(d) {
             d3.event.sourceEvent.stopPropagation();
-            d3.select(this).classed("dragging", true);
+            clearTimeout(_this.showNodeInfoTimer);
+            d3.select(this).classed("dragging", true)
+              .on('mouseover', null);
         }
 
         function dragged(d) {
@@ -621,7 +623,9 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }
 
         function dragend(d) {
-            d3.select(this).classed("dragging", false);
+            d3.select(this).classed("dragging", false)
+              .on('mouseover', _this.onMouseOverNode.bind(_this));
+            clearTimeout(_this.showNodeInfoTimer);
             d.fixed = true;
         }
         function zoomed() {
@@ -1030,7 +1034,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       this.showNodeInfoTimer = setTimeout(function() {
         var entity = wb.store.items.entities[d.id];
         wb.viewer.data(entity, 'entity').show(pos, 'network');
-      }, 500);
+      }, 1000);
     },
 
     onMouseOutNode: function(d) {
