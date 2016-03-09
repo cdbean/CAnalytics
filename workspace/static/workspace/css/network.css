@@ -1,8 +1,11 @@
-.node.dim circle {
+.network svg {
+  cursor: move;
+}
+.nodeg.dim circle {
   stroke-opacity: .2;
   fill-opacity: .2;
 }
-.node.dim text {
+.nodeg.dim text {
   fill-opacity: .2;
 }
 .linkg.dim path {
@@ -20,6 +23,8 @@ path.link {
     fill: none;
     stroke: #ccc;
     stroke-width: 2px;
+}
+.linkg, .nodeg {
     cursor: pointer;
 }
 
@@ -45,6 +50,7 @@ path.dragline {
     list-style-type: none;
     width: 100%;
     background-color: #ECEDF7;
+    padding-top: 5px 3px 1px 0;
 }
 .network-filterbar ul {
   padding: 0;
@@ -79,4 +85,9 @@ path.dragline {
 .network .link-text {
   font-size: .8em;
   text-anchor: 'middle';
+}
+.network .watching-icon {
+  position: relative;
+  top: -5px;
+  left: -5px;
 }

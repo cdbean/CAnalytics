@@ -152,4 +152,17 @@ wb.utility = {};
                       + wb.store.items.entities[item.primary.target].primary.name;
     }
   };
+
+  wb.utility.uuid = function() {
+    var d = Date.now();
+    if(window.performance && typeof window.performance.now === "function"){
+        d += performance.now(); //use high-precision timer if available
+    }
+    var uuid = 'xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx'.replace(/[xy]/g, function(c) { // uuid is usually separeted by '-', I change it to '_'
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+  };
 })();

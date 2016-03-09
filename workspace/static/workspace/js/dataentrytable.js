@@ -76,7 +76,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         </div> \
       '
       var el = $(html).appendTo(this.element);
-      this.layout = this.element.layout({
+      this.layout = this.element.layout({ // jquery layout plugin
         applyDemoStyles: true,
         west__size: 100,
         onresize: function() {

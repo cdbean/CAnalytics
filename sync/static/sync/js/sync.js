@@ -10,7 +10,7 @@ $(function() {
   var room = CASE + '-' + GROUP;
   ishout.joinRoom(room, function(d) {
     // inform the server that it has joined the room
-    // the server will broadcast and update the list of online users
+    // the server will broadcast and update the list of online users and all users in the group
     $.post('/sync/join', {
       'case': CASE,
       'group': GROUP,
@@ -39,6 +39,40 @@ $(function() {
 
   ishout.on('user.tool', onUserTool);
 
+  ishout.on('view.request', onViewRequested); // somebody requested to watch my view
+  ishout.on('view.stream', onViewStreamed); // somebody streamed their view to me
+  ishout.on('view.stop', onViewStopped); // somebody stopped watching my view
+  ishout.on('view.share', onViewShared); // somebody shared a view
+
+
+  function onViewShared(v) {
+    var network = $('.network').data('instance');
+    if (network) {
+      network.loadView(v);
+    }
+    if (v.user != wb.info.user)
+      wb.utility.notify(wb.info.users[v.user].name + ' shared a view');
+  }
+
+  function onViewRequested(d) {
+    var network = $('.network').not(function() {
+      return this.className.indexOf('watch-') > 1; // exclude the views that are waching 
+    }).first().data('instance');
+    if (network) network.watchRequested(d.from); // if there are multiple views, stream the first one
+  }
+
+  function onViewStreamed(d) {
+    var network = $('.network.watch-' + d.from).data('instance');
+    if (network) network.watchStream(d.state);
+  }
+
+  function onViewStopped(d) {
+    var network = $('.network').not(function() {
+      return this.className.indexOf('watch-') > 1; // exclude the views that are waching 
+    }).first().data('instance');
+    if (network) network.watchStopped(d.from); // if there are multiple views, stream the first one
+  }
+
 
   // show where collaborators are working on
   function onUserTool(d) {
@@ -50,7 +84,7 @@ $(function() {
       }
     }
     $('.user-monitor').empty();
-    $('.user-icon').remove();
+    $('span.user-icon').remove();
     for (u in user_tool) {
       if (wb.info.user == u) continue; // skip the current user
       var t = user_tool[u];
@@ -82,6 +116,7 @@ $(function() {
 
 
   function onUsersOnline(data) {
+    // get all users in the group
     var users = data.users;
     var online_users = data.online_users;
     for (var i = 0, len = users.length; i < len; i++) {
@@ -122,6 +157,9 @@ $(function() {
       }
     }
     if (toupdate) onUserTool(); // update collaborator workspace
+
+    var network = $('.network').data('instance');
+    if (network) network.updateViewAvailability();
   }
 
   function onNewMessage(data) {

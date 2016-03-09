@@ -69,6 +69,7 @@ def reset_password_done(request):
 
 
 def users(request):
+    print 'users requested'
     res = []
     group = request.user.groups.get(id=request.GET['group'])
     users = group.user_set.all()

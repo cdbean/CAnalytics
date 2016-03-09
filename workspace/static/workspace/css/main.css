@@ -177,3 +177,28 @@ a.wb-entity:hover:after {
   /*z-index: 9999;*/
 }
 
+.ui-autocomplete {
+  z-index: 1001;
+}
+
+.timestamp {
+  padding-right: 15px;
+  text-align: right;
+  font-size: 60%;
+}
+
+.username {
+  color: rgb(255, 127, 14);
+}
+
+.user-icon, .user-icon:hover{
+  color: rgb(255, 127, 14) !important;
+}
+
+.user-icon.active {
+  background-color: blue;
+}
+.user-icon.disabled {
+  color: grey !important;
+  cursor: not-allowed;
+}

@@ -31,9 +31,48 @@
 
   $.subscribe('user/online', onUserOnline);
 
-
-  // lister to the following events and broadcast
+  // when user changes tool
   $.subscribe('user/tool', onUserTool);
+
+  // when user request watch other's view
+  $.subscribe('view/request', onRequestView);
+  // when under watch, stream view to server
+  $.subscribe('view/stream', onStreamView);
+  // stop watching other's view
+  $.subscribe('view/stop', onStopView);
+
+
+
+  function onRequestView(e, user) { // user: which user to watch
+    if (window.ishout) {
+      ishout.rooms.forEach(function(r) {
+        if (ishout.socket)
+          ishout.socket.emit('view.request', user, {from: USER, to: user});
+      });
+    }
+  }
+
+  // data = {
+  //  state: the state of the view
+  //  to: the user the stream is sent to 
+  //  from: the user the stream is from 
+  function onStreamView(e, data) { 
+    if (window.ishout) {
+      ishout.rooms.forEach(function(r) {
+        if (ishout.socket)
+          ishout.socket.emit('view.stream', r.roomName, data);
+      });
+    }
+  }
+
+  function onStopView(e, user) {
+    if (window.ishout) {
+      ishout.rooms.forEach(function(r) {
+        if (ishout.socket)
+          ishout.socket.emit('view.stop', user, {from: USER, to: user});
+      });
+    }
+  }
 
   function onUserTool(e, d) {
     if (window.ishout) {

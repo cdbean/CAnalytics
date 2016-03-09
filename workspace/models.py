@@ -274,3 +274,33 @@ class Relationship(models.Model):
         res['meta']['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
         return res
 
+class View(models.Model):
+    def upload_path_handler(self, filename):
+        return 'views/{case}/{group}/{file}'.format(case=self.case.id, group=self.group.id, file=filename)
+
+    image = models.TextField() # svg html
+    state = models.TextField() # json format
+    comment = models.TextField()
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(auto_now_add=True)
+    group      = models.ForeignKey(Group)
+    case       = models.ForeignKey(Case)
+
+    def __unicode__(self):
+        return self.created_by.username + ' ' + self.created_at.strftime('%m/%d/%Y %H:%M:%S')
+
+    class Meta: 
+        ordering = ['created_at']
+
+    def serialize(self):
+        return {
+            'id'   : self.id,
+            'image': self.image,
+            'state': self.state,
+            'comment': self.comment,
+            'created_by': self.created_by.id,
+            'created_at': self.created_at.strftime('%m/%d/%Y %H:%M:%S'),
+            'group': self.group.id,
+            'case': self.case.id
+        }
+

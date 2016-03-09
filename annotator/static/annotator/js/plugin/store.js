@@ -104,6 +104,7 @@ Annotator.Plugin.Store = (function(_super) {
                     data: wb.log.logItem(entities[0])
                 });
                 // send log if other entities are 'implicitly' created
+                // TODO: log is problematic here
                 for (var i = 1; i < entities.length; i++) {
                     if (! (entities[i].meta.id in wb.store.items.entities)) {
                         wb.log.log({

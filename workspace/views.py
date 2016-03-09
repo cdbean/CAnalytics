@@ -7,7 +7,7 @@ from django.http import QueryDict
 from canalytics import settings
 
 from django.contrib.auth.models import Group
-from workspace.models import Case, DataEntry, Entity, Relationship
+from workspace.models import Case, DataEntry, Entity, Relationship, View
 from annotator.models import Annotation
 from workspace.entity import get_or_create_entity, set_primary_attr, get_or_create_relationship
 from sync.views import sync_item
@@ -407,4 +407,39 @@ def restore_relationship(request, id):
     res['annotation'] = [a.serialize() for a in anns]
     sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+'''
+read or save network view, including
+a screenshot image
+state info, e.g. node position, node state (dim, display), zoom
+user comment,
+and other meta info
+'''
+import re
+import base64
+import os
+from datetime import datetime
+from django.utils import dateformat 
+import canalytics.settings
+@login_required
+def network_view(request):
+    res = {}
+    if request.method == 'POST':
+        img = request.POST.get('image', None)
+        state = request.POST.get('state', None)
+        comment = request.POST.get('comment', '')
+        group = request.user.groups.get(id=request.POST['group'])
+        case = group.case_set.get(id=request.POST['case'])
+        view = View.objects.create(image=img, state=state, comment=comment, group=group, case=case, created_by=request.user)
+        sync_item('share', 'view', view.serialize(), case, group, request.user)
+        return HttpResponse('success')
+    elif request.method == 'GET':
+        group = request.user.groups.get(id=request.GET['group'])
+        case = group.case_set.get(id=request.GET['case'])
+        views = View.objects.filter(group=group, case=case)
+        res = [v.serialize() for v in views]
+        return HttpResponse(json.dumps(res), content_type='application/json')
+    return HttpResponseBadRequest()
+
 

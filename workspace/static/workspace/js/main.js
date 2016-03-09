@@ -32,6 +32,27 @@ $(function() {
   $('#case-info').click(onCaseInfo);
   $('.viz-opts').click(onVizSelect);
   $('#case-sync').click(onSyncCase);
+  $('#share-network-modal form').on('submit', function(e) {
+    e.preventDefault();
+    $.ajax({
+      type: 'post',
+      url: $(this).attr('action'),
+      data: $(this).serialize(),
+      success: function() {
+        wb.utility.notify('You have shared your view!');
+      },
+    });
+    $('#share-network-modal').modal('hide');
+  });
+  
+  $('#use-network-modal form').on('submit', function(e) {
+    e.preventDefault();
+    var network = $('.viz.network').data('instance');
+    var state = $('#use-network-modal').data('state');
+    network.useState(state);
+    $('#use-network-modal').modal('hide');
+    wb.utility.notify('You have changed your network view');
+  });
 
   $('body').on('mouseover', '.wb-item', onMouseOverEntity);
   $('body').on('mouseout', '.wb-item', onMouseOutEntity);
