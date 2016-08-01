@@ -429,9 +429,19 @@ def network_view(request):
         img = request.POST.get('image', None)
         state = request.POST.get('state', None)
         comment = request.POST.get('comment', '')
+        parent = request.POST.get('parent', [])
+        path = []
+        depth = 0
+        if parent: 
+            parent = View.objects.get(id=parent)
+            path = parent.path
+            depth = parent.depth + 1
         group = request.user.groups.get(id=request.POST['group'])
         case = group.case_set.get(id=request.POST['case'])
-        view = View.objects.create(image=img, state=state, comment=comment, group=group, case=case, created_by=request.user)
+        # save the view to get an ID
+        view = View.objects.create(image=img, state=state, comment=comment, path=path, depth=depth, group=group, case=case, created_by=request.user)
+        view.path = view.path.append(view.id)
+        view.save()
         sync_item('share', 'view', view.serialize(), case, group, request.user)
         return HttpResponse('success')
     elif request.method == 'GET':

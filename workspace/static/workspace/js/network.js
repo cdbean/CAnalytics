@@ -40,7 +40,10 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }, this.autoSaveInterval)
     },
 
-    useState: function(state) {
+    useState: function(state, id) { // id is the id of the view
+      // since we use the state of the view [id], we mark the view as the parent of the current view
+      this.element.find('.ui-layout-center>svg').data('parent', id); 
+
       this.chart.selectAll('.nodeg').attr("transform", function(d) {
        if (d.id in state.nodes) {
           var n = state.nodes[d.id];
@@ -359,6 +362,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           .find('.username').text(username).end()
           .find('.timestamp').text(data.time).end()
           .find('#screenshot').html(data.image).end()
+          .find('#viewId').val(data.id).end()
           .find('#comment').text(data.comment);
         // resize screenshot
         var svg = d3.select('#use-network-modal #screenshot>svg');
@@ -503,7 +507,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       <div class="media"> \
         <div class="media-left"> \
           <a href="#">  \
-            <div id="screenshot" class="media-object img-thumbnail" src="" alt="Shared view" style="width:210px;"></div> \
+            <div class="screenshot media-object img-thumbnail" src="" alt="Shared view" style="width:210px;"></div> \
           </a> \
         </div> \
         <div class="media-body"> \
@@ -515,13 +519,23 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         </div> \
       </div>';
     var row = $(str).prependTo(el)
-      .find('#screenshot').html(v.image).end() // use inline svg as image src
+      .css('margin-left', v.depth * 10 + 'em')
+      .find('.screenshot').html(v.image).end() // use inline svg as image src
       .find('.comment').text(v.comment).end()
       .find('.username').text(wb.info.users[v.created_by].name).end()
       .find('.timestamp').text(v.created_at).end()
-      .data({'state': JSON.parse(v.state), 'user': v.created_by, 'comment': v.comment, 'time': v.created_at, 'image': v.image});
+      .data({
+        'state': JSON.parse(v.state), 
+        'user': v.created_by,
+        'comment': v.comment,
+        'time': v.created_at,
+        'image': v.image,
+        'id': v.id,
+        'depth': v.depth,
+        'path': v.path
+      });
     // resize svg
-    var svg = d3.select(row[0]).select('#screenshot>svg');
+    var svg = d3.select(row[0]).select('.screenshot>svg');
     var w = svg.attr('width'),
         h = svg.attr('height');
     svg.attr('viewBox', '0,0,' + w + ',' + h)
@@ -531,9 +545,13 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
   _shareState: function() {
     var state = JSON.stringify(this._getState());
-    var svg_html = $('.ui-layout-center>svg')[0].outerHTML.replace(/"/g, "'"); // replace double quote to single quote
+    var svg_html = this.element.find('.ui-layout-center>svg')[0].outerHTML.replace(/"/g, "'"); // replace double quote to single quote
+    // get the id of this view's parent
+    // parent can be null
+    var parent = this.element.find('.ui-layout-center>svg').data('parent');
     // pop up share modal
     $('#share-network-modal').find('#case').val(CASE).end()
+      .find('#parent').val(parent).end()
       .find('#group').val(GROUP).end()
       .find('#state').val(state).end()
       .find('textarea').val('').end()

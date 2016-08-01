@@ -3,6 +3,7 @@ from model_utils.managers import InheritanceManager
 from django.contrib.auth.models import User, Group
 from datetime import datetime
 from tinymce.models import HTMLField
+from dbarray import IntegerArrayField
 
 
 # Create your models here.
@@ -274,6 +275,7 @@ class Relationship(models.Model):
         res['meta']['annotations'] = list(self.annotation_set.all().values_list('id', flat=True))
         return res
 
+
 class View(models.Model):
     def upload_path_handler(self, filename):
         return 'views/{case}/{group}/{file}'.format(case=self.case.id, group=self.group.id, file=filename)
@@ -281,6 +283,8 @@ class View(models.Model):
     image = models.TextField() # svg html
     state = models.TextField() # json format
     comment = models.TextField()
+    path  = IntegerArrayField(blank=True, null=True, editable=False)
+    depth = models.PositiveSmallIntegerField(default=0)
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
     group      = models.ForeignKey(Group)
@@ -290,7 +294,7 @@ class View(models.Model):
         return self.created_by.username + ' ' + self.created_at.strftime('%m/%d/%Y %H:%M:%S')
 
     class Meta: 
-        ordering = ['created_at']
+        ordering = ['path']
 
     def serialize(self):
         return {
@@ -298,9 +302,12 @@ class View(models.Model):
             'image': self.image,
             'state': self.state,
             'comment': self.comment,
+            'path': self.path,
+            'depth': self.depth,
             'created_by': self.created_by.id,
             'created_at': self.created_at.strftime('%m/%d/%Y %H:%M:%S'),
             'group': self.group.id,
             'case': self.case.id
         }
+
 

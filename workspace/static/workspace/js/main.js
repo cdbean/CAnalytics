@@ -49,7 +49,8 @@ $(function() {
     e.preventDefault();
     var network = $('.viz.network').data('instance');
     var state = $('#use-network-modal').data('state');
-    network.useState(state);
+    var id = $(this).find('#viewId').val();
+    network.useState(state, id);
     $('#use-network-modal').modal('hide');
     wb.utility.notify('You have changed your network view');
   });
