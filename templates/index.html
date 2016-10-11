@@ -4,7 +4,7 @@
 {% load drealtimetags %}
 
 {% block extrajs %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.min.js" charset="utf-8"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.5/d3.js" charset="utf-8"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMvHihbbhhhr61dsroJomX8kjZNi8LE9M&v=3.exp&signed_in=false&libraries=places"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/OpenLayers-2.13.1/OpenLayers.js' %}"></script>
 {% compress js %}
@@ -29,9 +29,9 @@
 <script type="text/javascript" src="{% static 'lib/jquery-layout-1.4/jquery.layout.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jquery-aceditable/jquery.aceditable.js' %}"></script>
 <!-- libraries to convert svg to canvas -->
-<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/rgbcolor.js"></script>
 <script type="text/javascript" src="http://gabelerner.github.io/canvg/StackBlur.js"></script>
-<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script> 
+<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
 {% endcompress %}
 
 <!-- for sync -->
@@ -46,7 +46,6 @@
 <script type="text/javascript" src="{% static 'workspace/js/filter.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/utility.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/viz/table.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/viz/timeline.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/viewer.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/editor.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/vizbase.js' %}"></script>
@@ -55,7 +54,9 @@
 <script type="text/javascript" src="{% static 'workspace/js/entitytable.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/annotationtable.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/dataentrytable.js' %}"></script>
-<script type="text/javascript" src="{% static 'workspace/js/timeline.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/timeline/timelineLayout.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/timeline/timeline.js' %}"></script>
+<script type="text/javascript" src="{% static 'workspace/js/timeline/timelineWindow.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/map.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/network.js' %}"></script>
 <script type="text/javascript" src="{% static 'workspace/js/message.js' %}"></script>
@@ -227,4 +228,3 @@
 
 
 {% endblock %}
-

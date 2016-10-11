@@ -13,15 +13,11 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       var width = this.element.innerWidth() - 20;
       var height = this.element.innerHeight() - 20;
-      this.timeline = wb.viz.timeline(this.element[0]).width(width).height(height);
 
       this.timeline = wb.viz.timeline()
         .width(width)
         .height(height)
-        .on('filter', function() {
-          $.publish('data/filter', '#' + this.element.attr('id'));
-        }.bind(this))
-      ;
+        .on('filter', this.onFilter.bind(this));
 
       this.updateData();
       this.updateView();
@@ -30,6 +26,43 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     _destroy: function() {
       this._super('_destroy');
+    },
+
+    onFilter: function(filter) {
+      var shelf_by = wb.store.shelf_by.entities.slice();
+      shelf_by = wb.utility.uniqueArray(shelf_by.concat(filter));
+
+      wb.store.shelf_by.entities = shelf_by;
+      $('.filter-div .filter-item').filter(function(i, item) {
+        return $(item).find('a').data('item') === 'event';
+      }).remove();
+      if (!filter.length) {
+        wb.log.log({
+          operation: 'defiltered',
+          item: 'events',
+          tool: 'timeline',
+          public: false
+        });
+      } else {
+        var selected_events = [];
+        filter.forEach(function(d) {
+          var e = wb.store.items.entities[d];
+          wb.filter.add('event: ' + e.primary.name, {
+            item: 'event',
+            id: e.meta.id,
+            tool: 'timeline',
+          });
+          selected_events.push(e);
+        });
+        wb.log.log({
+          operation: 'filtered',
+          item: 'events',
+          tool: 'timeline',
+          data: wb.log.logItems(selected_events),
+          public: false
+        });
+      }
+      $.publish('data/filter', '#' + this.element.attr('id'));
     },
 
     updateData: function() {
@@ -49,7 +82,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
               var index = 0;
               while (date <= repeated_until) {
                 data.push({
-                  start: date, 
+                  start: date,
                   end: new Date(date.getTime() + delta),
                   label: entity.primary.name,
                   lid: entity.meta.id + '-' + index, // local id, for viz only
@@ -60,8 +93,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
               }
             } else {
               data.push({
-                start: entity.primary.start_date,
-                end: entity.primary.end_date,
+                start: wb.utility.Date(entity.primary.start_date),
+                end: wb.utility.Date(entity.primary.end_date),
                 label: entity.primary.name,
                 id: entity.meta.id,
                 lid: entity.meta.id
@@ -71,8 +104,10 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         }
       }
 
-      this.timeline.data(data);
-      d3.select(this.element[0]).call(this.timeline);
+      d3.select(this.element[0])
+        .select('svg.chart')
+        .datum(data)
+        .call(this.timeline);
       return this;
     },
 
@@ -83,29 +118,51 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     setupUI: function() {
       var html = ' \
-        <ul class="controls"> \
+        <select class="controls" style=""> \
+          <option value="">Group by...</option> \
+          <option value="person">person</option> \
+          <option value="location">location</option> \
+          <option value="resource">resource</option> \
+          <option value="organization">organization</option> \
+        </select> \
+        <ul class="controls" style="margin-top:40px;"> \
           <li class="control filter" title="Filter"> \
         </ul> \
+        <svg class="chart"></svg> \
       ';
       this.element.append(html);
+      d3.select(this.element[0]).select('svg')
+        .attr('width', this.element.innerWidth() - 20)
+        .attr('height', this.element.innerHeight() - 30)
 
       var _this = this;
 
+      this.element.find('select').change(function(e) {
+        _this.timeline.trackBy(this.value);
+        d3.select(_this.element[0])
+          .select('svg.chart')
+          .call(_this.timeline)
+      })
+
       this.element.find('.control').click(function() {
         $(this).toggleClass('selected');
-        if ($(this).hasClass('selected')) {
-          _this.timeline.setBrushMode();
-        } else {
-          _this.timeline.setNormalMode();
-        }
+        _this.timeline.brushable($(this).hasClass('selected'));
+        d3.select(_this.element[0])
+          .select('svg.chart')
+          .call(_this.timeline)
       });
     },
 
     resize: function() {
       this._super('resize');
       var width = this.element.innerWidth() - 20;
-      var height = this.element.innerHeight() - 20;
-      this.timeline.width(width).height(height).redraw();
+      var height = this.element.innerHeight() - 30;
+      this.timeline.width(width).height(height);
+      d3.select(this.element[0])
+        .select('svg.chart')
+        .attr('width', width)
+        .attr('height', height)
+        .call(this.timeline);
       return this;
     },
 
@@ -116,4 +173,3 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       return this;
     }
 });
-
