@@ -95,6 +95,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       this.zoom.translate(z.translate).scale(z.scale);
       this.chart.attr("transform", "translate(" + z.translate[0] + "," + z.translate[1]+ ")"
               + " scale(" + z.scale + ")");
+      this.chart.select('.chart-area').call(this.zoom)
     },
 
     _getState: function() {

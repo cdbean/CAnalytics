@@ -24,6 +24,12 @@ wb.filter.set = function(data, tool, window) {
   this.update();
 
   $.publish('data/filter', window);
+
+  wb.log.log({
+    operation: 'filtered',
+    tool: tool,
+    public: false
+  });
 };
 
 wb.filter.update = function() {
@@ -50,7 +56,7 @@ wb.filter.remove = function(item) {
   wb.log.log({
     operation: 'defiltered',
     item: item,
-    tool: 'filter bar',
+    tool: item,
     public: false
   });
 
