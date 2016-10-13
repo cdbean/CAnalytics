@@ -24,7 +24,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
         this.updateData();
         this.updateView();
-        // restore the view state, if previously saved 
+        // restore the view state, if previously saved
         var state = JSON.parse(localStorage.getItem('network_state'));
         if (state) this.useState(state);
         this._registerAutoSave();
@@ -42,7 +42,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
 
     useState: function(state, id) { // id is the id of the view
       // since we use the state of the view [id], we mark the view as the parent of the current view
-      this.element.find('.ui-layout-center>svg').data('parent', id); 
+      this.element.find('.ui-layout-center>svg').data('parent', id);
 
       this.chart.selectAll('.nodeg').attr("transform", function(d) {
        if (d.id in state.nodes) {
@@ -57,11 +57,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           return d.dim = state.nodes[d.id].dim || false; // do not dim by default
         return false;
       })
-      .style('display', function(d) {
-        if (d.id in state.nodes)
-          return (d.display = state.nodes[d.id].display || false) ? '' : 'none'; // hide by default
-        return 'none'; // if the item is not in the state, the item might not have been created at the time when the state was created
-      });
+      // .style('display', function(d) {
+      //   if (d.id in state.nodes)
+      //     return (d.display = state.nodes[d.id].display || false) ? '' : 'none'; // hide by default
+      //   return 'none'; // if the item is not in the state, the item might not have been created at the time when the state was created
+      // });
       this.chart.selectAll('.linkg').select('path').attr('d', function(d) {
         d.linknum = d.linknum || 1;
         var deltaX = d.target.x - d.source.x,
@@ -82,15 +82,15 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       });
       this.chart.selectAll('.linkg')
         .classed('dim', function(d) {
-          if (d.id in state.links) 
+          if (d.id in state.links)
             return d.dim = state.links[d.id].dim || false; // do not dim by default
           return false;
         })
-        .style('display', function(d) {
-          if (d.id in state.links) 
-            return (d.display = state.links[d.id].display || false) ? '' : 'none'; // show by default
-          return 'none'; // if the item is not in the state, the item might not have been created at the time when the state was created
-        });
+        // .style('display', function(d) {
+        //   if (d.id in state.links)
+        //     return (d.display = state.links[d.id].display || false) ? '' : 'none'; // show by default
+        //   return 'none'; // if the item is not in the state, the item might not have been created at the time when the state was created
+        // });
       var z = state.zoom;
       this.zoom.translate(z.translate).scale(z.scale);
       this.chart.attr("transform", "translate(" + z.translate[0] + "," + z.translate[1]+ ")"
@@ -101,16 +101,16 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       var network_state = {nodes: {}, links: {}, zoom: {}}; // network state info
       this.chart.selectAll('.nodeg').each(function(d) {
         network_state.nodes[d.id] = {
-          id: d.id, 
-          x: d.x, 
-          y: d.y, 
+          id: d.id,
+          x: d.x,
+          y: d.y,
           display: d.display, // whether the node is shown
           dim: d.dim // whether the node is dimmed
         };
       });
       this.chart.selectAll('.linkg').each(function(d) {
         network_state.links[d.id] = {
-          id: d.id, 
+          id: d.id,
           display: d.display, // whether the node is shown
           dim: d.dim // whether the node is dimmed
         };
@@ -143,7 +143,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             .attr('width', this.width)
             .attr('height', this.height)
             .attr("pointer-events", "all")
-            .attr('id', this.uuid) 
+            .attr('id', this.uuid)
         ;
         // define node image
         for (var i = 0; i < wb.store.static.entity_types.length; i++) {
@@ -254,7 +254,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       '
       var el = $(html).appendTo(this.element);
       var _this = this;
-      this.layout = this.element.layout({ // jquery layout plugin, save this.layout because it is referred in resize() 
+      this.layout = this.element.layout({ // jquery layout plugin, save this.layout because it is referred in resize()
         applyDemoStyles: true,
         west__size: 100,
         east__size: 300,
@@ -272,11 +272,11 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       for (var i in wb.info.users) {
         if (i == USER) continue; // skip the user himself, add him later
         var u = wb.info.users[i];
-        filterbar += '<div class="user-view-container pull-right"><a class="badge user-icon" href="#" data-user=' + i 
+        filterbar += '<div class="user-view-container pull-right"><a class="badge user-icon" href="#" data-user=' + i
           + ' title="View ' + u.name + '">' + u.name[0].toUpperCase() + '</a><span class="glyphicon glyphicon-eye-open hidden watching-icon"></span></div>';
       }
       // put current user first
-      filterbar += '<a class="badge user-icon pull-right active" href="#" data-user=' + USER 
+      filterbar += '<a class="badge user-icon pull-right active" href="#" data-user=' + USER
         + ' title="Go back to your own view">' + wb.info.users[USER].name[0].toUpperCase() + '</a>';
       filterbar += '<ul>'
       for (var i = 0; i < entity_types.length; i++) {
@@ -414,7 +414,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     this.element.find('#share-btn').replaceWith('<button id="clone-btn" class="btn btn-success btn-xs pull-right">Clone</button>')
   },
 
-  // watch other's view stream 
+  // watch other's view stream
   watchStream: function(state) {
     this.useState(state);
   },
@@ -460,7 +460,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       });
       if (tostream) {
         var state;
-        if (_this.watchUser) state = _this.state;  // if I am watching other's view, stream my prior saved view 
+        if (_this.watchUser) state = _this.state;  // if I am watching other's view, stream my prior saved view
         else state = _this._getState();
         $.publish('view/stream', {state: state, from: USER, to: usersInWatch});
       } else {
@@ -496,7 +496,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       case: CASE,
       group: GROUP
     }, function(views) {
-      for (var i = 0; i < views.length; i++) 
+      for (var i = 0; i < views.length; i++)
         _this.loadView(views[i]);
     });
   },
@@ -525,7 +525,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       .find('.username').text(wb.info.users[v.created_by].name).end()
       .find('.timestamp').text(v.created_at).end()
       .data({
-        'state': JSON.parse(v.state), 
+        'state': JSON.parse(v.state),
         'user': v.created_by,
         'comment': v.comment,
         'time': v.created_at,
@@ -616,7 +616,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     this.svg.selectAll('.link').transition().style('display', function(d) {
       var rel = wb.store.items.relationships[d.id];
       if (rel.primary.relation === value) {
-        d.display = true;  
+        d.display = true;
         return display;
       }
       d.display = false;
@@ -922,7 +922,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         function brushing() {
             var e = _this.brush.extent();
             var selected_nodes = [], selected_relationships = [];
-            d3.selectAll(".node").classed("selected", function(d) {
+            _this.chart.selectAll(".node").classed("selected", function(d) {
                 return  e[0][0] <= d.x && d.x <= e[1][0]
                     && e[0][1] <= d.y && d.y <= e[1][1];
             });
@@ -941,49 +941,17 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         function brushend() {
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
-            $('.filter-div .filter-item').filter(function(i, item) {
-              return $(item).find('a').data('tool') === 'network';
-            }).remove();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
-                wb.store.shelf_by.entities = [];
-                // d3.selectAll(".node").classed("selected", function(d) {
-                //     return d.selected = false;
-                // });
-                wb.log.log({
-                    operation: 'defiltered',
-                    item: 'entities',
-                    tool: 'network',
-                    public: false
-                });
+              wb.filter.remove('network')
             }
             else {
-                var ents_id = [];
-                d3.selectAll('.node.selected').each(function(d) {
-                    var r = wb.store.items.entities[d.id];
-                    ents_id.push(d.id);
+                var filter = [];
+                _this.chart.selectAll('.node.selected').each(function(d) {
+                    filter.push(d.id);
                 })
-                wb.store.shelf_by.entities = ents_id;
-
-                selected_entities = []
-                ents_id.forEach(function(d) {
-                  var entity = wb.store.items.entities[d];
-                  selected_entities.push(entity);
-                  wb.filter.add(entity.primary.entity_type + ': ' + entity.primary.name, {
-                    item: entity.primary.entity_type,
-                    id: entity.meta.id,
-                    tool: 'network'
-                  });
-                });
-                wb.log.log({
-                    operation: 'filtered',
-                    item: 'entities',
-                    tool: 'network',
-                    data: wb.log.logItems(selected_entities),
-                    public: false
-                });
+                wb.filter.set(filter, 'network', '#' + _this.element.attr("id"))
             }
-            $.publish('data/filter', '#' + _this.element.attr("id"));
         }
         return this;
     },
@@ -1190,7 +1158,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
     updateData: function() {
         var _this = this;
 
-        // first add all entities as nodes 
+        // first add all entities as nodes
         for (var d in wb.store.items.entities) {
           var ent = wb.store.items.entities[d];
           if (ent.meta.deleted) continue;
@@ -1213,7 +1181,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             }
           } else {
             delete this.nodes[i].temp_exist;
-          } 
+          }
         }
 
         // add relationships as links
@@ -1243,14 +1211,14 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           if (this.links[i]) {
             if (!this.links[i].temp_exist) {
               delete this.linkMap[this.links[i].id];
-              this.links.splice(i, 1); 
+              this.links.splice(i, 1);
               // update position in linkMap after i
               for (var j = i; j < this.links.length; j++) {
                 this.linkMap[this.links[j].id] = j;
               }
             } else {
               delete this.links[i].temp_exist;
-            } 
+            }
           }
         }
 
@@ -1299,8 +1267,8 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           .attr('width', '200px')
           .style('text-align', 'center')
           .html('No entities created yet');
-      } 
-      else d3.select('.ui-layout-center').selectAll('.placeholder').remove(); 
+      }
+      else d3.select('.ui-layout-center').selectAll('.placeholder').remove();
 
       this.svg.selectAll('.linkg').attr('display', function(d) {
         if (wb.store.shelf.relationships.indexOf(d.id) > -1) {
@@ -1310,7 +1278,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
           // calculate relations
           var rel = wb.store.items.relationships[d.id];
           if (rel.primary.relation in rels) rels[rel.primary.relation]++;
-          else rels[rel.primary.relation] = 1; 
+          else rels[rel.primary.relation] = 1;
           d.display = true;
           return '';
         }
@@ -1353,7 +1321,7 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         link_g.append('path')
           .attr('class', 'link')
           .attr('id', function(d) {
-            return 'path-' + d.id + '-' + uuid; 
+            return 'path-' + d.id + '-' + uuid;
           })
           .style('marker-start', function(d) { return d.left ? 'url(#start-arrow)' : ''; })
           .style('marker-end', function(d) { return 'url(#end-arrow)'; })
@@ -1561,5 +1529,3 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       return this;
     }
 });
-
-

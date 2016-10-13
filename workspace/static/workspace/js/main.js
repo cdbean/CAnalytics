@@ -44,7 +44,7 @@ $(function() {
     });
     $('#share-network-modal').modal('hide');
   });
-  
+
   $('#use-network-modal form').on('submit', function(e) {
     e.preventDefault();
     var network = $('.viz.network').data('instance');
@@ -108,9 +108,10 @@ $(function() {
   }
 
   function onRemoveFilter(e) {
-    var item = $(e.target).parent();
-    var data = item.find('a').data();
-    wb.filter.remove(item, data);
+    var item = $(e.target).parent()
+      .find('a')
+      .text();
+    wb.filter.remove(item);
   }
 
   function onClickOutside() {
@@ -296,7 +297,7 @@ $(function() {
     } else if (viz_name === 'history') {
       var sel = $('.viz.history');
       if (sel.length) sel.dialog('open');
-      else 
+      else
         viz = $('<div>').vizhistory({
           title: 'History',
           tool: 'history',
@@ -335,4 +336,3 @@ $(function() {
   }
 
 });
-

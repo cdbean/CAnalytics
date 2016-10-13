@@ -29,40 +29,11 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     },
 
     onFilter: function(filter) {
-      var shelf_by = wb.store.shelf_by.entities.slice();
-      shelf_by = wb.utility.uniqueArray(shelf_by.concat(filter));
-
-      wb.store.shelf_by.entities = shelf_by;
-      $('.filter-div .filter-item').filter(function(i, item) {
-        return $(item).find('a').data('item') === 'event';
-      }).remove();
       if (!filter.length) {
-        wb.log.log({
-          operation: 'defiltered',
-          item: 'events',
-          tool: 'timeline',
-          public: false
-        });
+        wb.filter.remove('timeline');
       } else {
-        var selected_events = [];
-        filter.forEach(function(d) {
-          var e = wb.store.items.entities[d];
-          wb.filter.add('event: ' + e.primary.name, {
-            item: 'event',
-            id: e.meta.id,
-            tool: 'timeline',
-          });
-          selected_events.push(e);
-        });
-        wb.log.log({
-          operation: 'filtered',
-          item: 'events',
-          tool: 'timeline',
-          data: wb.log.logItems(selected_events),
-          public: false
-        });
+        wb.filter.set(filter, 'timeline', '#' + this.element.attr('id'));
       }
-      $.publish('data/filter', '#' + this.element.attr('id'));
     },
 
     updateData: function() {

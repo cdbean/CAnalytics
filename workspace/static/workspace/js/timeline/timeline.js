@@ -44,6 +44,15 @@ wb.viz.timeline = function() {
     return exports;
   }
 
+  exports.filter = function(subset) {
+    if (container)
+      container.selectAll('.item')
+        .attr('display', function(d) {
+          if (subset.indexOf(d.id) > -1) return '';
+          else return 'none';
+        });
+  }
+
   function exports(selection) {
     selection.each(function(dd) {
       var innerW = width - margin.left - margin.right,
@@ -80,7 +89,7 @@ wb.viz.timeline = function() {
       update.apply(this);
 
       function init() {
-        if (d3.select(this).select('.timelineVis').empty()) {
+        if (!container) {
           container = d3.select(this).append('g').attr('class', 'timelineVis')
           container.append('clipPath').attr('id', 'clip')
             .append('rect');
