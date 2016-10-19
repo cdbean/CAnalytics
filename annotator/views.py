@@ -5,7 +5,7 @@ import json
 from django.contrib.auth.models import User, Group
 from workspace.entity import get_or_create_entity, get_or_create_relationship
 from workspace.models import DataEntry, Case
-from sync.views import sync_item
+# from sync.views import sync_item
 from annotator.models import Annotation
 
 
@@ -51,7 +51,7 @@ def create_ann(data, case, group, user):
         case=case
     )
 
-    return annotation, [entity] + new_ents + updated_ents, [rel] + new_rels 
+    return annotation, [entity] + new_ents + updated_ents, [rel] + new_rels
 
 
 def update_ann(annotation, data, case, group, user):
@@ -94,7 +94,7 @@ def del_ann(annotation):
     annotation.deleted = True
     annotation.save()
 
-    return annotation 
+    return annotation
 
 
 
@@ -137,7 +137,7 @@ def post_annotation(request):
     res['entity'] += [e.serialize() for e in ents if e is not None]
 
     # sync annotation
-    sync_item('create', 'annotation', res, case, group, request.user)
+    # sync_item('create', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -167,7 +167,7 @@ def update_annotation(request, id):
         r.save()
         res['relationship'].append(r.serialize())
 
-    sync_item('update', 'annotation', res, case, group, request.user)
+    # sync_item('update', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -189,7 +189,7 @@ def del_annotation(request, id):
     ann = del_ann(annotation)
     res['annotation'] = ann.serialize()
 
-    sync_item('delete', 'annotation', res, case, group, request.user)
+    # sync_item('delete', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -237,7 +237,7 @@ def post_annotations(request):
         res['entities'] += [e.serialize() for e in ents if e is not None]
         log_anns.append({'id': ann.id, 'name': ann.quote})
 
-    sync_item('create', 'annotation', res, case, group, request.user)
+    # sync_item('create', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -269,7 +269,7 @@ def update_annotations(request):
             r.save()
             res['relationships'].append(r.serialize())
 
-    sync_item('update', 'annotation', res, case, group, request.user)
+    # sync_item('update', 'annotation', res, case, group, request.user)
 
     return HttpResponse(json.dumps(res), content_type='application/json')
 
@@ -292,8 +292,5 @@ def del_annotations(request):
         ann = del_ann(annotation)
         res['annotations'].append(ann.serialize())
 
-    sync_item('delete', 'annotation', res, case, group, request.user)
+    # sync_item('delete', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
-
-
-

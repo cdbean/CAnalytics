@@ -10,8 +10,8 @@ from django.contrib.auth.models import Group
 from workspace.models import Case, DataEntry, Entity, Relationship, View
 from annotator.models import Annotation
 from workspace.entity import get_or_create_entity, set_primary_attr, get_or_create_relationship
-from sync.views import sync_item
-import sync.views as sync
+# from sync.views import sync_item
+# import sync.views as sync
 
 # Create your views here.
 @login_required
@@ -80,7 +80,7 @@ def cases(request):
                 group.user_set.add(request.user)
                 case.groups.add(group)
             else: # either join user group or other group
-                try: 
+                try:
                     group = request.user.groups.get(id=g_id)
                 except:
                     # join other group
@@ -124,7 +124,7 @@ def case_page(request, case, group):
         case = group.case_set.get(id=case)
     except:
         return HttpResponse('Sorry, you cannot join the group in this case')
-        
+
     datasets = case.dataset_set.all()
     for ds in datasets:
         ds.entries = ds.dataentry_set.count()
@@ -143,7 +143,7 @@ def case_page(request, case, group):
 @login_required
 def case_info(request):
     res = {}
-    if request.method == 'GET': 
+    if request.method == 'GET':
         try:
             group = request.user.groups.get(id=request.GET['group'])
             case = group.case_set.get(id=request.GET['case'])
@@ -228,10 +228,10 @@ def entity(request, id=0):
             res['relationship'].append(r_info)
             r.delete()
 
-        sync_item('update', 'entity', res, case, group, request.user)
+        # sync_item('update', 'entity', res, case, group, request.user)
 
         return HttpResponse(json.dumps(res), content_type='application/json')
-    # delete an entity    
+    # delete an entity
     if request.method == 'DELETE':
         res = {}
         data = QueryDict(request.body)
@@ -254,7 +254,7 @@ def entity(request, id=0):
             anns = r.annotation_set.all()
             res['annotation'] += [a.serialize() for a in anns]
 
-        sync_item('delete', 'entity', res, case, group, request.user)
+        # sync_item('delete', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
     if request.method == 'RESTORE':
         res = {}
@@ -278,7 +278,7 @@ def entity(request, id=0):
             anns = r.annotation_set.all()
             res['annotation'] += [a.serialize() for a in anns]
 
-        sync_item('restore', 'entity', res, case, group, request.user)
+        # sync_item('restore', 'entity', res, case, group, request.user)
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -334,7 +334,7 @@ def create_relationship(request):
     res['relationship'] = rel.serialize()
     res['entity'] += [e.serialize() for e in new_ents]
     res['entity'] += [e.serialize() for e in updated_ents]
-    sync_item('create', 'relationship', res, case, group, request.user)
+    # sync_item('create', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -348,7 +348,7 @@ def update_relationship(request, id):
     res['relationship'] = rel.serialize()
     res['entity'] += [e.serialize() for e in new_ents]
     res['entity'] += [e.serialize() for e in updated_ents]
-    sync_item('update', 'relationship', res, case, group, request.user)
+    # sync_item('update', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -377,7 +377,7 @@ def delete_relationship(request, id):
     anns = rel.annotation_set.all()
     anns.update(deleted=True)
     res['annotation'] = [a.serialize() for a in anns]
-    sync_item('delete', 'relationship', res, case, group, request.user)
+    # sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 def restore_relationship(request, id):
@@ -405,7 +405,7 @@ def restore_relationship(request, id):
     anns = rel.annotation_set.all()
     anns.update(deleted=False)
     res['annotation'] = [a.serialize() for a in anns]
-    sync_item('delete', 'relationship', res, case, group, request.user)
+    # sync_item('delete', 'relationship', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -420,7 +420,7 @@ import re
 import base64
 import os
 from datetime import datetime
-from django.utils import dateformat 
+from django.utils import dateformat
 import canalytics.settings
 @login_required
 def network_view(request):
@@ -432,7 +432,7 @@ def network_view(request):
         parent = request.POST.get('parent', [])
         path = []
         depth = 0
-        if parent: 
+        if parent:
             parent = View.objects.get(id=parent)
             path = parent.path
             depth = parent.depth + 1
@@ -442,7 +442,7 @@ def network_view(request):
         view = View.objects.create(image=img, state=state, comment=comment, path=path, depth=depth, group=group, case=case, created_by=request.user)
         view.path = view.path.append(view.id)
         view.save()
-        sync_item('share', 'view', view.serialize(), case, group, request.user)
+        # sync_item('share', 'view', view.serialize(), case, group, request.user)
         return HttpResponse('success')
     elif request.method == 'GET':
         group = request.user.groups.get(id=request.GET['group'])
@@ -451,5 +451,3 @@ def network_view(request):
         res = [v.serialize() for v in views]
         return HttpResponse(json.dumps(res), content_type='application/json')
     return HttpResponseBadRequest()
-
-

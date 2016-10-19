@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from workspace import views
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Examples:
     url(r'^cases$', views.cases_page, name='cases_page'),
     url(r'^cases/all$', views.cases, name='cases'),
@@ -19,4 +19,4 @@ urlpatterns = patterns('',
     url(r'^relationship/(\d+)$', views.relationship, name='relationship_id'),
     url(r'^relationship$', views.relationship, name='relationship'),
     url(r'^view/network$', views.network_view, name='network_view'),
-)
+]

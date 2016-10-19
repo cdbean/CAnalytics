@@ -3,7 +3,7 @@ from model_utils.managers import InheritanceManager
 from django.contrib.auth.models import User, Group
 from datetime import datetime
 from tinymce.models import HTMLField
-from dbarray import IntegerArrayField
+from django.contrib.postgres.fields import JSONField, ArrayField
 
 
 # Create your models here.
@@ -58,7 +58,7 @@ def get_model_attr(instance):
 class Case(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    groups = models.ManyToManyField(Group, null=True, blank=True)
+    groups = models.ManyToManyField(Group)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     location = models.GeometryField(null=True, blank=True)
@@ -70,7 +70,7 @@ class Case(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Meta: 
+    class Meta:
         ordering = ['name']
 
 
@@ -102,7 +102,7 @@ class Dataset(models.Model):
 
     def __unicode__(self):
         return self.case.name + ': ' + self.name
-    class Meta: 
+    class Meta:
         ordering = ['name']
 
 
@@ -138,7 +138,7 @@ class Entity(models.Model):
     priority      = models.CharField(max_length=10, null=True, blank=True)  # Low, High, Medium
     entity_type    = models.CharField(max_length=50, blank=True)
     note          = models.TextField(blank=True, null=True)
-    attributes    = models.ManyToManyField(Attribute, blank=True, null=True)
+    attributes    = models.ManyToManyField(Attribute)
     created_by     = models.ForeignKey(User, null=True, blank=True, verbose_name='created by', related_name='created_entities')
     created_at     = models.DateTimeField(auto_now_add=True, verbose_name='created at')
     last_edited_by = models.ForeignKey(User, null=True, blank=True, related_name='edited_entities')
@@ -207,7 +207,7 @@ class Person(Entity):
 
 
 class Organization(Entity):
-    person      = models.ManyToManyField(Person, null=True, blank=True)
+    person      = models.ManyToManyField(Person)
     category    = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
 
     def save(self, *args, **kwargs):
@@ -218,8 +218,8 @@ class Organization(Entity):
 
 
 class Event(Entity):
-    person       = models.ManyToManyField(Person, null=True, blank=True)
-    organization = models.ManyToManyField(Organization, null=True, blank=True)
+    person       = models.ManyToManyField(Person)
+    organization = models.ManyToManyField(Organization)
     location     = models.ForeignKey(Location, null=True, blank=True)
     category     = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     start_date   = models.DateTimeField(null=True, blank=True)
@@ -258,7 +258,7 @@ class Relationship(models.Model):
     confidence  = models.FloatField(null=True, blank=True)
     priority    = models.CharField(max_length=10, null=True, blank=True)  # L, M, H
     dataentry  = models.ForeignKey(DataEntry, null=True, blank=True)
-    attributes = models.ManyToManyField(Attribute, null=True, blank=True)
+    attributes = models.ManyToManyField(Attribute)
     created_at   = models.DateTimeField(default=datetime.now, verbose_name='created at')
     created_by  = models.ForeignKey(User, null=True, blank=True, verbose_name='created by', related_name='created_relationships')
     last_edited_by  = models.ForeignKey(User, null=True, blank=True, verbose_name='edited by', related_name='edited_relationships')
@@ -281,9 +281,9 @@ class View(models.Model):
         return 'views/{case}/{group}/{file}'.format(case=self.case.id, group=self.group.id, file=filename)
 
     image = models.TextField() # svg html
-    state = models.TextField() # json format
+    state = JSONField() # json format
     comment = models.TextField()
-    path  = IntegerArrayField(blank=True, null=True, editable=False)
+    path  = ArrayField(models.IntegerField(blank=True, null=True))
     depth = models.PositiveSmallIntegerField(default=0)
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -293,7 +293,7 @@ class View(models.Model):
     def __unicode__(self):
         return self.created_by.username + ' ' + self.created_at.strftime('%m/%d/%Y %H:%M:%S')
 
-    class Meta: 
+    class Meta:
         ordering = ['path']
 
     def serialize(self):
@@ -309,5 +309,3 @@ class View(models.Model):
             'group': self.group.id,
             'case': self.case.id
         }
-
-
