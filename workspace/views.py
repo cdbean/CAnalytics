@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseBadRequest
 import json
 from django.http import QueryDict
 
-from canalytics import settings
+from random import randint
 
+from canalytics import settings
 from django.contrib.auth.models import Group
 from workspace.models import Case, DataEntry, Entity, Relationship, View
 from annotator.models import Annotation
@@ -80,7 +81,7 @@ def cases(request):
                 group.user_set.add(request.user)
                 case.groups.add(group)
             else: # either join user group or other group
-                try: 
+                try:
                     group = request.user.groups.get(id=g_id)
                 except:
                     # join other group
@@ -89,6 +90,9 @@ def cases(request):
                         group.user_set.add(request.user)
                     except:
                         return HttpResponse('Group PIN incorrect')
+            # assign role
+            if case.roles and (not request.user.role):
+                random_assign_roles(case, group, request.user)
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
         return redirect('ws:case_page', case=case.id, group=group.id)
@@ -102,7 +106,7 @@ def join_case(request):
         except Case.DoesNotExist:
             return HttpResponse('Case PIN incorrect')
 
-        g_id = int(request.POST['group'])
+        g_id = int(request.POST.get('group', 0))
         if g_id == 0:
             group = Group.objects.create(name=request.POST['group_name'], pin=request.POST['group_pin'])
         else:
@@ -114,7 +118,22 @@ def join_case(request):
         group.user_set.add(request.user)
         case.groups.add(group)
 
+        if case.roles and (not request.user.role):
+            random_assign_roles(case, group, request.user)
+
         return redirect('ws:case_page', case=case.id, group=group.id)
+
+
+def random_assign_roles(case, group, user):
+    roles = case.roles
+    for u in group.user_set.exclude(id=user.id).all():
+        if u.role in roles:
+            roles.remove(u.role)
+
+    # random
+    i = randint(0, len(roles) - 1)
+    user.role = roles[i]
+    user.save()
 
 
 @login_required
@@ -124,7 +143,7 @@ def case_page(request, case, group):
         case = group.case_set.get(id=case)
     except:
         return HttpResponse('Sorry, you cannot join the group in this case')
-        
+
     datasets = case.dataset_set.all()
     for ds in datasets:
         ds.entries = ds.dataentry_set.count()
@@ -143,7 +162,7 @@ def case_page(request, case, group):
 @login_required
 def case_info(request):
     res = {}
-    if request.method == 'GET': 
+    if request.method == 'GET':
         try:
             group = request.user.groups.get(id=request.GET['group'])
             case = group.case_set.get(id=request.GET['case'])
@@ -184,7 +203,11 @@ def data(request):
     except:
         return HttpResponseBadRequest()
 
-    datasets = case.dataset_set.all()
+    # send only the dataset of the role
+    if not request.user.role:
+        datasets = case.dataset_set.filter(role=request.user.role)
+    else:
+        datasets = case.dataset_set.all()
     for ds in datasets:
         res['datasets'].append(ds.serialize())
     dataentries = DataEntry.objects.filter(dataset__in=datasets)
@@ -231,7 +254,7 @@ def entity(request, id=0):
         sync_item('update', 'entity', res, case, group, request.user)
 
         return HttpResponse(json.dumps(res), content_type='application/json')
-    # delete an entity    
+    # delete an entity
     if request.method == 'DELETE':
         res = {}
         data = QueryDict(request.body)
@@ -420,7 +443,7 @@ import re
 import base64
 import os
 from datetime import datetime
-from django.utils import dateformat 
+from django.utils import dateformat
 import canalytics.settings
 @login_required
 def network_view(request):
@@ -432,7 +455,7 @@ def network_view(request):
         parent = request.POST.get('parent', [])
         path = []
         depth = 0
-        if parent: 
+        if parent:
             parent = View.objects.get(id=parent)
             path = parent.path
             depth = parent.depth + 1
@@ -451,5 +474,3 @@ def network_view(request):
         res = [v.serialize() for v in views]
         return HttpResponse(json.dumps(res), content_type='application/json')
     return HttpResponseBadRequest()
-
-
