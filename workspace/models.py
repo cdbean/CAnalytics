@@ -137,7 +137,7 @@ class DataEntry(models.Model):
 
 class Entity(models.Model):
     name          = models.CharField(max_length=1000)
-    priority      = models.CharField(max_length=10, blank=True)  # Low, High, Medium
+    priority      = models.CharField(max_length=10, null=True, blank=True)  # Low, High, Medium
     entity_type    = models.CharField(max_length=50, blank=True)
     note          = models.TextField(blank=True, null=True)
     attributes    = models.ManyToManyField(Attribute, blank=True, null=True)
@@ -180,7 +180,7 @@ class Entity(models.Model):
 
 class Location(Entity):
     geometry = models.GeometryField(null=True, blank=True)
-    address = models.CharField(max_length=500, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
     precision = models.FloatField(null=True, blank=True, help_text='in meter')
 
     objects = models.GeoManager()
@@ -195,11 +195,11 @@ class Location(Entity):
 
 
 class Person(Entity):
-    gender       = models.CharField(max_length=10, blank=True)
-    nationality  = models.CharField(max_length=50, blank=True)
+    gender       = models.CharField(max_length=10, null=True, blank=True)
+    nationality  = models.CharField(max_length=50, null=True, blank=True)
     alias        = models.ForeignKey('self', null=True, blank=True)  # TODO: the person could be an alias to another person
-    job          = models.CharField(max_length=50, blank=True)
-    age          = models.CharField(max_length=50, blank=True)
+    job          = models.CharField(max_length=50, null=True, blank=True)
+    age          = models.CharField(max_length=50, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""
@@ -210,7 +210,7 @@ class Person(Entity):
 
 class Organization(Entity):
     person      = models.ManyToManyField(Person, null=True, blank=True)
-    category    = models.CharField(max_length=100, blank=True, verbose_name='type')
+    category    = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
 
     def save(self, *args, **kwargs):
         """auto fill entity_type"""
@@ -223,7 +223,7 @@ class Event(Entity):
     person       = models.ManyToManyField(Person, null=True, blank=True)
     organization = models.ManyToManyField(Organization, null=True, blank=True)
     location     = models.ForeignKey(Location, null=True, blank=True)
-    category     = models.CharField(max_length=100, blank=True, verbose_name='type')
+    category     = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     start_date   = models.DateTimeField(null=True, blank=True)
     end_date     = models.DateTimeField(null=True, blank=True)
     repeated       = models.NullBooleanField(default=False, null=True, blank=True)  # 1 -7, stands for Mon - Sun
@@ -239,9 +239,9 @@ class Event(Entity):
 
 
 class Resource(Entity):
-    condition    = models.CharField(max_length=100, blank=True)
-    availability = models.CharField(max_length=50, blank=True)
-    category    = models.CharField(max_length=50, blank=True, verbose_name='type')
+    condition    = models.CharField(max_length=100, null=True, blank=True)
+    availability = models.CharField(max_length=50, null=True, blank=True)
+    category    = models.CharField(max_length=50, null=True, blank=True, verbose_name='type')
 
     objects = InheritanceManager()
 
@@ -256,9 +256,9 @@ class Relationship(models.Model):
     source = models.ForeignKey(Entity, null=True, blank=True, related_name="relates_as_source") # trick here: if source is null, it is a "special" relationship, indicating that a dataentry 'contains' an entity
     target = models.ForeignKey(Entity, related_name="relates_as_target")
     note   = models.TextField(null=True, blank=True)
-    relation  = models.CharField(max_length=500, blank=True)
+    relation  = models.CharField(max_length=500, null=True, blank=True)
     confidence  = models.FloatField(null=True, blank=True)
-    priority    = models.CharField(max_length=10, blank=True)  # L, M, H
+    priority    = models.CharField(max_length=10, null=True, blank=True)  # L, M, H
     dataentry  = models.ForeignKey(DataEntry, null=True, blank=True)
     attributes = models.ManyToManyField(Attribute, null=True, blank=True)
     created_at   = models.DateTimeField(default=datetime.now, verbose_name='created at')

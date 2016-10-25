@@ -239,55 +239,21 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.map.addPopup(feature.popup, true);
     },
 
-    filterByLocation: function(feature) {
-        var shelf_by = wb.store.shelf_by.entities.slice();
-        var selectedFeas = []; // selected feature ids
+    filterByLocation: function() {
+        var filter = []; // selected feature ids
 
-        $('.filter-div .filter-item').filter(function(i, item) {
-          return $(item).find('a').data('tool') === 'map';
-        }).remove();
-
-        this.features.forEach(function(d) {
-          var i = wb.store.shelf_by.entities.indexOf(d.attributes.id);
-          if (i > -1) shelf_by.splice(i, 1);
-        });
-
-        // get the id of all selected features
         this.layers.forEach(function(layer) {
-            for (var i = 0, len = layer.selectedFeatures.length; i < len; i++) {
-                selectedFeas.push(layer.selectedFeatures[i].attributes.id);
-            }
+          for (var i = 0, len = layer.selectedFeatures.length; i < len; i++) {
+            filter.push(layer.selectedFeatures[i].attributes.id);
+          }
         });
-        shelf_by = shelf_by.concat(selectedFeas);
-        wb.store.shelf_by.entities = shelf_by;
 
-        if (selectedFeas.length == 0) {
-            wb.log.log({
-                operation: 'defiltered',
-                item: 'locations',
-                tool: 'map',
-                public: false
-            });
+        if (filter.length) {
+          wb.filter.set(filter, 'map', '#' + this.element.attr('id'));
         } else {
-            var selected_locations = selectedFeas.map(function(id) {
-                var e = wb.store.items.entities[id];
-                wb.filter.add('location: ' + e.primary.name, {
-                    item: 'location',
-                    id: e.meta.id,
-                    tool: 'map'
-                });
-                return e;
-            });
-
-            wb.log.log({
-                operation: 'filtered',
-                item: 'locations',
-                tool: 'map',
-                data: wb.log.logItems(selected_locations),
-                public: false
-            });
+          wb.filter.remove('map');
         }
-        $.publish('data/filter', '#' + this.element.attr('id'));
+
         return this;
     },
 
@@ -308,4 +274,3 @@ $.widget("viz.vizmap", $.viz.vizbase, {
       return this;
     }
 });
-

@@ -83,14 +83,17 @@ def reset_password_done(request):
 
 
 def users(request):
-    print 'users requested'
     res = []
     group = request.user.groups.get(id=request.GET['group'])
     users = group.user_set.all()
     for u in users:
         res.append({
             'id': u.id,
-            'name': u.username
+            'name': u.first_name, # name is for display
+            'fname': u.first_name,
+            'lname': u.last_name,
+            'email': u.email,
+            'username': u.username
         })
     return HttpResponse(json.dumps(res), content_type='application/json')
 

@@ -40,9 +40,11 @@ def broadcast_users_status(user, case, group):
     for u in users:
         data['users'].append({
             'id': u.id,
-            'name': u.username,
+            'name': u.first_name,
             'fname': u.first_name,
-            'lname': u.last_name
+            'lname': u.last_name,
+            'username': u.username,
+            'email': u.email
         })
 
     status = ishout_client.get_room_status(name)
@@ -77,7 +79,7 @@ def messages(request):
         if (res['has_next']): res['next_page'] = msgs.next_page_number()
         if (res['has_previous']): res['previous_page'] = msgs.previous_page_number()
         res['number'] = msgs.number
-        res['num_pages'] = msgs.paginator.num_pages 
+        res['num_pages'] = msgs.paginator.num_pages
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -119,4 +121,3 @@ def broadcast_activity(data, case, group, user):
         ishout_client.broadcast_group(name, 'action', data)
     except:
         print '[warning] Sync failed. Is sync server running?'
-
