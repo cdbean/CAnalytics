@@ -6,7 +6,7 @@
 {% endblock%}
 
 {% block extracss %}
-<link rel="stylesheet" type="text/css" href="{% static 'account/css/login.css' %}">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'account/css/login.css' %}"> -->
 {% endblock%}
 
 
@@ -15,25 +15,26 @@
 {% endblock %}
 
 {% block page-body %}
-  <form action="{% url 'account:login' %}" method='POST' class="form-signin">
-    <h2 class="form-signin-heading">Sign in</h2>
-    <label for="username" class="sr-only">Email address</label>
-    <input id="username" name="username" class="form-control" placeholder="User name" required autofocus>
-    <label for="password" class="sr-only">Password</label>
-    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
-    <!--
-    <select id="case" name="case" class="form-control selectpicker" title="Select a case...">
-      {% for case in cases %}
-      <option value={{case.id}}>{{case.name}}</option>
-      {% endfor %}
-    </select>
-    <select id="group" name="group" class="form-control selectpicker" title="Select your group...">
-      {% for group in groups %}
-      <option value={{group.id}}>{{group.name}}</option>
-      {% endfor %}
-    </select>
-    -->
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-    <span class="help-block pull-right">Not signed up yet? <a href="{% url 'account:register' %}">Register here</a></span>
-  </form>
+<div class="container" id="content-main">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <form action="{% url 'account:login' %}" method='POST' class="form-signin">
+        <h2 class="form-signin-heading">Sign in </h2>
+        <div class="control-group">
+          <label for="username" class="sr-only">PSU email</label>
+          <div class="input-group">
+            <input type="text" class="form-control" name="username" placeholder="PSU email" aria-describedby="basic-addon2">
+            <span class="input-group-addon" id="basic-addon2">@psu.edu</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="password" class="sr-only">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+        <!-- <span class="help-block pull-right">Not signed up yet? <a href="{% url 'account:register' %}">Register here</a></span> -->
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}

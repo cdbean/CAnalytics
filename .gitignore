@@ -22,7 +22,7 @@ Thumbs.db
 /*/CACHE/
 pip-log.txt
 run_gunicorn.sh
-/*/migrations/
+**/migrations
 /logs/
 /.idea/
 .idea/

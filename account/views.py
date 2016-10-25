@@ -7,6 +7,7 @@ import json
 
 from django.contrib.auth.models import User, Group
 from workspace.models import Case
+from .psuAuth import psuAuth
 
 
 # Create your views here.
@@ -15,13 +16,26 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
+        res = psuAuth(username=username, password=password)
+        if 'error' in res:
+            return HttpResponse('Invalid credentials')
+
+        if not User.objects.filter(username=res['uid'][0]).exists():
+            User.objects.create_user(
+                username=res['uid'][0],
+                first_name=res['givenName'][0],
+                last_name=res['sn'][0],
+                email=res['mail'][0],
+                password=password
+            )
+
         user = authenticate(username=username, password=password)
+
         if user:
             try:
                 auth_login(request, user)
                 return redirect('home')
             except Exception as e:
-                print e
                 return HttpResponse('User name and password do not match')
         else:
             return HttpResponse('User name and password do not match')
@@ -81,7 +95,7 @@ def users(request):
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
-def validate_username(request): 
+def validate_username(request):
     validated = True
     username = request.GET['username']
     if User.objects.filter(username=username).exists():
@@ -106,5 +120,5 @@ def validate_groupname(request, case):
 
     if validated:
         return HttpResponse(status=200)
-    else: 
+    else:
         return HttpResponseBadRequest()
