@@ -43,6 +43,24 @@ d3.timelineLayout = function() {
     return timeline
   }
 
+  timeline.nodeMinWidth = function(_) {
+    if (!arguments.length) return nodeMinWidth;
+    nodeMinWidth = _;
+    return timeline
+  }
+
+  timeline.nodeMaxWidth = function(_) {
+    if (!arguments.length) return nodeMaxWidth;
+    nodeMaxWidth = _;
+    return timeline
+  }
+
+  timeline.nodePadding = function(_) {
+    if (!arguments.length) return nodePadding;
+    nodePadding = _;
+    return timeline
+  }
+
   timeline.nodes = function() {
     return nodes;
   }

@@ -6,7 +6,10 @@ wb.viz.timeline = function() {
   var tracks = [],
       itemPadding = 5,
       itemHeight = 20,
-      itemMinWidth = 100;
+      itemMinWidth = 10,
+      itemMaxWidth = 100;
+
+  var showLabel = true;
 
   var trackBy = '';
   var brushable = false;
@@ -14,7 +17,9 @@ wb.viz.timeline = function() {
 
   var container = null;
 
-  var dispatch = d3.dispatch('filter');
+  var scaleX;
+
+  var dispatch = d3.dispatch('filter', 'zoom');
 
   var formatDate = d3.time.format("%m/%d/%Y-%H:%M:%S");
 
@@ -30,8 +35,50 @@ wb.viz.timeline = function() {
     return exports
   }
 
-  exports.filter = function() {
-    // TODO: filter view
+  exports.itemMinWidth = function(_) {
+    if (!arguments.length) return itemMinWidth;
+    itemMinWidth = _;
+    return exports
+  }
+
+  exports.itemMaxWidth = function(_) {
+    if (!arguments.length) return itemMaxWidth;
+    itemMaxWidth = _;
+    return exports
+  }
+
+  exports.itemHeight = function(_) {
+    if (!arguments.length) return itemHeight;
+    itemHeight = _;
+    return exports
+  }
+
+  exports.itemPadding = function(_) {
+    if (!arguments.length) return itemPadding;
+    itemPadding = _;
+    return exports
+  }
+
+  exports.showLabel = function(_) {
+    if (!arguments.length) return showLabel;
+    showLabel = _;
+    return exports
+  }
+
+  exports.domain = function(_) {
+    if (!arguments.length) {
+      if (scaleX) {
+        return scaleX.domain();
+      }
+      else {
+        return
+      }
+    }
+    if (scaleX) {
+      scaleX.domain(_);
+    }
+    if (zoom) zoom.x(scaleX)
+    return exports
   }
 
   exports.trackBy = function(by) {
@@ -42,6 +89,19 @@ wb.viz.timeline = function() {
   exports.brushable = function(_) {
     brushable = _;
     return exports;
+  }
+
+  exports.setBrush = function(extent) {
+    if (!brush) return;
+    var domain = scaleX.domain()
+    if (extent[0] <= domain[0] && extent[1] > domain[1]) {
+      brush.clear()
+    } else {
+      brush.extent(extent);
+    }
+    brush(container.select('.brush').transition())
+    // fire brushstart, brushmove, brushend events
+    // brush.event(container.select(".brush"))
   }
 
   exports.filter = function(subset) {
@@ -57,7 +117,7 @@ wb.viz.timeline = function() {
     selection.each(function(dd) {
       var innerW = width - margin.left - margin.right,
           innerH = height - margin.top - margin.bottom;
-      var scaleX, axis;
+      var axis;
       var timelineLayout;
 
 
@@ -66,10 +126,11 @@ wb.viz.timeline = function() {
         updateItems()
         updateTracks()
         updateAxis()
+        dispatch.zoom(zoom.x().domain())
       }
 
       function brushing() {
-        var ext = brush.extent()
+        var ext = brush.extent();
         container.selectAll('.item').classed('active', function(d) {
           return (d.start <= ext[1]  && d.start >= ext[0])
             || (d.end >= ext[0] && d.end <= ext[1])
@@ -80,9 +141,10 @@ wb.viz.timeline = function() {
       function brushed() {
         var filter = [];
         container.selectAll('.item.active').each(function(d) {
-          filter.push(d.id);
+          filter.push(d);
         });
-        return dispatch.filter(filter);
+        var ext = brush.empty() ? null : brush.extent();
+        return dispatch.filter(filter, ext);
       }
 
       init.apply(this);
@@ -146,12 +208,17 @@ wb.viz.timeline = function() {
         container.select('clipPath rect').attr('width', width).attr('height', height);
 
         container.select('.axis').attr('transform', 'translate(0,' + innerH + ')')
+
         timelineLayout = d3.timelineLayout()
           .data(dd)
           .width(innerW)
           .height(innerH)
           .trackBy(trackBy)
           .scale(scaleX)
+          .nodeHeight(itemHeight)
+          .nodeMinWidth(itemMinWidth)
+          .nodeMaxWidth(itemMaxWidth)
+          .nodePadding(itemPadding)
           .layout();
       }
 
@@ -185,7 +252,9 @@ wb.viz.timeline = function() {
 
         var itemEnter = item.enter().append('g').attr('class', 'item')
         itemEnter.append('rect')
-        itemEnter.append('text')
+        if (showLabel) {
+          itemEnter.append('text')
+        }
 
         item.select('rect')
           .attr('x', function(d) { return d.x; })
@@ -194,17 +263,21 @@ wb.viz.timeline = function() {
           .attr('height', function(d) { return d.height; })
           .style('fill', 'steelblue')
 
-        item.select('text')
-          .attr('x', function(d) { return d.x; })
-          .attr('y', function(d) { return d.y + itemHeight/2; })
-          .attr('dy', '.35em')
-          .attr('text-anchor', 'start')
-          .text(function(d) { return d.label; })
+        if (showLabel) {
+          item.select('text')
+            .attr('x', function(d) { return d.x; })
+            .attr('y', function(d) { return d.y + itemHeight/2; })
+            .attr('dy', '.35em')
+            .attr('text-anchor', 'start')
+            .text(function(d) { return d.label; })
+        }
       }
 
       function updateTracks() {
+        var dd = d3.values(timelineLayout.tracks());
+        var trackNum = dd.length;
         var track = container.select('.tracks').selectAll('.track')
-          .data(d3.values(timelineLayout.tracks()))
+          .data(dd)
 
         track.exit().remove()
 
@@ -222,9 +295,13 @@ wb.viz.timeline = function() {
           .style('fill', '#aaa');
 
         track.select('path')
-          .attr('d', function(d) {
-            var y = d.start - d.height - itemPadding/2;
-            return 'M0,' + y + 'L' + innerW + ',' + y;
+          .attr('d', function(d, i) {
+            if (i < trackNum - 1) {
+              var y = d.start - d.height - itemPadding/2;
+              return 'M0,' + y + 'L' + innerW + ',' + y;
+            } else {
+              return null;
+            }
           })
           .style('stroke', '#ccc');
       }

@@ -16,12 +16,12 @@
     stroke-width : 1;
     stroke: grey;
     shape-rendering: crispEdges;
+    fill: none;
 }
 
 /* brush */
 
-
-.chart {
+#detailTimeline, #overviewTimeline {
     fill: white;
 }
 
@@ -56,13 +56,9 @@
     pointer-events: auto;
 }
 
-.svg {
+/*.svg {
     border-style: solid;
     border-width: 1px;
     border-color: black;
     background-color: #FFFFFF;
-}
-
-
-
-
+}*/
