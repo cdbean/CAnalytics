@@ -940,18 +940,19 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }
 
         function brushend() {
+            var windowId = '#' + _this.element.attr('id');
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
-              wb.filter.remove('network')
+              wb.filter.remove(windowId);
             }
             else {
                 var filter = [];
                 _this.chart.selectAll('.node.selected').each(function(d) {
                     filter.push(d.id);
                 })
-                wb.filter.set(filter, 'network', '#' + _this.element.attr("id"))
+                wb.filter.set(filter, 'network', windowId);
             }
         }
         return this;
@@ -1441,6 +1442,13 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
       var pos = {top: d3.event.pageY, left: d3.event.pageX};
       var rel = wb.store.items.relationships[d.id];
       wb.viewer.data(rel, 'relationship').show(pos, 'network');
+    },
+
+    defilter: function() {
+      if (!this.brush) return;
+
+      this.brush.clear();
+      this.chart.select('.brush').call(this.brush);
     },
 
     highlight: function(item) {

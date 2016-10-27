@@ -239,6 +239,10 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.map.addPopup(feature.popup, true);
     },
 
+    defilter: function() {
+      this.mapControls.select.unselectAll();
+    },
+
     filterByLocation: function() {
         var filter = []; // selected feature ids
 
@@ -248,10 +252,11 @@ $.widget("viz.vizmap", $.viz.vizbase, {
           }
         });
 
+        var windowId = '#' + this.element.attr('id');
         if (filter.length) {
-          wb.filter.set(filter, 'map', '#' + this.element.attr('id'));
+          wb.filter.set(filter, 'map', windowId);
         } else {
-          wb.filter.remove('map');
+          wb.filter.remove(windowId);
         }
 
         return this;

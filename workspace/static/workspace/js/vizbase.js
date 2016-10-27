@@ -90,7 +90,7 @@ $.widget('viz.vizbase', {
         if (n < 4 && n > 1) { // one row
             $(viz).each(function(i, el) {
                 $(el).dialog('option', {
-                    width: width/n, 
+                    width: width/n,
                     height: height-100,
                     position: {
                         my: 'left top',
@@ -106,7 +106,7 @@ $.widget('viz.vizbase', {
             $(viz).each(function(i, el) {
                 if (i < n/2) {
                     $(el).dialog('option', {
-                        width: width/col, 
+                        width: width/col,
                         height: (height-100)/2,
                         position: {
                             my: 'left top',
@@ -116,7 +116,7 @@ $.widget('viz.vizbase', {
                     });
                 } else {
                     $(el).dialog('option', {
-                        width: width/col, 
+                        width: width/col,
                         height: (height-100)/2,
                         position: {
                             my: 'left bottom',

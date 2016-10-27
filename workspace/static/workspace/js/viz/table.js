@@ -125,11 +125,6 @@ wb.viz.table = function() {
       }
     }
 
-    function formatDetails(table, tr) {
-      var d = table.fnGetData(tr);
-      return 'hahah';
-    }
-
     function onFilter(e) {
       if ( $(this.parentNode).hasClass('row_selected') ) {
         $(this.parentNode).removeClass('row_selected');
@@ -153,69 +148,6 @@ wb.viz.table = function() {
       });
       return dispatch.filter(records_id);
     }
-    /*
-    function onFilter(e) {
-        if ( $(this.parentNode).hasClass('row_selected') ) {
-            $(this.parentNode).removeClass('row_selected');
-        } else {
-            if (! e.shiftKey) {
-                $('tr.row_selected', table).removeClass('row_selected');
-            }
-            document.getSelection().removeAllRanges(); // disable text selection when shift+clik
-            $(this.parentNode).addClass('row_selected');
-        }
-        var selected_rows = $('tr.row_selected', table);
-        if (selected_rows.length == 0) {
-          if (title === 'dataentry')
-            wb.store.shelf_by.dataentries = [];
-          else {
-            data.forEach(function(d) {
-              var i = wb.store.shelf_by.entities.indexOf(d[0]);
-              if (i > -1) wb.store.shelf_by.entities.splice(i, 1);
-            });
-          }
-
-          wb.log({
-              operation: 'removed filter in',
-              item: title,
-              tool: title,
-          });
-        } else {
-            records_id = [];
-            $('tr.row_selected', table).each(function(idx, row) {
-              var id = $(row).data('id');
-                records_id.push(id);
-            });
-            if (title === 'dataentry')
-              wb.store.shelf_by.dataentries = records_id;
-            else
-              wb.store.shelf_by.entities = wb.store.shelf_by.entities.concat(records_id)
-
-            var selected_names = [];
-            if (title !== 'dataentry') {
-              selected_names = records_id.map(function(id) {
-                return wb.store.items.entities[id].primary.name;
-              });
-            } else {
-              selected_names = records_id.map(function(id) {
-                return wb.store.items.dataentries[id].name;
-              });
-            }
-            wb.log({
-                operation: 'filtered in',
-                item: title,
-                tool: title,
-                data: JSON.stringify({
-                  'id': records_id.join(','),
-                  'name': selected_names.join(',')
-                })
-            });
-
-        }
-        dispatch.filter();
-
-    }
-        */
 
     exports.filter = function(subset) {
       // filter table
@@ -235,6 +167,10 @@ wb.viz.table = function() {
       // 2nd param: which column to filter;
       // 3rd param: to use regular expression or not
       table.fnFilter(filter, 0, true);
+    };
+
+    exports.defilter = function() {
+      $('tr.row_selected', table).removeClass('row_selected');
     };
 
     exports.margin = function(_) {
@@ -281,9 +217,8 @@ wb.viz.table = function() {
 
     exports.resize = function() {
       $(table).css({ width: $(table).parent().width() });
-      table.fnAdjustColumnSizing();  
+      table.fnAdjustColumnSizing();
     };
 
     return d3.rebind(exports, dispatch, 'on');
 };
-

@@ -24,7 +24,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
               if (selected.length) {
                 wb.filter.set(selected, _this.options.title + ' table', '#' + _this.element.attr('id'));
               } else {
-                wb.filter.remove(_this.options.title + ' table');
+                wb.filter.remove('#' + _this.element.attr('id'));
               }
             })
         ;
@@ -61,6 +61,14 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
     updateView: function() {
       this.table.filter(wb.store.shelf.entities);
       return this;
+    },
+
+    filter: function() {
+
+    },
+
+    defilter: function() {
+      this.table.defilter();
     },
 
     reload: function() {

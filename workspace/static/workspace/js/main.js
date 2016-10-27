@@ -108,10 +108,8 @@ $(function() {
   }
 
   function onRemoveFilter(e) {
-    var item = $(e.target).parent()
-      .find('a')
-      .text();
-    wb.filter.remove(item);
+    var item = $(e.target).parent()[0].__data__;
+    wb.filter.remove(item.windowId);
   }
 
   function onClickOutside() {

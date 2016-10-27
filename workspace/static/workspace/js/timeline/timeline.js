@@ -99,7 +99,7 @@ wb.viz.timeline = function() {
     } else {
       brush.extent(extent);
     }
-    brush(container.select('.brush').transition())
+    container.select('.brush').transition().call(brush);
     // fire brushstart, brushmove, brushend events
     // brush.event(container.select(".brush"))
   }
@@ -111,6 +111,12 @@ wb.viz.timeline = function() {
           if (subset.indexOf(d.id) > -1) return '';
           else return 'none';
         });
+  }
+
+  exports.defilter = function() {
+    if (!container) return;
+    brush.clear();
+    container.select('.brush').transition().call(brush)
   }
 
   function exports(selection) {

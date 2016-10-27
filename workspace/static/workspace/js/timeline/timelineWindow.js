@@ -67,11 +67,12 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     onDetailFilter: function(filter) {
       var filter_id = filter.map(function(d) { return d.id; })
+      var windowId = '#' + this.element.attr('id');
 
       if (!filter.length) {
-        wb.filter.remove('timeline');
+        wb.filter.remove(windowId);
       } else {
-        wb.filter.set(filter_id, 'timeline', '#' + this.element.attr('id'));
+        wb.filter.set(filter_id, 'timeline', windowId);
       }
     },
 
@@ -134,6 +135,10 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.data = data;
 
       return this;
+    },
+
+    defilter: function() {
+      this.detailTimeline.defilter();
     },
 
     updateView: function() {
