@@ -51,9 +51,13 @@
     shape-rendering: crispEdges;
 }
 
-.item {
+.viz.timeline .item {
     cursor : default;
     pointer-events: auto;
+}
+
+.viz.timeline .item text {
+  font: 10px sans-serif;
 }
 
 /*.svg {

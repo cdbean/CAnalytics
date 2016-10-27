@@ -19,7 +19,7 @@ wb.viz.timeline = function() {
 
   var scaleX;
 
-  var dispatch = d3.dispatch('filter', 'zoom');
+  var dispatch = d3.dispatch('filter', 'zoom', 'elaborate', 'delaborate');
 
   var formatDate = d3.time.format("%m/%d/%Y-%H:%M:%S");
 
@@ -94,7 +94,7 @@ wb.viz.timeline = function() {
   exports.setBrush = function(extent) {
     if (!brush) return;
     var domain = scaleX.domain()
-    if (extent[0] <= domain[0] && extent[1] > domain[1]) {
+    if (extent[0] <= domain[0] || extent[1] > domain[1]) {
       brush.clear()
     } else {
       brush.extent(extent);
@@ -119,6 +119,7 @@ wb.viz.timeline = function() {
           innerH = height - margin.top - margin.bottom;
       var axis;
       var timelineLayout;
+      var clipId = wb.utility.uuid();
 
 
       function zoomed() {
@@ -153,10 +154,10 @@ wb.viz.timeline = function() {
       function init() {
         if (!container) {
           container = d3.select(this).append('g').attr('class', 'timelineVis')
-          container.append('clipPath').attr('id', 'clip')
+          container.append('clipPath').attr('id', 'clip-' + clipId)
             .append('rect');
           container.append('rect').attr('class', 'chartArea');
-          var g = container.append('g').attr('clip-path', 'url(#clip)')
+          var g = container.append('g').attr('clip-path', 'url(#clip-' + clipId + ')')
           g.append('g').attr('class', 'items');
           container.append('g').attr('class', 'tracks');
           container.append('g').attr('class', 'axis');
@@ -251,9 +252,19 @@ wb.viz.timeline = function() {
         item.exit().remove()
 
         var itemEnter = item.enter().append('g').attr('class', 'item')
-        itemEnter.append('rect')
+          .on('mouseover', function(d) {
+            var pos = {top: d3.event.pageY, left: d3.event.pageX};
+            window.mouseoverTimeout = setTimeout(function() {
+              dispatch.elaborate(d, pos);
+            }, 500)
+          })
+          .on('mouseout', function(d) {
+            if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+            dispatch.delaborate(d);
+          });
+        itemEnter.append('rect');
         if (showLabel) {
-          itemEnter.append('text')
+          itemEnter.append('text');
         }
 
         item.select('rect')
@@ -270,6 +281,18 @@ wb.viz.timeline = function() {
             .attr('dy', '.35em')
             .attr('text-anchor', 'start')
             .text(function(d) { return d.label; })
+            .each(wrap); // cut text to fit in rect
+        }
+
+        function wrap(d) {
+          var self = d3.select(this),
+              textLength = self.node().getBBox().width,
+              text = self.text(),
+              width = d.width,
+              limitLength = width / (textLength / text.length);
+
+          text = text.substring(0, limitLength);
+          self.text(text)
         }
       }
 

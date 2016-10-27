@@ -17,6 +17,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         .width(this.width)
         .height(this.detailTimelineHeight)
         .on('zoom', this.onDetailZoom.bind(this))
+        .on('elaborate', this.onDetailElaborate.bind(this))
+        .on('delaborate', this.onDetailDelaborate.bind(this))
         .on('filter', this.onDetailFilter.bind(this));
 
       this.overviewTimeline = wb.viz.timeline()
@@ -48,6 +50,15 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     _destroy: function() {
       this._super('_destroy');
+    },
+
+    onDetailDelaborate: function(d) {
+      wb.viewer.hide();
+    },
+
+    onDetailElaborate: function(d, pos) {
+      var entity = wb.store.items.entities[d.id];
+      wb.viewer.data(entity, 'entity').show(pos, 'timeline');
     },
 
     onDetailZoom: function(domain) {
