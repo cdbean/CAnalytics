@@ -30,6 +30,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         ;
         this.updateData();
         this.updateView();
+        this.arrange_window();
         return this;
     },
 

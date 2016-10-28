@@ -34,6 +34,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       this.updateData();
       this.updateView();
+      this.arrange_window();
       return this;
     },
 

@@ -83,19 +83,19 @@ $.widget('viz.vizbase', {
 
     arrange_window: function() {
         // auto arrange all opened windows
-        var width = $(window).width(),
-            height = $(window).height();
+        var width = $(window).innerWidth() - 5,
+            height = $(window).innerHeight();
 
         var viz = $('.viz'),
             n = viz.length;
-        if (n < 4 && n > 1) { // one row
+        if (n < 4) { // one row
             $(viz).each(function(i, el) {
                 $(el).dialog('option', {
                     width: width/n,
-                    height: height-100,
+                    // height: height-100,
                     position: {
                         my: 'left top',
-                        at: 'left+' + width/n*i + ' top+100',
+                        at: 'left+' + (width/n + 1)*i + ' top+100',
                         of: window
                     }
                 });
@@ -108,7 +108,7 @@ $.widget('viz.vizbase', {
                 if (i < n/2) {
                     $(el).dialog('option', {
                         width: width/col,
-                        height: (height-100)/2,
+                        // height: (height-100)/2,
                         position: {
                             my: 'left top',
                             at: 'left+' + width/col*(i%col) + ' top+100',
@@ -118,7 +118,7 @@ $.widget('viz.vizbase', {
                 } else {
                     $(el).dialog('option', {
                         width: width/col,
-                        height: (height-100)/2,
+                        // height: (height-100)/2,
                         position: {
                             my: 'left bottom',
                             at: 'left+' + width/col*(i%col) + ' bottom',

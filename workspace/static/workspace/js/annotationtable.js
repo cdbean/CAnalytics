@@ -52,6 +52,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         ;
         this.updateData();
         this.updateView();
+        this.arrange_window();
         return this;
     },
 
@@ -109,7 +110,3 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
       hint.run();
     }
 });
-
-
-
-

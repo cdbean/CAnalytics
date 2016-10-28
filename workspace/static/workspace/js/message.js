@@ -35,6 +35,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
     this.loadMessages(0); // show last page
 
     this._initialize();
+    this.arrange_window();
     return this;
   },
 
@@ -121,7 +122,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
           data: wb.log.logItem(item),
           public: false
         });
-      } 
+      }
     });
     var msg = el.html();
     el.html('');
@@ -149,17 +150,17 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         _this.loadMessage(data.items[i]);
       }
       // message is ordered from latest to oldest
-      // so data.previous refers to later messages 
-      if (data.has_previous) 
+      // so data.previous refers to later messages
+      if (data.has_previous)
         $('.pager .prev', this.element).removeClass('hidden')
           .data('page', data.previous_page);
-      else 
+      else
         $('.pager .prev', this.element).addClass('hidden');
 
-      if (data.has_next) 
+      if (data.has_next)
         $('.pager .next', this.element).removeClass('hidden')
           .data('page', data.next_page);
-      else 
+      else
         $('.pager .next', this.element).addClass('hidden');
       // scroll to bottom
       var ele = _this.element.find('ul.messages');

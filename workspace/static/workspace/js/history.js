@@ -12,6 +12,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
 
     this._setupUI();
     this.loadData(0);
+    this.arrange_window();
     return this;
   },
 
@@ -48,16 +49,16 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       for (var i = 0, len = data.items.length; i < len; i++) {
         _this.add(data.items[i]);
       }
-      if (data.has_previous) 
+      if (data.has_previous)
         $('.pager .prev', this.element).removeClass('hidden')
           .data('page', data.previous_page);
-      else 
+      else
         $('.pager .prev', this.element).addClass('hidden');
 
-      if (data.has_next) 
+      if (data.has_next)
         $('.pager .next', this.element).removeClass('hidden')
           .data('page', data.next_page);
-      else 
+      else
         $('.pager .next', this.element).addClass('hidden');
 
       // scroll to bottom
