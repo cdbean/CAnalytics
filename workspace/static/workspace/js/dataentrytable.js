@@ -58,7 +58,6 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this._setupAnnotator();
 
       this.updateView();
-      this.arrange_window();
       return this;
     },
 
@@ -90,7 +89,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         if (a.name > b.name) return 1;
         return 0;
       }).forEach(function(ds) {
-        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name
+        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name 
         + ' <span class="badge">' + ds.dataentries.length + '</span></a>';
       });
       el.find('#ds-list').append(str);
@@ -127,7 +126,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       var ds = wb.store.items.datasets[id];
       if (ds) {
         var de = ds.dataentries[0];
-        if (de)
+        if (de) 
           wb.utility.scrollTo(this.element.find('#row-' + de), $('.dataTables_scrollBody', this.element));
       }
     },
@@ -291,7 +290,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
               var existed = false;
               for (var i = 0; i < existing_anns.length; i++) {
                 var exist_ann = existing_anns[i];
-                if (range.startOffset === exist_ann.ranges[0].startOffset
+                if (range.startOffset === exist_ann.ranges[0].startOffset 
                   && range.endOffset === exist_ann.ranges[0].endOffset) {
                     existed = true;
                     break;

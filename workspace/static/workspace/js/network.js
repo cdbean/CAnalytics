@@ -28,8 +28,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         var state = JSON.parse(localStorage.getItem('network_state'));
         if (state) this.useState(state);
         this._registerAutoSave();
-
-        this.arrange_window();
         return this;
     },
 

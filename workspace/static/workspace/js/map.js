@@ -126,8 +126,6 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.mapControls = mapControls;
 
         this.updateView();
-
-        this.arrange_window();
         return this;
 
     },

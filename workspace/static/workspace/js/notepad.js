@@ -27,7 +27,6 @@ $.widget("viz.viznotepad", $.viz.vizbase, {
           height: '100%',
           plugins: {'autocomp': 'true', 'copy_paste_images': 'true', 'tables2': 'false'}
         });
-        this.arrange_window();
         return this;
     },
 
