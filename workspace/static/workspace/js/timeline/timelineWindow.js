@@ -16,6 +16,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.detailTimeline = wb.viz.timeline()
         .width(this.width)
         .height(this.detailTimelineHeight)
+        .trackBy('person')
         .on('zoom', this.onDetailZoom.bind(this))
         .on('elaborate', this.onDetailElaborate.bind(this))
         .on('delaborate', this.onDetailDelaborate.bind(this))
@@ -24,6 +25,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.overviewTimeline = wb.viz.timeline()
         .width(this.width)
         .height(this.overviewTimelineHeight)
+        .trackBy('person')
         .itemHeight(10)
         .itemMinWidth(5)
         .itemMaxWidth(10)
@@ -154,8 +156,8 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     setupUI: function() {
       var html = ' \
         <select class="controls" style=""> \
-          <option value="">Group by...</option> \
-          <option value="person">person</option> \
+          <option value="">No Group<option> \
+          <option value="person" selected>person</option> \
           <option value="location">location</option> \
           <option value="resource">resource</option> \
           <option value="organization">organization</option> \
