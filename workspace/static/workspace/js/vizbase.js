@@ -92,7 +92,7 @@ $.widget('viz.vizbase', {
             $(viz).each(function(i, el) {
                 $(el).dialog('option', {
                     width: width/n,
-                    height: height-100,
+                    // height: height-100,
                     position: {
                         my: 'left top',
                         at: 'left+' + width/n*i + ' top+100',

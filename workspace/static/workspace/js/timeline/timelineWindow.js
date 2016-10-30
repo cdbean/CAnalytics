@@ -34,6 +34,10 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       this.updateData();
       this.updateView();
+
+      // show brush in overviewTimeline
+      this.overviewTimeline.setBrush(this.overviewTimeline.domain());
+
       return this;
     },
 

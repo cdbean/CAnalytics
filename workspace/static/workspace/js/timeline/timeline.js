@@ -1,5 +1,5 @@
 wb.viz.timeline = function() {
-  var margin = {top: 20, right: 30, bottom: 30, left: 80},
+  var margin = {top: 10, right: 20, bottom: 20, left: 80},
       width = 960,
       height = 500
   ;
@@ -94,11 +94,10 @@ wb.viz.timeline = function() {
   exports.setBrush = function(extent) {
     if (!brush) return;
     var domain = scaleX.domain()
-    if (extent[0] <= domain[0] || extent[1] > domain[1]) {
-      brush.clear()
-    } else {
-      brush.extent(extent);
-    }
+    // set extent within the range of domain
+    extent[0] = Math.max(extent[0], domain[0]);
+    extent[1] = Math.min(extent[1], domain[1]);
+    brush.extent(extent);
     container.select('.brush').transition().call(brush);
     // fire brushstart, brushmove, brushend events
     // brush.event(container.select(".brush"))
@@ -126,6 +125,7 @@ wb.viz.timeline = function() {
       var axis;
       var timelineLayout;
       var clipId = wb.utility.uuid();
+      var brushExtent = null; // record brush extent before scale changes
 
 
       function zoomed() {
@@ -170,10 +170,10 @@ wb.viz.timeline = function() {
           container.append('g').attr('class', 'brush');
 
           zoom = d3.behavior.zoom()
-            .on('zoom', zoomed)
+            .on('zoom', zoomed);
           brush = d3.svg.brush()
             .on('brush', brushing)
-            .on('brushend', brushed)
+            .on('brushend', brushed);
         }
       }
 
@@ -192,14 +192,16 @@ wb.viz.timeline = function() {
           // enable brush and disable zoom
           zoom.on('zoom', null);
           brush.x(scaleX);
+          if (brushExtent) brush.extent(brushExtent);
+
           container.select('.brush')
             .style('display', '')
-            .attr('height', height)
+            .attr('height', innerH)
             .call(brush);
           container.select('.brush')
             .selectAll('rect')
             .attr('y', 0)
-            .attr('height', height)
+            .attr('height', innerH)
         } else { // enable zoom and disable brush
           container.select('.brush').style('display', 'none');
           container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
@@ -210,9 +212,9 @@ wb.viz.timeline = function() {
       function updateLayout() {
         container.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
 
-        container.select('.chartArea').attr('width', width).attr('height', height).call(zoom)
+        container.select('.chartArea').attr('width', innerW).attr('height', innerH).call(zoom)
 
-        container.select('clipPath rect').attr('width', width).attr('height', height);
+        container.select('clipPath rect').attr('width', innerW).attr('height', innerH);
 
         container.select('.axis').attr('transform', 'translate(0,' + innerH + ')')
 
@@ -230,19 +232,21 @@ wb.viz.timeline = function() {
       }
 
       function updateScale(dd) {
+        // keep zoom scale domain
         scaleX = zoom.x()
 
-        if (!scaleX) {
+        if (!scaleX) { // if scale has not been defined
           var min = d3.min(dd, function(d) { return d.start; })
           var max = d3.max(dd, function(d) { return d.end; })
           scaleX = d3.time.scale()
             .domain([min, max])
             .rangeRound([0, innerW])
             .nice(d3.time.week)
-
-
           zoom.x(scaleX);
         } else {
+          if (brush) {
+            brushExtent = brush.extent();
+          }
           scaleX.rangeRound([0, innerW])
         }
 
