@@ -1,4 +1,4 @@
-d3.timelineLayout = function() {
+wb.viz.timelineLayout = function() {
   var timeline = {},
       nodeHeight = 20,
       nodeMinWidth = 10,
@@ -16,49 +16,49 @@ d3.timelineLayout = function() {
   timeline.width = function(_) {
     if (!arguments.length) return width;
     width = _;
-    return timeline
+    return timeline;
   }
 
   timeline.height = function(_) {
     if (!arguments.length) return height;
     height = _;
-    return timeline
+    return timeline;
   }
 
   timeline.data = function(_) {
     if (!arguments.length) return data;
     data = _;
-    return timeline
+    return timeline;
   }
 
   timeline.trackBy = function(_) {
     if (!arguments.length) return trackBy;
     trackBy = _;
-    return timeline
+    return timeline;
   }
 
   timeline.nodeHeight = function(_) {
     if (!arguments.length) return nodeHeight;
     nodeHeight = _;
-    return timeline
+    return timeline;
   }
 
   timeline.nodeMinWidth = function(_) {
     if (!arguments.length) return nodeMinWidth;
     nodeMinWidth = _;
-    return timeline
+    return timeline;
   }
 
   timeline.nodeMaxWidth = function(_) {
     if (!arguments.length) return nodeMaxWidth;
     nodeMaxWidth = _;
-    return timeline
+    return timeline;
   }
 
   timeline.nodePadding = function(_) {
     if (!arguments.length) return nodePadding;
     nodePadding = _;
-    return timeline
+    return timeline;
   }
 
   timeline.nodes = function() {

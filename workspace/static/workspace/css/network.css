@@ -1,30 +1,35 @@
 .network svg {
   cursor: move;
+  fill: white;
 }
-.nodeg.dim circle {
+.node.dim circle {
   stroke-opacity: .2;
   fill-opacity: .2;
 }
-.nodeg.dim text {
+.network .node text {
+  fill: #555;
+}
+.node.dim text {
   fill-opacity: .2;
 }
-.linkg.dim path {
+.link.dim path {
   stroke-opacity: .2;
 }
-.linkg.dim text {
+.link.dim text {
   fill-opacity: .2;
 }
 circle.selected {
     stroke: #3276b1 !important;
     stroke-width: dpx;
 }
-path.dragline,
-path.link {
+
+.network path.dragline,
+.network .link path {
     fill: none;
     stroke: #ccc;
     stroke-width: 2px;
 }
-.linkg, .nodeg {
+.link, .node {
     cursor: pointer;
 }
 
@@ -46,45 +51,15 @@ path.dragline {
     shape-rendering: crispEdges;
 }
 
-.network-filterbar {
-    list-style-type: none;
+#filterBar {
     width: 100%;
     background-color: #ECEDF7;
-    padding-top: 5px 3px 1px 0;
-}
-.network-filterbar ul {
-  padding: 0;
-}
-.network-filterbar li {
-    display: inline;
-    margin: 20px 10px;
+    padding: 5px 5px;
 }
 
-.network .rel-div {
-  position: absolute;
-  margin-top: 70px;
-  margin-left: 5px;
-  padding:0;
-}
-.network .rel-list {
-  list-style-type: none;
-  max-width: 20em;
-  /*height: 100%;*/
-  overflow: auto;
-  padding:0;
-}
-
-.network .rel-item input[type=checkbox] {
-  margin-right: 2px;
-}
-
-.network .rel-item label {
-  font-weight: normal;
-}
-
-.network .link-text {
+.network .link text {
   font-size: .8em;
-  text-anchor: 'middle';
+  text-anchor: middle;
 }
 .network .watching-icon {
   position: relative;

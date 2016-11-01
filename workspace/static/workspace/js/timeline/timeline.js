@@ -127,7 +127,6 @@ wb.viz.timeline = function() {
       var clipId = wb.utility.uuid();
       var brushExtent = null; // record brush extent before scale changes
 
-
       function zoomed() {
         updateLayout()
         updateItems()
@@ -159,11 +158,11 @@ wb.viz.timeline = function() {
 
       function init() {
         if (!container) {
-          container = d3.select(this).append('g').attr('class', 'timelineVis')
+          container = d3.select(this).append('g').attr('class', 'timelineVis');
           container.append('clipPath').attr('id', 'clip-' + clipId)
             .append('rect');
           container.append('rect').attr('class', 'chartArea');
-          var g = container.append('g').attr('clip-path', 'url(#clip-' + clipId + ')')
+          var g = container.append('g').attr('clip-path', 'url(#clip-' + clipId + ')');
           g.append('g').attr('class', 'items');
           container.append('g').attr('class', 'tracks');
           container.append('g').attr('class', 'axis');
@@ -218,7 +217,7 @@ wb.viz.timeline = function() {
 
         container.select('.axis').attr('transform', 'translate(0,' + innerH + ')')
 
-        timelineLayout = d3.timelineLayout()
+        timelineLayout = wb.viz.timelineLayout()
           .data(dd)
           .width(innerW)
           .height(innerH)
@@ -257,9 +256,9 @@ wb.viz.timeline = function() {
 
       function updateItems() {
         var item = container.select('.items').selectAll('.item')
-          .data(timelineLayout.nodes())
+          .data(timelineLayout.nodes());
 
-        item.exit().remove()
+        item.exit().remove();
 
         var itemEnter = item.enter().append('g').attr('class', 'item')
           .on('mouseover', function(d) {

@@ -927,16 +927,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
                 return  e[0][0] <= d.x && d.x <= e[1][0]
                     && e[0][1] <= d.y && d.y <= e[1][1];
             });
-            // d3.selectAll(".link").classed("selected", function(d) {
-            //     return  (e[0][0] <= d.source.x
-            //         && d.source.x <= e[1][0]
-            //         && e[0][1] <= d.source.y
-            //         && d.source.y <= e[1][1])
-            //         || (e[0][0] <= d.target.x
-            //         && d.target.x <= e[1][0]
-            //         && e[0][1] <= d.target.y
-            //         && d.target.y <= e[1][1]);
-            // });
         }
 
         function brushend() {
@@ -1026,34 +1016,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         // exit drag mode
         this.chart.selectAll('.nodeg').on('mousedown.drag', null);
         return this;
-    },
-
-    showLinkEditor: function(l) {
-      // var $editor = $('.network-editor').show()
-      //     // .css('top', (this.mouseup_node.y + this.mousedown_node.y)/2.0)
-      //     // .css('left', (this.mouseup_node.x + this.mousedown_node.x)/2.0)
-      //     .css('top', (l.source.y + l.target.y)/2.0)
-      //     .css('left', (l.source.x + l.target.x)/2.0)
-      //     .data('link', l)
-      // ;
-      //
-      // var node_type = l.source.id.split('-')[0];
-      // if (node_type === 'dataentry') {
-      //   var source = 'dataentry';
-      // } else {
-      //   var source = l.source.primary.name;
-      // }
-      // var target = l.target.primary.name;
-      // $editor.find('.rel-source').text(source);
-      // $editor.find('.rel-target').text(target);
-      // // add link attributes if any
-      // $editor.find('#relation').val(l.relation);
-      // $editor.find('#desc').val(l.description);
-    },
-
-
-    showNodeEditor: function(d) {
-
     },
 
     showLinkInfo: function(l, pos) {
@@ -1342,11 +1304,6 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
             return d.relation;
           });
 
-        // this.selected_link && this.selected_link.style('stroke-dasharray', '10,2');
-
-        // this.link.append('svg:title')
-        //     .text(function(d) { return d.rel; })
-        // ;
         link_d.exit().remove();
 
         var node_d = this.chart.selectAll('.nodeg').data(this.nodes, function(d) { return d.id; });
