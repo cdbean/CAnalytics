@@ -247,18 +247,26 @@ wb.viz.network = function() {
         var linkEnter = link.enter().append('g').attr('class', 'link')
           .on('mouseover', onMouseOverLink)
           .on('mouseout', onMouseOutLink);
+          
+        linkEnter
+          .style('opacity', 0)
+          .transition()
+          .duration(1000)
+          .style('opacity', 1)
+
         linkEnter.append('path')
           .attr('id', function(d) { return 'path-' + d.meta.id + '-' + uuid; });
-        linkEnter.append('text');
+        linkEnter.append('text').append('textPath');
 
         link.select('path')
           .style('marker-start', function(d) { return d.left ? 'url(#start-arrow-' + uuid + ')' : ''; })
           .style('marker-end', function(d) { return 'url(#end-arrow-' + uuid + ')'; })
 
         link.select('text')
-          .attr('dx', -20)
+          .attr('text-anchor', 'middle')
           .attr('dy', -5)
-          .append('textPath')
+          .select('textPath')
+          .attr('startOffset', '50%')
           .attr('xlink:href', function(d) { return '#path-' + d.meta.id + '-' + uuid; })
           .text(function(d) {
             return d.primary.relation;
