@@ -183,7 +183,7 @@ wb.viz.network = function() {
         // and copy force data attributes (x, y, px, py) to current data if matched
         if (!networkLayout) return;
 
-        var nodes = networkLayout.nodes();
+        var nodes = JSON.parse(JSON.stringify(networkLayout.nodes()));
         for (var i = 0, len = dd.nodes.length; i < len; i++) {
           for (var j = 0; j < nodes.length; j++) {
             if (nodes[j].meta.id === dd.nodes[i].meta.id) {
@@ -247,7 +247,7 @@ wb.viz.network = function() {
         var linkEnter = link.enter().append('g').attr('class', 'link')
           .on('mouseover', onMouseOverLink)
           .on('mouseout', onMouseOutLink);
-          
+
         linkEnter
           .style('opacity', 0)
           .transition()
@@ -273,11 +273,15 @@ wb.viz.network = function() {
           });
 
         function onMouseOverLink(d) {
-
+          var pos = {top: d3.event.pageY, left: d3.event.pageX};
+          window.mouseoverTimeout = setTimeout(function() {
+            dispatch.elaborate(d, pos);
+          }, 500)
         }
 
         function onMouseOutLink(d) {
-
+          if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+          dispatch.delaborate(d);
         }
       }
 
@@ -316,11 +320,15 @@ wb.viz.network = function() {
           .style("-webkit-user-select", "none"); // disable text selection when dragging mouse
 
         function onMouseOverNode(d) {
-
+          var pos = {top: d3.event.pageY, left: d3.event.pageX};
+          window.mouseoverTimeout = setTimeout(function() {
+            dispatch.elaborate(d, pos);
+          }, 500)
         }
 
         function onMouseOutNode(d) {
-
+          if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+          dispatch.delaborate(d);
         }
       }
 
@@ -330,5 +338,5 @@ wb.viz.network = function() {
     });
   }
 
-  return exports;
+  return d3.rebind(exports, dispatch, 'on');
 }

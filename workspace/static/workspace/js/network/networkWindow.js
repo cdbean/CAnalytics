@@ -11,15 +11,15 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
       this.setupUI();
 
-      this.width = this.element.innerWidth() - 10,
-      this.height = this.element.innerHeight() - 10;
+      this.width = this.element.innerWidth(),
+      this.height = this.element.innerHeight();
 
       this.network = wb.viz.network()
         .width(this.width)
         .height(this.height)
-        // .on('filter', this.onFilter.bind(this))
-        // .on('elaborate', this.onElaborate.bind(this))
-        // .on('delaborate', this.onDelaborate.bind(this));
+        .on('filter', this.onFilter.bind(this))
+        .on('elaborate', this.onElaborate.bind(this))
+        .on('delaborate', this.onDelaborate.bind(this));
 
       this.updateData();
       this.updateView();
@@ -82,12 +82,18 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
     },
 
-    onElaborate: function() {
-
+    onElaborate: function(d, pos) {
+      if (d.primary.entity_type) {
+        var entity = wb.store.items.entities[d.meta.id];
+        wb.viewer.data(entity, 'entity').show(pos, 'network');
+      } else {
+        var relationship = wb.store.items.relationships[d.meta.id];
+        wb.viewer.data(relationship, 'relationship').show(pos, 'network');
+      }
     },
 
     onDelaborate: function() {
-
+      wb.viewer.hide();
     },
 
     updateView: function() {
@@ -132,6 +138,15 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
     resize: function() {
       this._super('resize');
+      this.width = this.element.innerWidth();
+      this.height = this.element.innerHeight();
+
+      d3.select(this.element[0]).select('svg#chart')
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .call(this.network
+          .width(this.width)
+          .height(this.height));
 
       return this;
     },
