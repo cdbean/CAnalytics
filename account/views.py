@@ -18,13 +18,22 @@ def login(request):
 
         res = psuAuth(username=username, password=password)
         if 'error' in res:
-            return HttpResponse('Invalid credentials')
+            # using local auth
+            user = authenticate(username=username, password=password)
+            if user:
+                try:
+                    auth_login(request, user)
+                    return redirect('home')
+                except:
+                    return HttpResponse('Invalid credentials')
+            else:
+                return HttpResponse('Invalid credentials')
 
         if not User.objects.filter(username=res['uid'][0]).exists():
             User.objects.create_user(
                 username=res['uid'][0],
-                first_name=res['givenName'][0],
-                last_name=res['sn'][0],
+                first_name=res['givenName'][0].title(),
+                last_name=res['sn'][0].title(),
                 email=res['mail'][0],
                 password=password
             )

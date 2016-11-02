@@ -142,6 +142,8 @@ wb.utility = {};
   };
 
   wb.utility.toString = function(item, type) {
+    if (item.constructor === Array) item = item[0];
+    
     if (type === 'entity') {
       return item.primary.entity_type + ' ' + item.primary.name;
     } else if (type === 'relationship') {

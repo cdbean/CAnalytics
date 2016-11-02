@@ -9,23 +9,6 @@
   // after filtering
   $.subscribe('data/filter', onDataFiltered);
 
-
-  $.subscribe('entity/created', onEntitiesCreated);
-  $.subscribe('entity/updated', onEntitiesUpdated);
-  $.subscribe('entity/deleted', onEntitiesDeleted);
-  $.subscribe('entity/restored', onEntitiesRestored);
-  $.subscribe('entity/attribute/update', onEntityAttrUpdated);
-
-  $.subscribe('relationship/created', onRelationshipsCreated);
-  $.subscribe('relationship/updated', onRelationshipsUpdated);
-  $.subscribe('relationship/deleted', onRelationshipsDeleted);
-  $.subscribe('relationship/restored', onRelationshipsRestored);
-
-  $.subscribe('annotation/created', onAnnotationsCreated);
-  $.subscribe('annotation/updated', onAnnotationsUpdated);
-  $.subscribe('annotation/deleted', onAnnotationsDeleted);
-  $.subscribe('annotation/restored', onAnnotationsRestored);
-
   $.subscribe('message/new', onNewMessage);
   $.subscribe('action/new', onNewAction);
 
@@ -54,9 +37,9 @@
 
   // data = {
   //  state: the state of the view
-  //  to: the user the stream is sent to 
-  //  from: the user the stream is from 
-  function onStreamView(e, data) { 
+  //  to: the user the stream is sent to
+  //  from: the user the stream is from
+  function onStreamView(e, data) {
     if (window.ishout) {
       ishout.rooms.forEach(function(r) {
         if (ishout.socket)
@@ -121,7 +104,7 @@
     $('#progressbar').hide();
 
     // restore windows after data are loaded
-    // so window info can be broadcast 
+    // so window info can be broadcast
     var tools = JSON.parse($.cookie('tools'));
     if (!$.isEmptyObject(tools)) {
       var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
@@ -208,16 +191,13 @@
   }
 
   function onDataUpdated() {
-    var datatype = [].slice.call(arguments, 1)
-    // if annotations are updated, we do not need to update other views
-    // only update views when entities or relationships are updated
-    if (datatype.indexOf('annotations') < 0) {
-      updateDataBut(['.dataentry']);
-      updateViewsBut(['.dataentry']);
-    } else { // update annotation table
-      var viz = $('.viz.annotation').data('instance');
-      if (viz) viz.updateData().updateView();
-    }
+    $('.viz').each(function(i, el) {
+      var viz = $(el).data('instance');
+      if (viz) {
+        viz.updateData()
+        viz.updateView();
+      }
+    })
   }
 
   function onDataFiltered() {
@@ -225,104 +205,6 @@
 
     var except = [].slice.call(arguments, 1)
     updateViewsBut(except);
-  }
-
-  function onEntitiesCreated() {
-    var entities = [].slice.call(arguments, 1);
-    wb.store.addItems(entities, 'entities');
-  }
-
-  function onEntitiesUpdated() {
-    var entities = [].slice.call(arguments, 1);
-    for (var i = 0, len = entities.length; i < len; i++) {
-      var e = entities[i];
-      if (e.deleted) wb.store.removeItems(e, 'entities');
-      else wb.store.addItems(e, 'entities');
-    }
-  }
-
-  function onEntitiesDeleted() {
-    var entities = [].slice.call(arguments, 1);
-    wb.store.removeItems(entities, 'entities');
-  }
-
-  function onEntitiesRestored() {
-    var entities = [].slice.call(arguments, 1);
-    wb.store.restoreItems(entities, 'entities');
-  }
-
-  function onEntityAttrUpdated(ent, attr) {
-
-  }
-
-  function onRelationshipsCreated() {
-    var rels = [].slice.call(arguments, 1);
-    wb.store.addItems(rels, 'relationships');
-  }
-
-  function onRelationshipsUpdated() {
-    var rels = [].slice.call(arguments, 1);
-    for (var i = 0, len = rels.length; i < len; i++) {
-      var r = rels[i];
-      if (r.deleted) wb.store.removeItems(r, 'relationships');
-      else wb.store.addItems(r, 'relationships');
-    }
-  }
-
-  function onRelationshipsDeleted() {
-    var rels = [].slice.call(arguments, 1);
-    wb.store.removeItems(rels, 'relationships');
-  }
-
-  function onRelationshipsRestored() {
-    var rels = [].slice.call(arguments, 1);
-    wb.store.restoreItems(rels, 'relationships');
-  }
-
-
-  function onAnnotationsCreated() {
-    var anns = [].slice.call(arguments, 1);
-    wb.store.addItems(anns, 'annotations');
-    //
-    // render annotation--add annotation to annotator
-    $('.viz.dataentry').not('.history').each(function() {
-      var viz = $(this).data('instance');
-      if (viz) viz.addAnnotations(anns);
-    });
-  }
-
-  function onAnnotationsUpdated() {
-    var anns = [].slice.call(arguments, 1);
-    for (var i = 0, len = anns.length; i < len; i++) {
-      var r = anns[i];
-      if (r.deleted) wb.store.removeItems(r, 'annotations');
-      else wb.store.addItems(r, 'annotations');
-    }
-    // render annotation--update annotation in dataentry table
-    $('.viz.dataentry').not('.history').each(function() {
-      var viz = $(this).data('instance');
-      if (viz) viz.updateAnnotations(anns);
-    });
-  }
-
-  function onAnnotationsDeleted() {
-    var anns = [].slice.call(arguments, 1);
-    wb.store.removeItems(anns, 'annotations');
-    // render annotation--update annotation in dataentry table
-    $('.viz.dataentry').not('.history').each(function() {
-      var viz = $(this).data('instance');
-      if (viz) viz.deleteAnnotations(anns);
-    });
-  }
-
-  function onAnnotationsRestored() {
-    var anns = [].slice.call(arguments, 1);
-    wb.store.restoreItems(anns, 'annotations');
-    // render annotation--update annotation in dataentry table
-    $('.viz.dataentry').not('.history').each(function() {
-      var viz = $(this).data('instance');
-      if (viz) viz.addAnnotations(anns);
-    });
   }
 
   function updateDataBut(except) {

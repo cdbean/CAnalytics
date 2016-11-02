@@ -51,7 +51,7 @@ def create_ann(data, case, group, user):
         case=case
     )
 
-    return annotation, [entity] + new_ents + updated_ents, [rel] + new_rels 
+    return annotation, [entity] + new_ents + updated_ents, [rel] + new_rels
 
 
 def update_ann(annotation, data, case, group, user):
@@ -88,13 +88,13 @@ def del_ann(annotation):
     """delete an annotation
     return:
         the deleted annotation
-        deleted entity (json)
-        deleted relationship (json)
+        deleted entity
+        deleted relationship
     """
     annotation.deleted = True
     annotation.save()
 
-    return annotation 
+    return annotation
 
 
 
@@ -275,7 +275,7 @@ def update_annotations(request):
 
 
 def del_annotations(request):
-    res = {'annotations': [], 'entity': {}, 'relationship': {}}
+    res = {'annotations': [], 'entity': [], 'relationship': []}
     data = json.loads(request.body)
     group = data.get('group', '')
     case = data.get('case', '')
@@ -291,9 +291,14 @@ def del_annotations(request):
         annotation = Annotation.objects.get(id=ann_data['id'])
         ann = del_ann(annotation)
         res['annotations'].append(ann.serialize())
+        if ann.entity:
+            ann.entity.deleted = true
+            ann.entity.save()
+            res['entity'].append(ann.entity.serialize())
+        if ann.relationship:
+            ann.relationship.deleted = true
+            ann.relationship.save()
+            res['relationship'].append(ann.relationship.serialize())
 
     sync_item('delete', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
-
-
-

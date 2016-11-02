@@ -18,46 +18,17 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         .title('dataentry')
         .columns(columns)
         .on('filter', function(selected) {
-          wb.store.shelf_by.dataentries = selected;
-          $('.filter-div .filter-item').filter(function(i, item) {
-            return $(item).find('a').data('tool') === 'document table';
-          }).remove();
-          var selected_docs = [];
-          selected.forEach(function(d) {
-            var de = wb.store.items.dataentries[d];
-            selected_docs.push(de);
-            wb.filter.add('document: ' + de.name, {
-              item: 'document',
-              id: de.id,
-              tool: 'document table',
-              public: false
-            });
-          });
-          if (selected_docs.length === 0) {
-            wb.log.log({
-                operation: 'defiltered',
-                item: 'documents',
-                tool: 'document table',
-                public: false
-            });
-          } else {
-            wb.log.log({
-                operation: 'filtered',
-                item: 'documents',
-                tool: 'document table',
-                data: wb.log.logDocs(selected_docs),
-                public: false
-            });
-          }
-          $.publish('data/filter', '#' + this.element.attr('id'));
-        }.bind(this))
-      ;
+          // no filter for data entry for now
+        }.bind(this));
 
-      this.updateData();
+      this.setupDocuments();
 
       this._setupAnnotator();
 
+      // this.updateData();
+
       this.updateView();
+
       return this;
     },
 
@@ -89,7 +60,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         if (a.name > b.name) return 1;
         return 0;
       }).forEach(function(ds) {
-        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name 
+        str += '<li><a href="#" id="ds-' + ds.id + '"><input type="checkbox" checked> ' + ds.name
         + ' <span class="badge">' + ds.dataentries.length + '</span></a>';
       });
       el.find('#ds-list').append(str);
@@ -126,7 +97,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       var ds = wb.store.items.datasets[id];
       if (ds) {
         var de = ds.dataentries[0];
-        if (de) 
+        if (de)
           wb.utility.scrollTo(this.element.find('#row-' + de), $('.dataTables_scrollBody', this.element));
       }
     },
@@ -136,7 +107,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this._super('_destroy');
     },
 
-    updateData: function() {
+    setupDocuments: function() {
       var data = [];
 
       d3.values(wb.store.items.dataentries).sort(function(a, b) {
@@ -159,13 +130,21 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       return this;
     },
 
+    updateData: function() {
+      var _this = this;
+
+      d3.values(wb.store.items.annotations).forEach(function(annotation) {
+        _this.addAnnotation(annotation);
+      });
+    },
+
 
     updateView: function() {
-      this.table.filter(wb.store.shelf.dataentries);
+      // this.table.filter(wb.store.shelf.dataentries);
 
       var el = this.element.find('#ann-list');
       el.empty();
-      if ($('.filter-div .filter-item').length) { // ugly way, but works. If a filter is applied, show ann list
+      if (!$.isEmptyObject(wb.filter.filter)) { // ugly way, but works. If a filter is applied, show ann list
         el.append('<li class="sidebar-brand">Annotations</li>');
         wb.store.shelf.annotations.forEach(function(d) {
           var ann = wb.store.items.annotations[d];
@@ -233,16 +212,12 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         });
         ele.annotator('addPlugin', 'Entity');
     },
+
     _destroyAnnotator: function() {
         var ele = this.element.closest(".ui-dialog");
         if (ele.data("annotator")) {
             ele.annotator("destroy");
         }
-    },
-
-    _resetAnnotator: function() {
-        this._destroyAnnotator();
-        this._setupAnnotator();
     },
 
     reloadAnnotations: function() {
@@ -290,7 +265,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
               var existed = false;
               for (var i = 0; i < existing_anns.length; i++) {
                 var exist_ann = existing_anns[i];
-                if (range.startOffset === exist_ann.ranges[0].startOffset 
+                if (range.startOffset === exist_ann.ranges[0].startOffset
                   && range.endOffset === exist_ann.ranges[0].endOffset) {
                     existed = true;
                     break;
@@ -331,8 +306,6 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
         if (i < 0) {
           store.registerAnnotation(annotation);
           annotator.setupAnnotation(annotation);
-        } else {
-          store.updateAnnotation(store.annotations[i], annotation);
         }
       }
       return this;

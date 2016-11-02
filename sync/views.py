@@ -100,6 +100,14 @@ def message(request):
         res = 'success'
         return HttpResponse(res)
 
+def sync_view(data, case, group, user):
+    name = group_name(case, group)
+    data['user'] = user.id
+    try:
+        ishout_client.broadcast_group(name, 'view.share', data)
+    except:
+        print '[warning] Sync failed. Is sync server running?'
+
 
 def sync_item(action, item, data, case, group, user):
     """ broadcast to group
@@ -109,8 +117,10 @@ def sync_item(action, item, data, case, group, user):
     """
     name = group_name(case, group)
     data['user']= user.id
+    data['action'] = action
+    data['item'] = item
     try:
-        ishout_client.broadcast_group(name, '%s.%s' % (item, action), data)
+        ishout_client.broadcast_group(name, 'items', data)
     except:
         print '[warning] Sync failed. Is sync server running?'
 

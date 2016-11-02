@@ -35,7 +35,7 @@ wb.store = {
   // TODO: load these properties from server
   static: {
     dataentry: ['file', 'content', 'date'],
-    event: ['person', 'location', 'organization', 'start_date', 'end_date', 'repeated', 'repeated_until', 'category', 'note'],
+    event: ['start_date', 'end_date', 'person', 'location', 'organization', 'repeated', 'repeated_until', 'note'],
     location: ['address', 'note'],
     person: ['gender', 'age', 'job', 'note'],
     organization: ['person', 'category', 'note'],
@@ -51,92 +51,44 @@ wb.store = {
     var _this = this;
     $.get(url, options, function(data) {
       for (var d in data) {
-        _this.addItems(data[d], d);
+        var items = data[d];
+        items.forEach(function(item) {
+          if (d === 'entities') {
+            if (item.primary.date) item.primary.date = wb.utility.Date(item.primary.date);
+            if (item.primary.geometry) item.primary.geometry = wb.utility.formatGeometry(item);
+          }
+          _this.items[d][item.id || item.meta.id] = item;
+        });
       }
       _this.setShelf();
-      _this._watchItems();
       $.publish('data/loaded');
     });
   },
 
-  // @items: object or array
-  // @type: string, item type, e.g. 'entities''relationships'
-  addItems: function(items, type) {
+  updateItems: function(items, type) {
     var _this = this;
-    if (items.constructor !== Array)
-      items = [items];
 
-    if (type === 'entities') {
-      items.forEach(function(d) {
+    if (items.constructor !== Array) items = [items];
+
+    items.forEach(function(d) {
+      if (!d) return;
+      if (d.primary) {
         if (d.primary.date) d.primary.date = wb.utility.Date(d.primary.date);
         if (d.primary.geometry) d.primary.geometry = wb.utility.formatGeometry(d);
-        _this.items.entities[d.meta.id] = d;
-      });
-    } else {
-      items.forEach(function(d) {
-        _this.items[type][d.id || d.meta.id] = d;
-      });
-    }
-  },
-
-  // @items: object or array
-  // @type: string, item type, e.g. 'entities''relationships'
-  removeItems: function(items, type) {
-    var _this = this;
-    if (items.constructor !== Array)
-      items = [items];
-
-    items.forEach(function(d) {
+      }
       var id = d.id || d.meta.id;
-      if (id in _this.items[type]) {
-        if (type === 'entities' || type === 'relationships' || type === 'annotations')
-          _this.items[type][id] = d;
-        else
-          delete _this.items[type][id];
+      _this.items[type][id] = d;
+
+      var shelf = _this.shelf[type];
+      var i = shelf.indexOf(id);
+      if (i < 0) {
+        shelf.push(id);
+        _this.cleanShelf(type);
+      }
+      else {
+        if (d.deleted) shelf.splice(i, 1);
       }
     });
-  },
-
-  restoreItems: function(items, type) {
-    var _this = this;
-    if (items.constructor !== Array)
-      items = [items];
-
-    items.forEach(function(d) {
-      _this.items[type][d.id || d.meta.id] = d;
-    });
-  },
-
-  // observe any change of store items
-  _watchItems: function() {
-    // Thanks to watch.js
-    // used to observe the change of object
-    // here set to only observe the change of number of items (not attribute of
-    // items)
-    var _this = this;
-    watch(this.items, function(prop, action, difference, oldval) {
-      var shelf = _this.shelf[prop];
-      if (shelf) {
-        if (difference) {
-          if (difference.added.length) {
-            difference.added.forEach(function(d) {
-              shelf.push(+d);
-            })
-            _this.cleanShelf(prop);
-          }
-          if (difference.removed.length) {
-            difference.removed.forEach(function(d) {
-              var i = shelf.indexOf(+d);
-              shelf.splice(i, 1);
-            });
-          }
-          $.publish('data/updated', prop);
-        }
-      } else {
-        // entity attribute change
-        $.publish('data/updated');
-      }
-    }, 3, true); // one level deep
   },
 
   // put items on shelf

@@ -465,7 +465,7 @@ def network_view(request):
         view = View.objects.create(image=img, state=state, comment=comment, path=path, depth=depth, group=group, case=case, created_by=request.user)
         view.path = view.path.append(view.id)
         view.save()
-        sync_item('share', 'view', view.serialize(), case, group, request.user)
+        sync_view(view.serialize(), case, group, request.user)
         return HttpResponse('success')
     elif request.method == 'GET':
         group = request.user.groups.get(id=request.GET['group'])
