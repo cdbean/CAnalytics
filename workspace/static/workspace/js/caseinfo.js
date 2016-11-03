@@ -41,6 +41,7 @@ $.widget('viz.vizcaseinfo', $.viz.vizbase, {
 			<div class="col-sm-2"><label id="pin-label">PIN:</label></div> \
 			<div class="col-sm-10"><span id="pin-body"></span></div> \
 		</div> \
+    <hr/> \
   	';
   	$(casehtml).appendTo(el)
   		.find('#case-title-body').text(cinfo.name).end()
@@ -49,21 +50,40 @@ $.widget('viz.vizcaseinfo', $.viz.vizbase, {
   		.find('#start-body').text(this._dateformat(cinfo.start_date) || 'Unknown').end()
   		.find('#end-body').text(this._dateformat(cinfo.end_date) || 'Unknown').end()
   		.find('#pin-body').text(cinfo.pin);
+    var role = wb.info.userRole;
+    if (role) {
+      var rolehtml = ' \
+        <div class="row"> \
+          <div class="col-sm-12"> \
+            <h4 id="role-title">Your role: <span id="role-title-body"></span></h4> \
+          </div> \
+        </div> \
+        <div class="row"> \
+          <div class="col-sm-12"><p id="role-desc"></p></div> \
+        </div> \
+        <hr/> \
+      ';
+
+      $(rolehtml).appendTo(el)
+        .find('#role-title-body').text(role.name).end()
+        .find('#role-desc').html(role.description);
+    }
+
   	var ginfo = wb.info.group;
   	var grouphtml = ' \
   		<div class="row"> \
   			<div class="col-sm-12"> \
 		  		<h4 id="group-title">Current group: <span id="group-title-body"></span></h4> \
 		  	</div> \
-		</div> \
-		<div class="row"> \
-			<div class="col-sm-2"><label id="gpin-label">PIN:</label></div> \
-			<div class="col-sm-10"><span id="gpin-body"></span></div> \
-		</div> \
-		<div class="row"> \
-			<div class="col-sm-2"><label id="members-label">Members:</label></div> \
-			<div class="col-sm-10"><span id="members-body"></span></div> \
-		</div> \
+  		</div> \
+  		<div class="row"> \
+  			<div class="col-sm-2"><label id="gpin-label">PIN:</label></div> \
+  			<div class="col-sm-10"><span id="gpin-body"></span></div> \
+  		</div> \
+  		<div class="row"> \
+  			<div class="col-sm-2"><label id="members-label">Members:</label></div> \
+  			<div class="col-sm-10"><span id="members-body"></span></div> \
+  		</div> \
   	';
   	$(grouphtml).appendTo(el)
   		.find('#group-title-body').text(ginfo.name).end()

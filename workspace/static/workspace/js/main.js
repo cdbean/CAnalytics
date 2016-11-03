@@ -21,6 +21,7 @@ $.get(GLOBAL_URL.case_info, {
   wb.info.case = res.case;
   wb.info.group = res.group;
   wb.info.othergroups = res.othergroups;
+  wb.info.userRole = res.user_role;
 });
 
 

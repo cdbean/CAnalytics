@@ -23,14 +23,9 @@ $.widget("viz.vizmap", $.viz.vizbase, {
                 }.bind(this)
             }
         });
-//        this.element.css("overflow", "hidden")
         var ghyb = new OpenLayers.Layer.Google(
             "Google Hybrid",
             {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 22}
-        );
-        var gphy = new OpenLayers.Layer.Google(
-            "Google Physical",
-            {type: google.maps.MapTypeId.TERRAIN}
         );
         var gmap = new OpenLayers.Layer.Google(
             "Google Streets", // the default
@@ -41,7 +36,7 @@ $.widget("viz.vizmap", $.viz.vizbase, {
             {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
         );
 
-        map.addLayers([gsat, ghyb, gmap, gphy]);
+        map.addLayers([gmap, ghyb]);
 
         this.pointlayer = new OpenLayers.Layer.Vector("Points", {
             styleMap: new OpenLayers.StyleMap({

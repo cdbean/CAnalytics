@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 import json
 from django.http import QueryDict
+from django.db.models import Q
 
 from random import randint
 
@@ -91,7 +92,7 @@ def cases(request):
                     except:
                         return HttpResponse('Group PIN incorrect')
             # assign role
-            if case.roles and (not request.user.role):
+            if case.role_set.exists() and (not request.user.role):
                 random_assign_roles(case, group, request.user)
         except:
             return HttpResponse('Error: You are not a member of the group in this case')
@@ -125,7 +126,7 @@ def join_case(request):
 
 
 def random_assign_roles(case, group, user):
-    roles = case.roles
+    roles = case.role_set.all()
     for u in group.user_set.exclude(id=user.id).all():
         if u.role in roles:
             roles.remove(u.role)
@@ -166,6 +167,7 @@ def case_info(request):
         try:
             group = request.user.groups.get(id=request.GET['group'])
             case = group.case_set.get(id=request.GET['case'])
+            role = request.user.role
             othergroups = request.user.groups.exclude(id=request.GET['group']) & case.groups.all()
         except:
             return HttpResponse('Query failed')
@@ -185,6 +187,12 @@ def case_info(request):
             'address': case.address,
             'location': case.location.wkt if case.location else None,
         }
+        if role:
+            res['user_role'] = {
+                'name': role.name,
+                'description': role.description
+            }
+            
         res['othergroups'] = []
         for g in othergroups:
             res['othergroups'].append({
@@ -205,7 +213,7 @@ def data(request):
 
     # send only the dataset of the role
     if not request.user.role:
-        datasets = case.dataset_set.filter(role=request.user.role)
+        datasets = case.dataset_set.filter(Q(role=request.user.role) | Q(role__isnull=True))
     else:
         datasets = case.dataset_set.all()
     for ds in datasets:

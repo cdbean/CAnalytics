@@ -5,7 +5,6 @@ from datetime import datetime
 from tinymce.models import HTMLField
 from dbarray import IntegerArrayField, CharArrayField
 
-
 # Create your models here.
 
 def get_field_value(instance, field_name):
@@ -54,7 +53,6 @@ def get_model_attr(instance):
 
     return attr
 
-
 class Case(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
@@ -64,7 +62,6 @@ class Case(models.Model):
     location = models.GeometryField(null=True, blank=True)
     address  = models.CharField(max_length=200, blank=True)
     pin = models.CharField(max_length=4)
-    roles = CharArrayField(max_length=500)
 
     objects = models.GeoManager()
 
@@ -73,6 +70,14 @@ class Case(models.Model):
 
     class Meta:
         ordering = ['name']
+
+class Role(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    case = models.ForeignKey(Case)
+
+    def __unicode__(self):
+        return self.name
 
 
 class Attribute(models.Model):
@@ -91,7 +96,7 @@ class Dataset(models.Model):
     case = models.ForeignKey(Case)
     created_by = models.ForeignKey(User, null=True, blank=True, verbose_name='created by')
     created_at  = models.DateTimeField(auto_now_add=True, verbose_name='created at')
-    role = models.CharField(max_length=20, blank=True)
+    role = models.ForeignKey(Role, null=True, blank=True)
 
     def serialize(self):
         attr = {}
