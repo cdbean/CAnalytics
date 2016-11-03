@@ -178,6 +178,14 @@ $.widget("viz.vizmap", $.viz.vizbase, {
 
         var entity = wb.store.items.entities[feature.attributes.id];
         wb.viewer.data(entity, 'entity').show(pos, 'map');
+
+        wb.log.log({
+            operation: 'elaborate',
+            item: 'location',
+            tool: 'map',
+            data: wb.log.logItem(entity),
+            public: false
+        });
       }
     },
 
@@ -186,73 +194,6 @@ $.widget("viz.vizmap", $.viz.vizbase, {
       setTimeout(function() {
         if (!$('.viewer:hover').length > 0) wb.viewer.hide();
       }, 300);
-    },
-    highlight: function (item) {
-        var feature;
-        if (typeof item === 'object')
-          feature = item;
-        else {
-          for (var i = 0, len = this.features.length; i < len; i++) {
-            if (this.features[i].attributes.id == item) {
-              feature = this.features[i];
-              break;
-            }
-          }
-        }
-        var entity = wb.store.items.entities[feature.attributes.id];
-
-        var primary = entity.primary;
-        var popup = '<div id="map-popup" class="entity-tooltip"><table>';
-        popup += '<tr><th>' + wb.utility.capfirst(primary.entity_type) + '</th><td>' + primary.name + '</td></tr>';
-        for (var attr in primary) {
-            if (attr !== 'id' && attr !== 'entity_type' && attr !== 'name' && primary[attr]) {
-                popup += '<tr><th>' + wb.utility.capfirst(attr) + '</th><td>' + primary[attr] + '</td></tr>';
-            }
-        }
-        popup += '</table></div>';
-
-        feature.popup = new OpenLayers.Popup.FramedCloud(
-                "location_info",
-                feature.geometry.getBounds().getCenterLonLat(),
-                // new OpenLayers.Size(200,150),
-                null,
-                popup,
-                null,
-                true
-        );
-        wb.log.log({
-            operation: 'read',
-            item: 'location',
-            tool: 'map',
-            data: wb.log.logItem(entity),
-            public: false
-        });
-
-        this.map.addPopup(feature.popup, true);
-        return this;
-    },
-    unhighlight: function(feature) {
-        if (feature.popup) {
-            this.map.removePopup(feature.popup);
-        }
-        return this;
-    },
-
-    _showDetails: function(feature) {
-        $("#footprint_popup #footprint_name").text(feature.attributes.name);
-        $("#footprint_popup #footprint_id").text(feature.attributes.id);
-        var content = $('#footprint_popup').css('display', '').clone();
-
-        feature.popup = new OpenLayers.Popup.FramedCloud(
-                "footprint_info",
-                feature.geometry.getBounds().getCenterLonLat(),
-                new OpenLayers.Size(100,80),
-                content.html(),
-                null,
-                true
-        );
-
-        this.map.addPopup(feature.popup, true);
     },
 
     defilter: function() {
