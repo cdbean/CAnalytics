@@ -13,6 +13,7 @@
 }
 .network .node text {
   fill: #555;
+  font-size: .8em;
 }
 .node.dim text {
   fill-opacity: .2;
