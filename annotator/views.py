@@ -292,7 +292,7 @@ def del_annotations(request):
         ann = del_ann(annotation)
         res['annotations'].append(ann.serialize())
         if ann.entity:
-            ann.entity.deleted = true
+            ann.entity.deleted = True
             ann.entity.save()
             res['entity'].append(ann.entity.serialize())
         if ann.relationship:

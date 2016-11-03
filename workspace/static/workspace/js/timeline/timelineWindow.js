@@ -128,15 +128,23 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         }
       }
 
-      d3.select(this.element[0])
-        .select('svg#detailTimeline')
-        .datum(data)
-        .call(this.detailTimeline);
+      if (data.length) {
+        this.element.find('.placeholder').hide();
+        this.element.find('.main').show();
 
-      d3.select(this.element[0])
-        .select('svg#overviewTimeline')
-        .datum(data)
-        .call(this.overviewTimeline)
+        d3.select(this.element[0])
+          .select('svg#detailTimeline')
+          .datum(data)
+          .call(this.detailTimeline);
+
+        d3.select(this.element[0])
+          .select('svg#overviewTimeline')
+          .datum(data)
+          .call(this.overviewTimeline)
+      } else {
+        this.element.find('.placeholder').show();
+        this.element.find('.main').hide();
+      }
 
       this.data = data;
 
@@ -148,25 +156,36 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     },
 
     updateView: function() {
-      this.detailTimeline.filter(wb.store.shelf.entities);
-      this.overviewTimeline.filter(wb.store.shelf.entities);
+      if (this.data.length) {
+        this.detailTimeline.filter(wb.store.shelf.entities);
+        this.overviewTimeline.filter(wb.store.shelf.entities);
+      }
       return this;
     },
 
     setupUI: function() {
       var html = ' \
-        <select class="controls" style=""> \
-          <option value="">No Group<option> \
-          <option value="person" selected>person</option> \
-          <option value="location">location</option> \
-          <option value="resource">resource</option> \
-          <option value="organization">organization</option> \
-        </select> \
-        <ul class="controls" style="margin-top:40px;"> \
-          <li class="control filter" title="Filter"> \
-        </ul> \
-        <svg id="detailTimeline"></svg> \
-        <svg id="overviewTimeline"></svg> \
+        <div class="main"> \
+          <select class="controls" style=""> \
+            <option value="">No Group<option> \
+            <option value="person" selected>person</option> \
+            <option value="location">location</option> \
+            <option value="resource">resource</option> \
+            <option value="organization">organization</option> \
+          </select> \
+          <ul class="controls" style="margin-top:40px;"> \
+            <li class="control filter" title="Filter"> \
+          </ul> \
+          <svg id="detailTimeline"></svg> \
+          <svg id="overviewTimeline"></svg> \
+        </div> \
+        <div class="jumbotron placeholder"> \
+          <div class="container"> \
+            <div class="text-center"> \
+              <p>Add events to display here</p> \
+            </div> \
+          </div> \
+        </div> \
       ';
       this.element.append(html);
 
@@ -211,17 +230,19 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.detailTimeline.width(this.width).height(this.detailTimelineHeight);
       this.overviewTimeline.width(this.width).height(this.overviewTimelineHeight);
 
-      d3.select(this.element[0])
-        .select('svg#detailTimeline')
-        .attr('width', this.width)
-        .attr('height', this.detailTimelineHeight)
-        .call(this.detailTimeline);
+      if (this.data.length) {
+        d3.select(this.element[0])
+          .select('svg#detailTimeline')
+          .attr('width', this.width)
+          .attr('height', this.detailTimelineHeight)
+          .call(this.detailTimeline);
 
-      d3.select(this.element[0])
-        .select('svg#overviewTimeline')
-        .attr('width', this.width)
-        .attr('height', this.overviewTimelineHeight)
-        .call(this.overviewTimeline);
+        d3.select(this.element[0])
+          .select('svg#overviewTimeline')
+          .attr('width', this.width)
+          .attr('height', this.overviewTimelineHeight)
+          .call(this.overviewTimeline);
+      }
 
       return this;
     },

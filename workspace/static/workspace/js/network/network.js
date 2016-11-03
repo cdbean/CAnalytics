@@ -159,7 +159,7 @@ wb.viz.network = function() {
       }
 
       function dragstart() {
-
+        if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
       }
 
       function dragged() {
@@ -242,7 +242,7 @@ wb.viz.network = function() {
         var link = container.select('.links').selectAll('.link')
           .data(networkLayout.links(), function(d) { return d.meta.id; });
 
-        link.exit().remove();
+        link.exit().transition().style('opacity', 0).remove();
 
         var linkEnter = link.enter().append('g').attr('class', 'link')
           .on('mouseover', onMouseOverLink)
@@ -281,7 +281,9 @@ wb.viz.network = function() {
 
         function onMouseOutLink(d) {
           if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
-          dispatch.delaborate(d);
+          setTimeout(function() {
+            if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
+          }, 300);
         }
       }
 
@@ -289,7 +291,7 @@ wb.viz.network = function() {
         var node = container.select('.nodes').selectAll('.node')
           .data(networkLayout.nodes(), function(d) { return d.meta.id; });
 
-        node.exit().transition().attr('r', 0).remove();
+        node.exit().transition().style('opacity', 0).remove();
 
         var nodeEnter = node.enter().append('g').attr('class', 'node')
           .on('mouseover', onMouseOverNode)
@@ -328,7 +330,9 @@ wb.viz.network = function() {
 
         function onMouseOutNode(d) {
           if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
-          dispatch.delaborate(d);
+          setTimeout(function() {
+            if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
+          }, 300);
         }
       }
 

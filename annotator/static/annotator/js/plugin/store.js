@@ -70,6 +70,9 @@ Annotator.Plugin.Store = (function(_super) {
 
         for (var i = 0, len = annotations.length; i < len; i++) {
             var annotation = annotations[i];
+            // if the annotaiton does not have an anchor, skip it
+            // one reason might be the annotated text is on the editor widget...
+            if (!annotation.anchor) continue;
             if (__indexOf.call(this.annotations, annotation) < 0) {
                 this.registerAnnotation(annotation);
                 to_create.push(annotation);

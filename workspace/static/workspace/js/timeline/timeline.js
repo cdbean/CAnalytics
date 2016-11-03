@@ -237,6 +237,7 @@ wb.viz.timeline = function() {
         if (!scaleX) { // if scale has not been defined
           var min = d3.min(dd, function(d) { return d.start; })
           var max = d3.max(dd, function(d) { return d.end; })
+          max = max || min; // max might be undefined if events are all instant events
           scaleX = d3.time.scale()
             .domain([min, max])
             .rangeRound([0, innerW])
@@ -269,7 +270,9 @@ wb.viz.timeline = function() {
           })
           .on('mouseout', function(d) {
             if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
-            dispatch.delaborate(d);
+            setTimeout(function() {
+              if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
+            }, 300);
           });
         itemEnter.append('rect');
         if (showLabel) {

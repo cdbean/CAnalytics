@@ -65,12 +65,23 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
         links = links.concat(d3.values(linkMap[st]))
       }
 
-      d3.select(this.element[0])
-        .select('svg#chart')
-        .attr('width', this.width)
-        .attr('height', this.height)
-        .datum({nodes: d3.values(nodeMap), links: links})
-        .call(this.network);
+      this.data = {nodes: d3.values(nodeMap), links: links};
+
+      if (this.data.nodes.length) {
+        this.element.find('#main').show();
+        this.element.find('.placeholder').hide();
+
+        d3.select(this.element[0])
+          .select('svg#chart')
+          .attr('width', this.width)
+          .attr('height', this.height)
+          .datum(this.data)
+          .call(this.network);
+      } else {
+        this.element.find('#main').hide();
+        this.element.find('.placeholder').show();
+      }
+
 
       return this;
     },
@@ -97,7 +108,9 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
     },
 
     updateView: function() {
-      this.network.displaySome({nodes: wb.store.shelf.entities, links: wb.store.shelf.relationships});
+      if (this.data.nodes.length) {
+        this.network.displaySome({nodes: wb.store.shelf.entities, links: wb.store.shelf.relationships});
+      }
       return this;
     },
 
@@ -107,6 +120,13 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
         </div> \
         <div id="main"> \
           <svg id="chart" xmlns: "http://www.w3.org/2000/svg"> \
+        </div> \
+        <div class="jumbotron placeholder"> \
+          <div class="container"> \
+            <div class="text-center"> \
+              <p>Add entities and relationships to display here</p> \
+            </div> \
+          </div> \
         </div> \
       ';
       var el = this.element;
@@ -141,12 +161,14 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       this.width = this.element.innerWidth();
       this.height = this.element.innerHeight();
 
-      d3.select(this.element[0]).select('svg#chart')
-        .attr('width', this.width)
-        .attr('height', this.height)
-        .call(this.network
-          .width(this.width)
-          .height(this.height));
+      if (this.data.nodes.length) {
+        d3.select(this.element[0]).select('svg#chart')
+          .attr('width', this.width)
+          .attr('height', this.height)
+          .call(this.network
+            .width(this.width)
+            .height(this.height));
+      }
 
       return this;
     },

@@ -1,5 +1,8 @@
 /* axis */
-
+.timeline .placeholder {
+  height: 100vh;
+  color: #999;
+}
 .viz.timeline .axis { /* axis labels */
     fill: #808080;
     font-family: sans-serif;
