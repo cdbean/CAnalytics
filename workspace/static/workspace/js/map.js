@@ -14,13 +14,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         var map = new OpenLayers.Map({
             div: this.element.attr("id"),
             eventListeners: {
-                featureover: function(e) {
-                    this.highlight(e.feature);
-                    // console.log(this.events.getMousePosition(e))
-                }.bind(this),
-                featureout: function(e) {
-                    this.unhighlight(e.feature);
-                }.bind(this)
+              featureover: this.onMouseOverFeature.bind(this),
+              featureout: this.onMouseOutFeature.bind(this)
             }
         });
         var ghyb = new OpenLayers.Layer.Google(
@@ -165,6 +160,32 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.updateData();
         this.update();
         return this;
+    },
+
+    onMouseOverFeature: function(e) {
+      window.mouseoverTimeout = setTimeout(popup.bind(this), 500);
+
+      function popup() {
+        var feature = e.feature,
+            geo = feature.geometry,
+            coord = new OpenLayers.LonLat(geo.x, geo.y),
+            px = this.map.getViewPortPxFromLonLat(coord);
+        var offset = $(this.map.div).offset();
+        var pos = {
+          left: offset.left + px.x,
+          top: offset.top + px.y
+        };
+
+        var entity = wb.store.items.entities[feature.attributes.id];
+        wb.viewer.data(entity, 'entity').show(pos, 'map');
+      }
+    },
+
+    onMouseOutFeature: function(e) {
+      if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+      setTimeout(function() {
+        if (!$('.viewer:hover').length > 0) wb.viewer.hide();
+      }, 300);
     },
     highlight: function (item) {
         var feature;
