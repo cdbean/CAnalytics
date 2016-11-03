@@ -9,7 +9,7 @@ from random import randint
 
 from canalytics import settings
 from django.contrib.auth.models import Group
-from workspace.models import Case, DataEntry, Entity, Relationship, View
+from workspace.models import Case, DataEntry, Entity, Relationship, View, UserCaseGroupRole
 from annotator.models import Annotation
 from workspace.entity import get_or_create_entity, set_primary_attr, get_or_create_relationship
 from sync.views import sync_item
@@ -92,9 +92,12 @@ def cases(request):
                     except:
                         return HttpResponse('Group PIN incorrect')
             # assign role
-            if case.role_set.exists() and (not request.user.role):
+            if case.role_set.exists() and (not UserCaseGroupRole.objects.filter(case=case,user=request.user,group=group)):
+                # if the case has role settings and the user does not have a role in this case
+                # randomly assign a role
                 random_assign_roles(case, group, request.user)
-        except:
+        except Exception as e:
+            print e
             return HttpResponse('Error: You are not a member of the group in this case')
         return redirect('ws:case_page', case=case.id, group=group.id)
 
@@ -126,15 +129,13 @@ def join_case(request):
 
 
 def random_assign_roles(case, group, user):
-    roles = case.role_set.all()
-    for u in group.user_set.exclude(id=user.id).all():
-        if u.role in roles:
-            roles.remove(u.role)
+    existed_roles = UserCaseGroupRole.objects.filter(case=case,group=group).values('role')
+    # get roles that have not been assigned
+    roles = case.role_set.exclude(id__in=existed_roles)
 
     # random
     i = randint(0, len(roles) - 1)
-    user.role = roles[i]
-    user.save()
+    UserCaseGroupRole.objects.create(case=case,group=group,user=user,role=roles[i])
 
 
 @login_required
@@ -167,8 +168,11 @@ def case_info(request):
         try:
             group = request.user.groups.get(id=request.GET['group'])
             case = group.case_set.get(id=request.GET['case'])
-            role = request.user.role
             othergroups = request.user.groups.exclude(id=request.GET['group']) & case.groups.all()
+            user_case_group_role = UserCaseGroupRole.objects.filter(user=request.user,case=case,group=group)
+            role = None
+            if len(user_case_group_role):
+                role = user_case_group_role[0].role
         except:
             return HttpResponse('Query failed')
 
@@ -192,7 +196,7 @@ def case_info(request):
                 'name': role.name,
                 'description': role.description
             }
-            
+
         res['othergroups'] = []
         for g in othergroups:
             res['othergroups'].append({
@@ -212,8 +216,10 @@ def data(request):
         return HttpResponseBadRequest()
 
     # send only the dataset of the role
-    if not request.user.role:
-        datasets = case.dataset_set.filter(Q(role=request.user.role) | Q(role__isnull=True))
+    user_case_group_role = UserCaseGroupRole.objects.filter(user=request.user,case=case,group=group)
+    if len(user_case_group_role):
+        role = user_case_group_role[0].role
+        datasets = case.dataset_set.filter(Q(role=role) | Q(role__isnull=True))
     else:
         datasets = case.dataset_set.all()
     for ds in datasets:

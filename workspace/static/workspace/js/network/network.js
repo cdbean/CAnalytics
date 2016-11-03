@@ -183,7 +183,7 @@ wb.viz.network = function() {
         // and copy force data attributes (x, y, px, py) to current data if matched
         if (!networkLayout) return;
 
-        var nodes = JSON.parse(JSON.stringify(networkLayout.nodes()));
+        var nodes = _.clone(networkLayout.nodes());
         for (var i = 0, len = dd.nodes.length; i < len; i++) {
           for (var j = 0; j < nodes.length; j++) {
             if (nodes[j].meta.id === dd.nodes[i].meta.id) {

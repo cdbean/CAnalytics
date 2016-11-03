@@ -79,6 +79,15 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name
 
+class UserCaseGroupRole(models.Model):
+    case = models.ForeignKey(Case)
+    group = models.ForeignKey(Group)
+    user = models.ForeignKey(User)
+    role = models.ForeignKey(Role)
+
+    def __unicode__(self):
+        return '%s-%s-%s-%s' % (self.case.name, self.group.name, self.user.name, self.role.name)
+
 
 class Attribute(models.Model):
     attr = models.CharField(max_length=255)
