@@ -32,7 +32,7 @@ wb.log.logAnnotation = function(ann) {
   // last_edited_by
   // entity
   // relationship
-  var a = JSON.parse(JSON.stringify(ann));
+  var a = _.clone(ann);
   var anchor = wb.store.items.dataentries[a.anchor];
   a.anchor = {id: anchor.id, name: anchor.name};
   a.name = a.quote;
@@ -45,7 +45,7 @@ wb.log.logAnnotation = function(ann) {
   if ('entity' in a) {
     if (a.entity.entity_type === 'relationship') {
       var r = wb.store.items.relationships[a.entity.id];
-      if (r) { 
+      if (r) {
         var source = wb.store.items.entities[r.primary.source];
         source = {id: source.meta.id, entity_type: source.primary.entity_type, name: source.primary.name};
         var target = wb.store.items.entities[r.primary.target];
@@ -68,7 +68,7 @@ wb.log.logAnnotations = function(anns) {
 
 // dump entity or relationship
 wb.log.logItem = function(item) {
-  var geo = null; 
+  var geo = null;
   if ('geometry' in item.primary) {
     geo = item.primary.geometry;
     delete item.primary.geometry;
@@ -110,4 +110,3 @@ wb.log.logDoc = function(doc) {
   var ds = wb.store.items.datasets[de.dataset];
   return JSON.stringify({id: de.id, name: de.name, dataset: {id: ds.id, name: ds.name}});
 };
-

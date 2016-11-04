@@ -105,11 +105,11 @@ wb.viz.timelineLayout = function() {
             var idd = id[i];
             var name = wb.store.items.entities[idd].primary.name;
             if (!(name in tracks)) tracks[name] = {trackNum: 0, nodes: [], label: name};
-            var node = JSON.parse(JSON.stringify(d))
+            var node = _.clone(d);
             // after clone, the date becomes string, turn them to Date object again
-            node.start = wb.utility.Date(node.start)
-            node.end = wb.utility.Date(node.end)
-            tracks[name].nodes.push(node)
+            node.start = wb.utility.Date(node.start);
+            node.end = wb.utility.Date(node.end);
+            tracks[name].nodes.push(node);
           }
         } else {
           if (id)
@@ -117,19 +117,19 @@ wb.viz.timelineLayout = function() {
           else
             var trackname = 'other';
           if (!(trackname in tracks)) tracks[trackname] = {trackNum: 0, nodes: [], label: trackname};
-          var node = JSON.parse(JSON.stringify(d))
+          var node = _.clone(d);
           // after clone, the date becomes string, turn them to Date object again
-          node.start = wb.utility.Date(node.start)
-          node.end = wb.utility.Date(node.end)
-          tracks[trackname].nodes.push(node)
+          node.start = wb.utility.Date(node.start);
+          node.end = wb.utility.Date(node.end);
+          tracks[trackname].nodes.push(node);
         }
       } else { // if 'trackBy' is not provided, assign a '0' track
         tracks[0] = tracks[0] || {trackNum: 0, nodes: [], label: ''};
-        var node = JSON.parse(JSON.stringify(d))
+        var node = _.clone(d);
         // after clone, the date becomes string, turn them to Date object again
-        node.start = wb.utility.Date(node.start)
-        node.end = wb.utility.Date(node.end)
-        tracks[0].nodes.push(node)
+        node.start = wb.utility.Date(node.start);
+        node.end = wb.utility.Date(node.end);
+        tracks[0].nodes.push(node);
       }
     });
   }

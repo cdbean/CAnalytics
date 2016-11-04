@@ -58,7 +58,7 @@ $.widget('viz.vizeditor', {
     lastrow.find('button').removeClass('attr-remove-btn').addClass('attr-add-btn');
     lastrow.find('span.glyphicon').removeClass('glyphicon-minus').addClass('glyphicon-plus');
 
-    // for relationship, no need to show title, 
+    // for relationship, no need to show title,
     if (type === 'relationship') $('.title', this.element).addClass('hidden');
 
     return this;
@@ -251,58 +251,27 @@ $.widget('viz.vizeditor', {
       dataType: 'json',
       type: opt.data.id ? 'PUT' : 'POST',
       success: function(d) {
-        if (!$.isEmptyObject(d.entity)) {
-          if (opt.data.id) {
-            $.publish('entity/updated', d.entity);
-            if (item_type === 'entity') {
-              wb.utility.notify('Entity updated!', 'success');
-              wb.log.log({
-                operation: 'updated',
-                item: item.primary.entity_type,
-                tool: tool,
-                data: wb.log.logItem(item),
-              });
-            }
-          } else {
-            $.publish('entity/created', d.entity);
-            if (item_type === 'entity') {
-              wb.utility.notify('Entity created!', 'success');
-              wb.log.log({
-                operation: 'created',
-                item: item.primary.entity_type,
-                tool: tool,
-                data: wb.log.logItem(d.entity),
-              });
-            }
-          }
-          // d.entity is an array
-          // including the entity that is updated, and possiblity related entities (newly created) 
-          // just log the currently updated entity
-        }
-        if (!$.isEmptyObject(d.relationship)) {
-          if (opt.data.id) {
-            $.publish('relationship/updated', d.relationship);
-            if (item_type === 'relationship') {
-              wb.utility.notify('relationship updated!', 'success');
-              wb.log.log({
-                operation: 'updated',
-                item: 'relationship',
-                tool: tool,
-                data: wb.log.logItem(item),
-              });
-            }
-          } else {
-            $.publish('relationship/created', d.relationship);
-            if (item_type === 'relationship') {
-              wb.utility.notify('relationship created!', 'success');
-              wb.log.log({
-                operation: 'created',
-                item: 'relationship',
-                tool: tool,
-                data: wb.log.logItem(d.relationship),
-              });
-            }
-          }
+        wb.store.updateItems(d.annotation, 'annotations');
+        wb.store.updateItems(d.entity, 'entities');
+        wb.store.updateItems(d.relationship, 'relationships');
+        $.publish('data/updated');
+
+        if (item_type === 'entity') {
+          wb.utility.notify('Entity updated!', 'success');
+          wb.log.log({
+            operation: 'updated',
+            item: item.primary.entity_type,
+            tool: tool,
+            data: wb.log.logItem(item),
+          });
+        } else if (item_type === 'relationship') {
+          wb.utility.notify('Relationship updated!', 'success');
+          wb.log.log({
+            operation: 'updated',
+            item: 'relationship',
+            tool: tool,
+            data: wb.log.logItem(item),
+          });
         }
       },
       error: function(d) {
@@ -348,4 +317,3 @@ $.widget('viz.vizeditor', {
     return res;
   },
 });
-

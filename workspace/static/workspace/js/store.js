@@ -35,7 +35,7 @@ wb.store = {
   // TODO: load these properties from server
   static: {
     dataentry: ['file', 'content', 'date'],
-    event: ['start_date', 'end_date', 'person', 'location', 'organization', 'repeated', 'repeated_until', 'note'],
+    event: ['start_date', 'end_date', 'repeated', 'repeated_until', 'person', 'location', 'organization', 'note'],
     location: ['address', 'note'],
     person: ['gender', 'age', 'job', 'note'],
     organization: ['person', 'category', 'note'],
@@ -86,7 +86,7 @@ wb.store = {
         _this.cleanShelf(type);
       }
       else {
-        if (d.deleted) shelf.splice(i, 1);
+        if (d.deleted || d.meta.deleted) shelf.splice(i, 1);
       }
     });
   },

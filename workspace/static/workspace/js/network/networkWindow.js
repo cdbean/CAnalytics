@@ -37,14 +37,14 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       var nodeMap = {}, linkMap = {};
 
       for (var id in wb.store.items.entities) {
-        var entity = JSON.parse(JSON.stringify(wb.store.items.entities[id]));
+        var entity = _.clone(wb.store.items.entities[id]);
         if (entity.meta.deleted) continue;
         if (!(id in nodeMap)) {
           nodeMap[id] = entity;
         }
       }
       for (var id in wb.store.items.relationships) {
-        var relation = JSON.parse(JSON.stringify(wb.store.items.relationships[id]));
+        var relation = _.clone(wb.store.items.relationships[id]);
         if (relation.meta.deleted) continue;
         var source = relation.primary.source,
             target = relation.primary.target,

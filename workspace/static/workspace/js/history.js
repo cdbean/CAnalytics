@@ -48,16 +48,16 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       for (var i = 0, len = data.items.length; i < len; i++) {
         _this.add(data.items[i]);
       }
-      if (data.has_previous) 
+      if (data.has_previous)
         $('.pager .prev', this.element).removeClass('hidden')
           .data('page', data.previous_page);
-      else 
+      else
         $('.pager .prev', this.element).addClass('hidden');
 
-      if (data.has_next) 
+      if (data.has_next)
         $('.pager .next', this.element).removeClass('hidden')
           .data('page', data.next_page);
-      else 
+      else
         $('.pager .next', this.element).addClass('hidden');
 
       // scroll to bottom
@@ -79,12 +79,16 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     var action = 'In ' + item.tool + '<i> ' + item.operation + ' </i>' + item.item;
     var entity;
     if (item.data) {
-      if (item.data.name) {
-        action += ' <a class="wb-item">' + item.data.name + '</span>';
+      var d = item.data;
+      if (d.constructor === Array) {
+        d = d[0]
+      }
+      if (d.name) {
+        action += ' <a class="wb-item">' + d.name + '</span>';
       }
     }
     $('<span class="content">').appendTo(row).html(action);
-    if (item.item === 'annotation') {
+    if (item.item === 'annotation' || item.item === 'annotations') {
       row.find('.wb-item').addClass('annotation').data('annotation', {id: item.data.id});
     } else if (item.item === 'relationship') {
       row.find('.wb-item').addClass('wb-relationship').data('relationship', {id: item.data.id});

@@ -26,8 +26,7 @@ $.get(GLOBAL_URL.case_info, {
 
 
 $(function() {
-  // $(window).unload(onBeforeUnload);
-  window.onbeforeunload = onBeforeUnload;
+  $(window).on('beforeunload', onBeforeUnload)
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
   $('#case-info').click(onCaseInfo);
@@ -97,6 +96,13 @@ $(function() {
       });
     });
     $.cookie('tools', JSON.stringify(tools));
+
+    $.post('/sync/leave', {
+      'case': CASE,
+      'group': GROUP
+    });
+
+    return 'Are you leaving?';
   }
 
   function onSyncCase() {

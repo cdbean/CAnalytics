@@ -20,7 +20,7 @@ $.widget('viz.vizviewer', {
     ';
     var controls = ' \
       <span class="viewer-controls"> \
-        <button type="button" title="delete" class="close delete"><span class="glyphicon glyphicon-trash"></span></button> \
+        <button type="button" title="archive" class="close delete"><span class="glyphicon glyphicon-trash"></span></button> \
         <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
         <button type="button" title="restore" class="close restore"><span class="glyphicon glyphicon-repeat"></span></button> \
         <button type="button" title="history" class="close history"><span class="glyphicon glyphicon-time"></span></button> \
@@ -190,6 +190,10 @@ $.widget('viz.vizviewer', {
         },
         type: 'RESTORE',
         success: function(res) {
+          wb.store.updateItems(res.annotation, 'annotations');
+          wb.store.updateItems(res.entity, 'entities');
+          wb.store.updateItems(res.relationship, 'relationships');
+          $.publish('data/updated');
           wb.utility.notify('Relationship restored', 'success');
           wb.log.log({
             operation: 'restored',
@@ -197,15 +201,7 @@ $.widget('viz.vizviewer', {
             tool: tool,
             data: wb.log.logItem(res.relationship),
           });
-          $.publish('relationship/restored', res.relationship);
-          // if res includes entity, it means an entity has been updated due to the deletion of the relationship
-          if (!$.isEmptyObject(res.entity)) {
-            $.publish('entity/updated', res.entity);
-          } 
-          if (!$.isEmptyObject(res.annotation)) {
-            $.publish('annotation/restored', res.annotation);
-          }
-        }, 
+        },
         error: function(e) {
           console.log(e);
           wb.utility.notify('Sorry, failed to delete the relationship');
@@ -220,20 +216,17 @@ $.widget('viz.vizviewer', {
         },
         type: 'RESTORE',
         success: function(res) {
+          wb.store.updateItems(res.annotation, 'annotations');
+          wb.store.updateItems(res.entity, 'entities');
+          wb.store.updateItems(res.relationship, 'relationships');
+          $.publish('data/updated');
           wb.utility.notify('Entity restored', 'success');
-          $.publish('entity/restored', res.entity);
           wb.log.log({
             operation: 'restored',
             item: res.entity.primary.entity_type,
             tool: tool,
             data: wb.log.logItem(res.entity),
           });
-          if (!$.isEmptyObject(res.relationship)) {
-            $.publish('relationship/restored', res.relationship);
-          }
-          if (!$.isEmptyObject(res.annotation)) {
-            $.publish('annotation/restored', res.annotation);
-          }
         },
         error: function(e) {
           console.log(e);
@@ -270,6 +263,11 @@ $.widget('viz.vizviewer', {
         },
         type: 'DELETE',
         success: function(res) {
+          wb.store.updateItems(res.annotation, 'annotations');
+          wb.store.updateItems(res.entity, 'entities');
+          wb.store.updateItems(res.relationship, 'relationships');
+          $.publish('data/updated');
+
           wb.utility.notify('Deleted a relationship', 'success');
           wb.log.log({
             operation: 'deleted',
@@ -277,14 +275,6 @@ $.widget('viz.vizviewer', {
             tool: tool,
             data: wb.log.logItem(res.relationship),
           });
-          $.publish('relationship/deleted', res.relationship);
-          // if res includes entity, it means an entity has been updated due to the deletion of the relationship
-          if (!$.isEmptyObject(res.entity)) {
-            $.publish('entity/updated', res.entity);
-          } 
-          if (!$.isEmptyObject(res.annotation)) {
-            $.publish('annotation/deleted', res.annotation);
-          }
         },
         error: function(e) {
           console.log(e);
@@ -301,24 +291,22 @@ $.widget('viz.vizviewer', {
         },
         type: 'DELETE',
         success: function(res) {
+          wb.store.updateItems(res.annotation, 'annotations');
+          wb.store.updateItems(res.entity, 'entities');
+          wb.store.updateItems(res.relationship, 'relationships');
+          $.publish('data/updated');
+
           wb.utility.notify('Deleted an entity', 'success');
-          $.publish('entity/deleted', res.entity);
           wb.log.log({
             operation: 'deleted',
             item: res.entity.primary.entity_type,
             tool: tool,
             data: wb.log.logItem(res.entity),
           });
-          if (!$.isEmptyObject(res.relationship)) {
-            $.publish('relationship/deleted', res.relationship);
-          }
-          if (!$.isEmptyObject(res.annotation)) {
-            $.publish('annotation/deleted', res.annotation);
-          }
         },
         error: function(e) {
           console.log(e);
-          wb.utility.notify('Sorry, failed to delete the entity');
+          wb.utility.notify('Sorry, failed to archive the entity');
         }
       });
     }

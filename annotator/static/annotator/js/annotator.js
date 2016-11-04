@@ -266,9 +266,9 @@ Annotator = (function(_super) {
                     var exist_ann = existing_anns[i];
                     if (annotation.anchor === exist_ann.anchor
                         && annotation.quote === exist_ann.quote
-                        && annotation.ranges[0].start === exist_ann.ranges[0].start 
+                        && annotation.ranges[0].start === exist_ann.ranges[0].start
                         && annotation.ranges[0].end === exist_ann.ranges[0].end
-                        && annotation.ranges[0].startOffset === exist_ann.ranges[0].startOffset 
+                        && annotation.ranges[0].startOffset === exist_ann.ranges[0].startOffset
                         && annotation.ranges[0].endOffset === exist_ann.ranges[0].endOffset) {
                       existed = true;
                       break;
@@ -475,7 +475,7 @@ Annotator = (function(_super) {
                             public: false
                         });
                 }
-            } 
+            }
         });
         return this.publish('annotationViewerShown', [this.viewer, annotations]);
     };
@@ -606,7 +606,8 @@ Annotator = (function(_super) {
     Annotator.prototype.onDeleteAnnotation = function(annotation) {
         this.viewer.hide();
         // ask if delete single or delete all
-        var content = '<p>Do you want to delete this single annotation, or all matching annotations?</p>'
+        var content = '<div><p>Do you want to delete this single annotation, or all matching annotations?</p>'
+        content += '<p> Note: The associated entity/relationship will be archived if you delete all the annotations.</p></div>'
         var deleteAnnotation = this.deleteAnnotation.bind(this);
         var deleteAnnotations = this.deleteAnnotations.bind(this);
         $(content).dialog({
@@ -656,9 +657,9 @@ Annotator = (function(_super) {
           // for (var i = 0; i < existing_anns.length; i++) {
           //   var exist_ann = existing_anns[i];
           //   if (ann.anchor === exist_ann.anchor
-          //       && range.start === exist_ann.ranges[0].start 
+          //       && range.start === exist_ann.ranges[0].start
           //       && range.end === exist_ann.ranges[0].end
-          //       && range.startOffset === exist_ann.ranges[0].startOffset 
+          //       && range.startOffset === exist_ann.ranges[0].startOffset
           //       && range.endOffset === exist_ann.ranges[0].endOffset) {
           //     existed = true;
           //     break;
@@ -671,7 +672,7 @@ Annotator = (function(_super) {
           $.extend(new_ann.ranges[0], range.nativeRange);
           new_ann.quote = annotation.quote;
           new_ann.entity = annotation.entity;
-          
+
           // this.setupAnnotation(new_ann);
           new_anns.push(new_ann);
 

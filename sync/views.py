@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from drealtime import iShoutClient
 import json
 from django.contrib.auth.decorators import login_required
@@ -25,11 +25,24 @@ def join_group(request):
         case = Case.objects.get(id=request.POST['case'])
         group = Group.objects.get(id=request.POST['group'])
     except:
-        return
+        return HttpResponseBadRequest()
     name = group_name(case, group)
     ishout_client.register_group(request.user.id, name)
     broadcast_users_status(request.user, case, group)
     return HttpResponse()
+
+@login_required
+def leave_group(request):
+    try:
+        case = Case.objects.get(id=request.POST['case'])
+        group = Group.objects.get(id=request.POST['group'])
+    except:
+        return HttpResponseBadRequest()
+    name = group_name(case, group)
+    ishout_client.unregister_group(request.user.id, name)
+    broadcast_users_status(request.user, case, group)
+    return HttpResponse()
+
 
 
 def broadcast_users_status(user, case, group):

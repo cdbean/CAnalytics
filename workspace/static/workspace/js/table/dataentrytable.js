@@ -134,7 +134,11 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       var _this = this;
 
       d3.values(wb.store.items.annotations).forEach(function(annotation) {
-        _this.addAnnotation(annotation);
+        if (annotation.meta.deleted) {
+          _this.deleteAnnotation(annotation);
+        } else {
+          _this.addAnnotation(annotation);
+        }
       });
     },
 

@@ -295,10 +295,25 @@ def del_annotations(request):
             ann.entity.deleted = True
             ann.entity.save()
             res['entity'].append(ann.entity.serialize())
+            rels = ann.entity.relates_as_source.all() | ann.entity.relates_as_target.all()
+            rels.update(deleted=True)
+            res['relationship'] = [r.serialize() for r in rels]
         if ann.relationship:
-            ann.relationship.deleted = true
+            ann.relationship.deleted = True
             ann.relationship.save()
             res['relationship'].append(ann.relationship.serialize())
+
+            rel = ann.relationship
+            if rel.relation == 'involve':
+                source = Entity.objects.filter(id=rel.source.id).select_subclasses()[0]
+                target = Entity.objects.filter(id=rel.target.id).select_subclasses()[0]
+                if source.entity_type == 'event':
+                    if target.entity_type == 'person': source.person.remove(target)
+                    if target.entity_type == 'location': source.location = None
+                    if target.entity_type == 'organization': source.organization.remove(target)
+                elif source.entity_type == 'organization':
+                    if target.entity_type == 'person': source.person.remove(target)
+                res['entity'] = [source.serialize(), target.serialize()]
 
     sync_item('delete', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
