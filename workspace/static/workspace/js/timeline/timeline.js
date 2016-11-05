@@ -232,7 +232,7 @@ wb.viz.timeline = function() {
 
       function updateScale(dd) {
         // keep zoom scale domain
-        scaleX = zoom.x()
+        scaleX = zoom.x();
 
         if (!scaleX) { // if scale has not been defined
           var min = d3.min(dd, function(d) { return d.start; })

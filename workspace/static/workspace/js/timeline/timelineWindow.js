@@ -174,7 +174,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
             <option value="organization">organization</option> \
           </select> \
           <ul class="controls" style="margin-top:40px;"> \
-            <li class="control filter" title="Filter"> \
+            <li class="control"> \
+              <button class="btn btn-sm"> Filter </button> \
+            </li> \
           </ul> \
           <svg id="detailTimeline"></svg> \
           <svg id="overviewTimeline"></svg> \

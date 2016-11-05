@@ -6,7 +6,10 @@ wb.viz.network = function() {
 
   var container = null;
 
+  var scaleX, scaleY;
+
   var networkLayout;
+  var brushable = false;
   var uuid = wb.utility.uuid();
 
   var dispatch = d3.dispatch('filter', 'elaborate', 'delaborate', 'drawn');
@@ -29,7 +32,14 @@ wb.viz.network = function() {
     return exports;
   }
 
+  exports.brushable = function(_) {
+    if (!arguments.length) return brushable;
+    brushable = _;
+    return exports;
+  }
+
   // controller
+
   exports.doZoom = function() {
 
   }
@@ -73,6 +83,7 @@ wb.viz.network = function() {
     selection.each(function(dd) {
       var innerW = width - margin.left - margin.right,
           innerH = height - margin.top - margin.bottom;
+      var brushExtent = null;
 
       init.apply(this);
       update.apply(this);
@@ -84,12 +95,12 @@ wb.viz.network = function() {
         container.append('clipPath').attr('id', 'clip-' + uuid).append('rect');
         // react area for zooming
         container.append('rect').attr('class', 'chartArea');
+        container.append('g').attr('class', 'brush');
         var chart = container.append('g')
           // .attr('clip-path', 'url(#clip-' + uuid + ')')
           .attr('class', 'chart');
         chart.append('g').attr('class', 'links');
         chart.append('g').attr('class', 'nodes');
-        chart.append('g').attr('class', 'brush');
 
         // add svg meta, e.g. link arrow, image
         container.selectAll('defs')
@@ -151,11 +162,19 @@ wb.viz.network = function() {
       }
 
       function brushing() {
-
+        var e = brush.extent();
+        container.selectAll(".node").classed("selected", function(d) {
+          return  e[0][0] <= d.x && d.x <= e[1][0]
+            && e[0][1] <= d.y && d.y <= e[1][1];
+        });
       }
 
       function brushed() {
-
+        var filter = [];
+        container.selectAll('.node.selected').each(function(d) {
+          filter.push(d)
+        });
+        return dispatch.filter(filter);
       }
 
       function dragstart() {
@@ -172,6 +191,7 @@ wb.viz.network = function() {
 
       function update() {
         updateData();
+        updateScale();
         updateLayout();
         updateLinks();
         updateNodes();
@@ -199,9 +219,31 @@ wb.viz.network = function() {
         }
       }
 
+      function updateScale() {
+        // keep zoom scale domain
+        scaleX = zoom.x();
+        scaleY = zoom.y();
+
+        if (!scaleX || !scaleY) {
+          scaleX = d3.scale.linear()
+            .range([0, width])
+            .domain([0, width]);
+          scaleY = d3.scale.linear()
+            .range([0, height])
+            .domain([0, height]);
+          zoom.x(scaleX).y(scaleY);
+        } else {
+          if (brush) {
+            brushExtent = brush.extent();
+          }
+          scaleX.range([0, width]);
+          scaleY.range([0, height]);
+        }
+      }
+
       function updateLayout() {
         container.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        container.select('.chartArea').attr('width', innerW).attr('height', innerH);
+        container.select('.chartArea').attr('width', innerW).attr('height', innerH).call(zoom);
         container.select('clipPath rect').attr('width', innerW).attr('height', innerH);
 
         networkLayout = d3.layout.force()
@@ -337,7 +379,18 @@ wb.viz.network = function() {
       }
 
       function updateBehavior() {
-        container.select('.chartArea').call(zoom);
+        if (brushable) {
+          zoom.on('zoom', null);
+          brush.x(zoom.x())
+            .y(zoom.y());
+          if (brushExtent) brush.extent(brushExtent);
+
+          container.select('.brush').style('display', '').call(brush);
+        } else {
+          container.select('.brush').style('display', 'none');
+          container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
+          zoom.on('zoom', zoomed);
+        }
       }
     });
   }

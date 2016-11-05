@@ -89,8 +89,15 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
     defilter: function() {
     },
 
-    onFilter: function() {
+    onFilter: function(filter) {
+      var filter_id = filter.map(function(d) { return d.meta.id; })
+      var windowId = '#' + this.element.attr('id');
 
+      if (!filter.length) {
+        wb.filter.remove(windowId);
+      } else {
+        wb.filter.set(filter_id, 'network', windowId);
+      }
     },
 
     onElaborate: function(d, pos) {
@@ -118,6 +125,11 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       var html = ' \
         <div id="filterBar"> \
         </div> \
+        <ul class="controls" style="margin-top:10px;"> \
+          <li class="control" id="filter"> \
+            <button class="btn btn-sm">Filter</button> \
+          </li> \
+        </ul> \
         <div id="main"> \
           <svg id="chart" xmlns: "http://www.w3.org/2000/svg"> \
         </div> \
@@ -146,6 +158,8 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       li.append('text')
         .text(function(d) { return d; });
 
+      el.find('#filter button').click(onFilterBtnClick);
+
       function onClickFilterOption(d) {
         var entity_types = d3.select(el[0]).select('#filterBar').selectAll('input')
           .filter(function(d) {
@@ -153,6 +167,14 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
           })
           .data();
         _this.network.displaySomeByType(entity_types);
+      }
+
+      function onFilterBtnClick() {
+        $(this).toggleClass('btn-primary'); // add 'btn-primary' when filter is activated
+        _this.network.brushable($(this).hasClass('btn-primary'));
+        d3.select(el[0])
+          .select('svg#chart')
+          .call(_this.network);
       }
     },
 
