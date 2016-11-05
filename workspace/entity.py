@@ -124,9 +124,14 @@ def create_entity(json, user, case, group):
         if entity_type == 'organization':
             obj, created = Organization.objects.get_or_create(name=name, case=case, group=group)
 
-        if created: 
+        if created:
             obj.created_by = user
             obj.save()
+        else:
+            if obj.deleted:
+                obj.deleted = False
+                obj.last_edited_by = user
+                obj.save()
         return obj
 
     else:
@@ -201,7 +206,7 @@ def set_primary_attr(entity, attr, value, user, case, group):
             except:
                 pass
         setattr(entity, attr, value)
-    else: 
+    else:
         if value == '':
             value = None
         # do not change boolean values
@@ -384,4 +389,3 @@ def set_attr_organization(entity, value, user, case, group):
             del_rels.append(del_rel)
 
     return new_ents, new_rels, del_rels, updated_ents
-

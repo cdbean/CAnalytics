@@ -264,8 +264,9 @@ Annotator.Plugin.Store = (function(_super) {
     };
 
     Store.prototype.unregisterAnnotation = function(annotation) {
-        return this.annotations.splice(this.annotations.indexOf(annotation), 1);
-        // return this.annotations.splice(__indexOfId.call(this.annotations, annotation), 1);
+        // return this.annotations.splice(this.annotations.indexOf(annotation), 1);
+        var i = __indexOfId.call(this.annotations, annotation);
+        if (i > -1) return this.annotations.splice(i, 1);
     };
 
     Store.prototype.updateAnnotation = function(annotation, data) {
