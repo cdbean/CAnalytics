@@ -8,15 +8,15 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         this.element.addClass(this.options.entity);
         this._super('_create');
 
-        // two empty title columns: for one collapse, the other for delete
-        var columns = ['ID', '', 'Name'].concat(wb.store.static[this.options.entity]);
+        // empty title column for collapse
+        var columns = ['ID', 'Detail', 'Name', 'Created by', 'Created at', 'Last edited by', 'Last edited at', 'Deleted'];
 
         var _this = this;
         this.table = wb.viz.table()
             .columns(columns)
             .height(this.element.height() - 80)
             .title(this.options.title + '_table')
-            .editable(true)
+            // .editable(true) // not editable
             .on('edit', function(entity, attr) {
                 $.publish('/entity/attribute/update', [entity, attr]);
             })
@@ -40,16 +40,18 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
 
         for (var d in wb.store.items.entities) {
           var entity = wb.store.items.entities[d];
-          if (entity.meta.deleted) continue;
           if (entity && entity.primary.entity_type === entity_type) {
-            // the two null values are for the two special columns
-            var row = [entity.meta.id, '<img src="' + GLOBAL_URL.static + '/workspace/img/details_open.png' + '" class="control"></img>', entity.primary.name || ''];
-            for (var i = 0, len = attrs.length; i < len; i++) {
-              var attr = attrs[i];
-              var value = wb.utility.parseEntityAttr(attr, entity.primary[attr]);
-
-              row.push(value);
-            }
+            var row = [
+              entity.meta.id,
+              '<i class="glyphicon glyphicon-list-alt control"></i>',
+              entity.primary.name || '',
+              wb.info.users[entity.meta.created_by].name,
+              entity.meta.created_at,
+              wb.info.users[entity.meta.last_edited_by].name,
+              entity.meta.last_edited_at,
+              entity.meta.deleted ? 'Yes' : 'No'
+            ];
+            // add archived entities to the end, and normal entities to front
             data.push(row);
           }
         }

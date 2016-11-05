@@ -194,7 +194,7 @@ $.widget('viz.vizviewer', {
           wb.store.updateItems(res.entity, 'entities');
           wb.store.updateItems(res.relationship, 'relationships');
           $.publish('data/updated');
-          wb.utility.notify('Relationship restored', 'success');
+          wb.utility.notify('Relationship is restored', 'success');
           wb.log.log({
             operation: 'restored',
             item: 'relationship',
@@ -204,7 +204,7 @@ $.widget('viz.vizviewer', {
         },
         error: function(e) {
           console.log(e);
-          wb.utility.notify('Sorry, failed to delete the relationship');
+          wb.utility.notify('Sorry, failed to restore the relationship');
         }
       });
     } else {
@@ -220,7 +220,7 @@ $.widget('viz.vizviewer', {
           wb.store.updateItems(res.entity, 'entities');
           wb.store.updateItems(res.relationship, 'relationships');
           $.publish('data/updated');
-          wb.utility.notify('Entity restored', 'success');
+          wb.utility.notify('Entity is restored', 'success');
           wb.log.log({
             operation: 'restored',
             item: res.entity.primary.entity_type,
@@ -230,7 +230,7 @@ $.widget('viz.vizviewer', {
         },
         error: function(e) {
           console.log(e);
-          wb.utility.notify('Sorry, failed to delete the entity');
+          wb.utility.notify('Sorry, failed to restore the entity');
         }
       });
     }
@@ -268,7 +268,7 @@ $.widget('viz.vizviewer', {
           wb.store.updateItems(res.relationship, 'relationships');
           $.publish('data/updated');
 
-          wb.utility.notify('Deleted a relationship', 'success');
+          wb.utility.notify('Relationship is archived', 'success');
           wb.log.log({
             operation: 'deleted',
             item: 'relationship',
@@ -296,7 +296,7 @@ $.widget('viz.vizviewer', {
           wb.store.updateItems(res.relationship, 'relationships');
           $.publish('data/updated');
 
-          wb.utility.notify('Deleted an entity', 'success');
+          wb.utility.notify('Entity is archived', 'success');
           wb.log.log({
             operation: 'deleted',
             item: res.entity.primary.entity_type,

@@ -166,14 +166,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     setupUI: function() {
       var html = ' \
         <div class="main"> \
-          <select class="controls" style=""> \
-            <option value="">No Group<option> \
-            <option value="person" selected>person</option> \
-            <option value="location">location</option> \
-            <option value="resource">resource</option> \
-            <option value="organization">organization</option> \
-          </select> \
-          <ul class="controls" style="margin-top:40px;"> \
+          <ul class="controls" style="margin-top:10px;"> \
             <li class="control"> \
               <button class="btn btn-sm"> Filter </button> \
             </li> \
@@ -203,18 +196,6 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       // register events
       var _this = this;
-      this.element.find('select').change(function(e) {
-        _this.detailTimeline.trackBy(this.value);
-        _this.overviewTimeline.trackBy(this.value);
-
-        d3.select(_this.element[0])
-          .select('svg#detailTimeline')
-          .call(_this.detailTimeline);
-
-        d3.select(_this.element[0])
-          .select('svg#overviewTimeline')
-          .call(_this.overviewTimeline);
-      });
 
       this.element.find('.control button').click(function() {
         $(this).toggleClass('btn-primary');

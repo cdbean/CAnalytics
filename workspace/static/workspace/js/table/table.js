@@ -31,9 +31,13 @@ wb.viz.table = function() {
                 });
 
                 if (title === 'dataentry'); // do nothing
-                else if (title === 'annotation_table') $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
-                else $(table).on('click', 'tr.even>td:nth-child(2), tr.odd>td:nth-child(2)', onFilter);
-                $(table).on('click', '.control', onControl.bind(this));
+                else if (title === 'annotation_table') {
+                  $(table).on('click', 'tr.even>td:first-child, tr.odd>td:first-child', onFilter);
+                }
+                else {
+                  $(table).on('click', 'tr.even>td:nth-child(2), tr.odd>td:nth-child(2)', onFilter);
+                  $(table).on('click', '.control', onControl.bind(this));
+                }
             }
 
             table.fnClearTable();
@@ -48,6 +52,10 @@ wb.viz.table = function() {
                 var data = table.fnGetData(pos);
                 $(row).data("id", data[0]);
                 $(row).attr('id', 'row-' + data[0]);
+                if (title !== 'dataentry' && title !== 'annotation_table') {
+                  var entity = wb.store.items.entities[data[0]];
+                  if (entity.meta.deleted) $(row).css('opacity', .3);
+                }
             });
 
             if (editable) {
@@ -87,11 +95,9 @@ wb.viz.table = function() {
       var tr = $(e.target).closest('tr')[0];
       if (table.fnIsOpen(tr)) {
         /* This row is already open - close it */
-        e.target.src = GLOBAL_URL.static + "/workspace/img/details_open.png";
         table.fnClose(tr);
       } else {
         /* Open this row */
-        e.target.src = GLOBAL_URL.static + "/workspace/img/details_close.png";
         var id = $(tr).data('id');
         // only entities have this row expand control
         var ent = wb.store.items.entities[id];
@@ -106,13 +112,75 @@ wb.viz.table = function() {
           for (var k in ent.other) {
             if (ent.other[k]) child += '<tr><td>' + k + ':</td><td>' + ent.other[k] + '</td></tr>';
           }
-          var metas = wb.store.static.meta;
-          for (var i = 0, len = metas.length; i < len; i++) {
-            var attr = metas[i], value = ent.meta[attr];
-            if (value) child += '<tr><td>' + attr + ':</td><td>' + wb.utility.parseEntityAttr(attr, value) + '</td></tr>';
-          }
           child += '</table>';
+
+          child += '<div style="margin-left:10px;">';
+          if (ent.deleted || ent.meta.deleted) {
+            child += '<span>The entity is archived. </span>';
+            child += '<button class="btn btn-xs btn-primary" id="restore-btn">Restore</button>';
+          } else {
+            child += '<button class="btn btn-xs btn-danger" id="delete-btn">Archive this entity</button>';
+          }
+          child += '</div>';
+
           table.fnOpen(tr, child, 'details');
+
+          $('#delete-btn', table).click(function() {
+            $.ajax({
+              url: GLOBAL_URL.entity_id.replace('0', ent.meta.id),
+              data: {
+                case: CASE,
+                group: GROUP
+              },
+              type: 'DELETE',
+              success: function(res) {
+                wb.store.updateItems(res.annotation, 'annotations');
+                wb.store.updateItems(res.entity, 'entities');
+                wb.store.updateItems(res.relationship, 'relationships');
+                $.publish('data/updated');
+
+                wb.utility.notify('Entity is archived', 'success');
+                wb.log.log({
+                  operation: 'deleted',
+                  item: res.entity.primary.entity_type,
+                  tool: 'table',
+                  data: wb.log.logItem(res.entity),
+                });
+              },
+              error: function(e) {
+                console.log(e);
+                wb.utility.notify('Sorry, failed to archive the entity');
+              }
+            });
+          })
+
+          $('#restore-btn', table).click(function() {
+            $.ajax({
+              url: GLOBAL_URL.entity_id.replace('0', ent.meta.id),
+              data: {
+                case: CASE,
+                group: GROUP
+              },
+              type: 'RESTORE',
+              success: function(res) {
+                wb.store.updateItems(res.annotation, 'annotations');
+                wb.store.updateItems(res.entity, 'entities');
+                wb.store.updateItems(res.relationship, 'relationships');
+                $.publish('data/updated');
+                wb.utility.notify('Entity is restored', 'success');
+                wb.log.log({
+                  operation: 'restored',
+                  item: res.entity.primary.entity_type,
+                  tool: 'table',
+                  data: wb.log.logItem(res.entity),
+                });
+              },
+              error: function(e) {
+                console.log(e);
+                wb.utility.notify('Sorry, failed to delete the entity');
+              }
+            });
+          });
 
           wb.log.log({
             operation: 'read',
