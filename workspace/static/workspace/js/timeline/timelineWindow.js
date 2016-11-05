@@ -216,9 +216,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
           .call(_this.overviewTimeline);
       });
 
-      this.element.find('.control').click(function() {
-        $(this).toggleClass('selected');
-        _this.detailTimeline.brushable($(this).hasClass('selected'));
+      this.element.find('.control button').click(function() {
+        $(this).toggleClass('btn-primary');
+        _this.detailTimeline.brushable($(this).hasClass('btn-primary'));
         d3.select(_this.element[0])
           .select('svg#detailTimeline')
           .call(_this.detailTimeline)
