@@ -170,10 +170,10 @@ $(function() {
 
     switch(data.item) {
       case 'entity':
-        message += wb.utiltiy.toString(entities, 'entity');
+        message += wb.utility.toString(entities, 'entity');
         break;
       case 'relationship':
-        message += wb.utiltiy.toString(relationships, 'relationship');
+        message += wb.utility.toString(relationships, 'relationship');
         break;
       case 'annotation':
         if (annotations.constructor === Array) annotations = annotations[0];
