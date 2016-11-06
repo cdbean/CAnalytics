@@ -40,6 +40,11 @@
 }
 .navbar #userlist li a {
   background-color: white;
+  color: rgb(255, 127, 14);
+}
+.navbar #userlist li a.watching {
+  background-color: #e40b0b;
+  color: white;
 }
 
 #progressbar {

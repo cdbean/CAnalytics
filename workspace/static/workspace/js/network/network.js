@@ -54,6 +54,71 @@ wb.viz.network = function() {
   // end controller
 
   // API
+  exports.state = function(_) {
+    if (!arguments.length) return getState();
+    return setState(_);
+
+    function getState() {
+      var state = {nodes: {}, transform: {}};
+
+      container.selectAll('.node').each(function(d) {
+        state.nodes[d.meta.id] = {
+          id: d.meta.id,
+          x: d.x,
+          y: d.y,
+          fixed: d.fixed
+        };
+      });
+      state.transform = {
+        translate: zoom.translate(),
+        scale: zoom.scale()
+      };
+      return state;
+    }
+
+    function setState(state) {
+      networkLayout.stop();
+      var nodes = state.nodes,
+          transform = state.transform;
+      container.selectAll('.node').each(function(d) {
+        if (!(d.meta.id in nodes)) return;
+        d.x = nodes[d.meta.id].x;
+        d.y = nodes[d.meta.id].y;
+        d.fixed = nodes[d.meta.id].fixed;
+      });
+      zoom.translate(transform.translate).scale(transform.scale);
+      container.select('.chart')
+        .attr("transform", "translate("
+          + transform.translate[0] + "," + transform.translate[1]+ ")"
+          + " scale(" + transform.scale + ")");
+      container.select('.chartArea').call(zoom);
+      tick();
+    }
+  }
+
+  function tick() {
+    container.selectAll('.link path').attr('d', function(d) {
+      var deltaX = d.target.x - d.source.x,
+          deltaY = d.target.y - d.source.y,
+          dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+          normX = deltaX / dist,
+          normY = deltaY / dist,
+          dr = dist / d.index, // the method is arbitary
+          sourcePadding = d.left ? 17 : 12,
+          targetPadding = d.right ? 17 : 12,
+          sourceX = d.source.x + (sourcePadding * normX),
+          sourceY = d.source.y + (sourcePadding * normY),
+          targetX = d.target.x - (targetPadding * normX),
+          targetY = d.target.y - (targetPadding * normY);
+//                    return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
+      if (d.index > 1) return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
+      else return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
+    });
+    container.selectAll('.node').attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+  }
+
   exports.displaySome = function(data) {
     if (!container) return;
 
@@ -207,28 +272,7 @@ wb.viz.network = function() {
         networkLayout.resume();
       }
 
-      function tick() {
-        container.selectAll('.link path').attr('d', function(d) {
-          var deltaX = d.target.x - d.source.x,
-              deltaY = d.target.y - d.source.y,
-              dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-              normX = deltaX / dist,
-              normY = deltaY / dist,
-              dr = dist / d.index, // the method is arbitary
-              sourcePadding = d.left ? 17 : 12,
-              targetPadding = d.right ? 17 : 12,
-              sourceX = d.source.x + (sourcePadding * normX),
-              sourceY = d.source.y + (sourcePadding * normY),
-              targetX = d.target.x - (targetPadding * normX),
-              targetY = d.target.y - (targetPadding * normY);
-//                    return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
-          if (d.index > 1) return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
-          else return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
-        });
-        container.selectAll('.node').attr("transform", function(d) {
-          return "translate(" + d.x + "," + d.y + ")";
-        });
-      }
+
 
       function update() {
         updateData();

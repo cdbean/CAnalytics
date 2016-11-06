@@ -43,22 +43,52 @@ $(function() {
   }
 
   function onViewRequested(d) {
-    var network = $('.network').not(function() {
-      return this.className.indexOf('watch-') > 1; // exclude the views that are waching
-    }).first().data('instance');
-    if (network) network.watchRequested(d.from); // if there are multiple views, stream the first one
+    // start streaming views
+    window.streamViewInterval = setInterval(streamView, 500);
+
+    function streamView() {
+      var data = {};
+
+      data.watching = [d.watching];
+      data.watched = d.watched;
+      data.windowState = wb.utility.getWindowState();
+      data.filter = wb.filter.filter;
+      if($('.viz.network').length) {
+        data.networkState = $('.viz.network').data('instance').getState();
+      }
+
+      ishout.rooms.forEach(function(r) {
+        if (ishout.socket)
+          ishout.socket.emit('view.stream', r.roomName, data);
+      });
+    }
   }
 
   function onViewStreamed(d) {
-    var network = $('.network.watch-' + d.from).data('instance');
-    if (network) network.watchStream(d.state);
+    // get views data; display them
+    var windowState = d.windowState,
+        filter = d.filter,
+        networkState = d.networkState;
+    if (windowState) {
+      wb.utility.setWindowState(windowState);
+    }
+    if (filter) {
+      wb.filter.filter = filter;
+      wb.filter.update();
+      $.publish('data/filter');
+    }
+    if (networkState) {
+      if ($('.viz.network').length) {
+        $('.viz.network').data('instance').setState(networkState);
+      }
+    }
   }
 
   function onViewStopped(d) {
-    var network = $('.network').not(function() {
-      return this.className.indexOf('watch-') > 1; // exclude the views that are waching
-    }).first().data('instance');
-    if (network) network.watchStopped(d.from); // if there are multiple views, stream the first one
+    // stop streaming views
+    if (window.streamViewInterval) {
+      clearInterval(window.streamViewInterval);
+    }
   }
 
 
@@ -145,9 +175,6 @@ $(function() {
       }
     }
     if (toupdate) onUserTool(); // update collaborator workspace
-
-    var network = $('.network').data('instance');
-    if (network) network.updateViewAvailability();
   }
 
   function onNewMessage(data) {

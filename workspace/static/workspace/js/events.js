@@ -30,7 +30,7 @@
     if (window.ishout) {
       ishout.rooms.forEach(function(r) {
         if (ishout.socket)
-          ishout.socket.emit('view.request', user, {from: USER, to: user});
+          ishout.socket.emit('view.request', user, {watching: USER, watched: user});
       });
     }
   }
@@ -88,15 +88,34 @@
       $('<a class="label label-primary"></a>').appendTo(li)
         .text(name)
         .attr('id', 'user-' + id)
-        .css('color', color)
-        .colorpicker()
-        .on('changeColor.colorpicker', function(e) {
-          var color = e.color.toHex();
-          this.style.color = color;
-          var id = this.id.split('-')[1];
-          wb.info.users[id].color = color;
+        // .css('color', color)
+        .mouseover(function() {
+          if ($(this).hasClass('watching')) {
+            $(this).text('Stop watching ' + name);
+          } else {
+            $(this).text('Watch ' + name);
+          }
         })
-      ;
+        .mouseout(function() {
+          if ($(this).hasClass('watching')) {
+            $(this).text('Watching ' + name);
+          } else {
+            $(this).text(name);
+          }
+        })
+        .click(function() {
+          // request or stop watching
+          $(this).toggleClass('watching');
+          var id = +$(this).attr('id').split('-')[1],
+              name = wb.info.users[id].name;
+          if ($(this).hasClass('watching')) {
+            $(this).text('Watching ' + name);
+            $.publish('view/request', id);
+          } else {
+            $(this).text(name);
+            $.publish('view/stop', id);
+          }
+        });
     }
   }
 
@@ -105,8 +124,8 @@
 
     // restore windows after data are loaded
     // so window info can be broadcast
-    var tools = JSON.parse($.cookie('tools'));
-    if (!$.isEmptyObject(tools)) {
+    var state = JSON.parse($.cookie('windowState'));
+    if (!$.isEmptyObject(state)) {
       var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
       $(content).dialog({
         title: 'Reopen windows?',
@@ -117,77 +136,11 @@
           },
           'Yes': function() {
             $(this).dialog("destroy");
-            restoreViz(tools);
+            wb.utility.setWindowState(state);
           }
         }
       });
     }
-  }
-
-  function restoreViz(tools) {
-    var viz;
-    tools.forEach(function(v) {
-      var t = v.tool;
-      if (t === 'document') {
-        viz = $('<div>').vizdataentrytable({
-          title: 'Documents',
-          tool: 'document'
-        });
-      } else if (t === 'timeline') {
-        viz = $('<div>').viztimeline({
-          title: 'Timeline',
-          tool: 'timeline'
-        });
-      } else if (t === 'map') {
-        viz = $('<div>').vizmap({
-          title: 'Map',
-          tool: 'map'
-        });
-      } else if (t === 'network') {
-        viz = $('<div>').viznetwork({
-          title: 'Network',
-          tool: 'network'
-        });
-      } else if (t === 'notepad') {
-        viz = $('<div>').viznotepad({
-          title: 'Notepad',
-          tool: 'notepad',
-          url: GLOBAL_URL.notepad,
-        });
-      } else if (t === 'message') {
-        viz = $('<div>').vizmessage({
-          title: 'Message',
-          tool: 'message'
-        });
-      } else if (t === 'history') {
-        viz = $('<div>').vizhistory({
-          title: 'History',
-          tool: 'history',
-          url: GLOBAL_URL.history
-        });
-      } else if (t === 'annotation table') {
-        viz = $('<div>').vizannotationtable({
-          title: 'Annotations',
-          tool: 'annotation table',
-        });
-      } else {
-        viz = $('<div>').vizentitytable({
-            title: t.split(' ')[0],
-            entity: t.split(' ')[0],
-            tool: t
-        });
-      }
-      viz.dialog('option', {
-        width: v.width,
-        height: v.height,
-        position: {
-          at: v.position_at,
-          my: v.position_my,
-          of: window
-        }
-      });
-      $(viz).data('instance').resize();
-    });
   }
 
   function onDataUpdated() {

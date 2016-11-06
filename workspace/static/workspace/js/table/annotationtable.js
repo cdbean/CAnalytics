@@ -4,7 +4,7 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
         this.options.extend.help  = this.help;
-        this.element.addClass('annotation');
+        this.element.addClass('annotation table');
         this._super('_create');
 
         var columns = ['ID', 'Quote', 'Data Entry', 'Annotation', 'Entity'];
@@ -109,7 +109,3 @@ $.widget('viz.vizannotationtable', $.viz.vizbase, {
       hint.run();
     }
 });
-
-
-
-

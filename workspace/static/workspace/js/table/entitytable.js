@@ -4,7 +4,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
         this.options.extend.maximize = this.resize.bind(this);
         this.options.extend.restore  = this.resize.bind(this);
         this.options.extend.help = this.help;
-        this.element.addClass('entity');
+        this.element.addClass('entity table');
         this.element.addClass(this.options.entity);
         this._super('_create');
 

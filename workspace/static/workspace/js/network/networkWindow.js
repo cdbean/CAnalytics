@@ -195,6 +195,14 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       return this;
     },
 
+    getState: function() {
+      return this.network.state();
+    },
+
+    setState: function(state) {
+      return this.network.state(state);
+    },
+
     help: function() {
       var hint = new EnjoyHint({});
       hint.set(wb.help.network);

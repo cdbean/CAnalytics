@@ -7,7 +7,7 @@ $.widget('viz.vizdataentrytable', $.viz.vizbase, {
       this.options.extend.restore  = this.resize.bind(this);
       this.options.extend.help     = this.help.bind(this);
       this._super('_create');
-      this.element.addClass('dataentry');
+      this.element.addClass('dataentry table');
 
       this._setUI();
 

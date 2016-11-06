@@ -83,22 +83,11 @@ $(function() {
       tool: '',
       public: false
     });
+
     // store tool windows size and position in cookie, for later restore
-    var tools = [];
-    $('.viz').each(function(i, v) {
-      var width = $(v).dialog('option', 'width');
-      var height = $(v).dialog('option', 'height');
-      var position = $(v).dialog('option', 'position');
-      var tool = $(v).data('instance').options.tool;
-      tools.push({
-        width: width,
-        height: height,
-        position_my: position.my,
-        position_at: position.at,
-        tool: tool
-      });
-    });
-    $.cookie('tools', JSON.stringify(tools));
+    var state = wb.utility.getWindowState();
+
+    $.cookie('windowState', JSON.stringify(state));
 
     $.post('/sync/leave', {
       'case': CASE,
