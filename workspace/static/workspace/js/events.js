@@ -109,6 +109,9 @@
           var id = +$(this).attr('id').split('-')[1],
               name = wb.info.users[id].name;
           if ($(this).hasClass('watching')) {
+            // save current state first
+            wb.utility.saveAllState();
+
             $(this).text('Watching ' + name);
             $.publish('view/request', id);
           } else {
@@ -124,8 +127,8 @@
 
     // restore windows after data are loaded
     // so window info can be broadcast
-    var state = JSON.parse($.cookie('windowState'));
-    if (!$.isEmptyObject(state)) {
+    var state = $.cookie('windowState');
+    if (state) {
       var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
       $(content).dialog({
         title: 'Reopen windows?',
@@ -136,7 +139,7 @@
           },
           'Yes': function() {
             $(this).dialog("destroy");
-            wb.utility.setWindowState(state);
+            wb.utility.loadAllState();
           }
         }
       });

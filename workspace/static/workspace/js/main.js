@@ -85,9 +85,7 @@ $(function() {
     });
 
     // store tool windows size and position in cookie, for later restore
-    var state = wb.utility.getWindowState();
-
-    $.cookie('windowState', JSON.stringify(state));
+    wb.utility.saveAllState();
 
     $.post('/sync/leave', {
       'case': CASE,

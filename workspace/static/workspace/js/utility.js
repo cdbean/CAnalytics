@@ -238,5 +238,53 @@ wb.utility = {};
       });
       $(viz).data('instance').resize();
     });
+  };
+
+  wb.utility.saveAllState = function() {
+    var state = wb.utility.getWindowState();
+    $.cookie('windowState', JSON.stringify(state));
+    $.cookie('filter', JSON.stringify(wb.filter.filter));
+    if ($('.viz.network').length) {
+      var networkState = $('.viz.network').data('instance').getState();
+      $.cookie('networkState', JSON.stringify(networkState));
+    }
+  };
+
+  wb.utility.setAllState = function(state) {
+    var windowState = state.windowState,
+        filter = state.filter,
+        networkState = state.networkState;
+    if (!$.isEmptyObject(windowState)) {
+      wb.utility.setWindowState(windowState);
+    }
+    if (!$.isEmptyObject(filter)) {
+      for (var win in filter) {
+        var content = filter[win];
+        var tool = content.tool.split(' ') [0];
+        var windowId = '#' + $('.viz.' + tool).attr('id');
+        wb.filter.set(content.filter, tool, windowId);
+      }
+    } else {
+      // remove all filter
+      for (var win in wb.filter.filter) {
+        wb.filter.remove(win);
+      }
+    }
+    if (!$.isEmptyObject(networkState)) {
+      if ($('.viz.network').length) {
+        $('.viz.network').data('instance').setState(networkState);
+      }
+    }
+  };
+
+  wb.utility.loadAllState = function() {
+    var windowState = JSON.parse($.cookie('windowState'));
+    var filter = JSON.parse($.cookie('filter'));
+    var networkState = JSON.parse($.cookie('networkState'));
+    wb.utility.setAllState({
+      windowState: windowState,
+      filter: filter,
+      networkState: networkState
+    });
   }
 })();
