@@ -69,15 +69,23 @@ $(function() {
     var windowState = d.windowState,
         filter = d.filter,
         networkState = d.networkState;
-    if (windowState) {
+    if (!$.isEmptyObject(windowState)) {
       wb.utility.setWindowState(windowState);
     }
-    if (filter) {
-      wb.filter.filter = filter;
-      wb.filter.update();
-      $.publish('data/filter');
+    if (!$.isEmptyObject(filter)) {
+      for (var win in filter) {
+        var content = filter[win];
+        var tool = content.tool.split(' ') [0];
+        var windowId = '#' + $('.viz.' + tool).attr('id');
+        wb.filter.set(content.filter, tool, windowId);
+      }
+    } else {
+      // remove all filter
+      for (var win in wb.filter.filter) {
+        wb.filter.remove(win);
+      }
     }
-    if (networkState) {
+    if (!$.isEmptyObject(networkState)) {
       if ($('.viz.network').length) {
         $('.viz.network').data('instance').setState(networkState);
       }

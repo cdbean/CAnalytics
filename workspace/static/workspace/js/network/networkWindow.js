@@ -24,10 +24,18 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       this.updateData();
       this.updateView();
 
+      var state = $.cookie('networkState');
+      if (state) {
+        state = JSON.parse(state);
+        this.setState(state);
+      }
+
       return this;
     },
 
     _destroy: function() {
+      var state = this.getState();
+      $.cookie('networkState', JSON.stringify(state));
       this._super('_destroy');
     },
 

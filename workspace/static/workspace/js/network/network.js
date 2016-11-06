@@ -66,7 +66,10 @@ wb.viz.network = function() {
           id: d.meta.id,
           x: d.x,
           y: d.y,
-          fixed: d.fixed
+          px: d.px,
+          py: d.py,
+          fixed: d.fixed,
+          draggedFix: d.draggedFix
         };
       });
       state.transform = {
@@ -84,7 +87,10 @@ wb.viz.network = function() {
         if (!(d.meta.id in nodes)) return;
         d.x = nodes[d.meta.id].x;
         d.y = nodes[d.meta.id].y;
+        d.px = nodes[d.meta.id].px;
+        d.py = nodes[d.meta.id].py;
         d.fixed = nodes[d.meta.id].fixed;
+        d.draggedFix = nodes[d.meta.id].draggedFix;
       });
       zoom.translate(transform.translate).scale(transform.scale);
       container.select('.chart')
