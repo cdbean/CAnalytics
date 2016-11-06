@@ -11,8 +11,8 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
       this.setupUI();
 
-      this.width = this.element.innerWidth(),
-      this.height = this.element.innerHeight();
+      this.width = this.element.innerWidth() - 15,
+      this.height = this.element.innerHeight() - 35;
 
       this.network = wb.viz.network()
         .width(this.width)
@@ -180,8 +180,8 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
     resize: function() {
       this._super('resize');
-      this.width = this.element.innerWidth();
-      this.height = this.element.innerHeight();
+      this.width = this.element.innerWidth() - 15;
+      this.height = this.element.innerHeight() - 35;
 
       if (this.data.nodes.length) {
         d3.select(this.element[0]).select('svg#chart')

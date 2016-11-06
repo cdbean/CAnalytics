@@ -59,6 +59,9 @@ $(function() {
   $('body').on('mouseout', '.wb-item', onMouseOutEntity);
   $('body').on('click', '.wb-item', onClickEntity);
   $('body').on('click', onClickOutside);
+  $('body').on('mouseleave', '.viewer', function() {
+    wb.viewer.hide();
+  })
   $('a#user_color').colorpicker().on('changeColor.colorpicker', onChangeUserColor);
   $('a#main_help').click(function() {
     var hint = new EnjoyHint({});

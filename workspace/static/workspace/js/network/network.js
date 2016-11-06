@@ -177,16 +177,57 @@ wb.viz.network = function() {
         return dispatch.filter(filter);
       }
 
-      function dragstart() {
+      function dragstart(d) {
+        d3.select(this).on('mouseover', null).on('mouseout', null);
         if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+        networkLayout.stop();
+
+        // find connected links and set fixed = false;
+        container.selectAll('.link').each(function(dd) {
+          // if the node has been dragged, set it to fix
+          if (dd.source.meta.id === d.meta.id) return dd.target.fixed = false || dd.target.draggedFix;
+          if (dd.target.meta.id === d.meta.id) return dd.source.fixed = false || dd.target.draggedFix;
+        });
       }
 
-      function dragged() {
-
+      function dragged(d) {
+        d.px += d3.event.dx;
+        d.py += d3.event.dy;
+        d.x += d3.event.dx;
+        d.y += d3.event.dy;
+        tick();
       }
 
-      function dragend() {
+      function dragend(d) {
+        d3.select(this).on('mouseover', onMouseOverNode).on('mouseout', onMouseOutNode);
+        d.fixed = true;
+        // if the node has been dragged, set it to fix
+        d.draggedFix = true;
+        tick();
+        networkLayout.resume();
+      }
 
+      function tick() {
+        container.selectAll('.link path').attr('d', function(d) {
+          var deltaX = d.target.x - d.source.x,
+              deltaY = d.target.y - d.source.y,
+              dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+              normX = deltaX / dist,
+              normY = deltaY / dist,
+              dr = dist / d.index, // the method is arbitary
+              sourcePadding = d.left ? 17 : 12,
+              targetPadding = d.right ? 17 : 12,
+              sourceX = d.source.x + (sourcePadding * normX),
+              sourceY = d.source.y + (sourcePadding * normY),
+              targetX = d.target.x - (targetPadding * normX),
+              targetY = d.target.y - (targetPadding * normY);
+//                    return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
+          if (d.index > 1) return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
+          else return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
+        });
+        container.selectAll('.node').attr("transform", function(d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        });
       }
 
       function update() {
@@ -256,28 +297,7 @@ wb.viz.network = function() {
 
         networkLayout.start();
 
-        function tick() {
-          container.selectAll('.link path').attr('d', function(d) {
-            var deltaX = d.target.x - d.source.x,
-                deltaY = d.target.y - d.source.y,
-                dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-                normX = deltaX / dist,
-                normY = deltaY / dist,
-                dr = dist / d.index, // the method is arbitary
-                sourcePadding = d.left ? 17 : 12,
-                targetPadding = d.right ? 17 : 12,
-                sourceX = d.source.x + (sourcePadding * normX),
-                sourceY = d.source.y + (sourcePadding * normY),
-                targetX = d.target.x - (targetPadding * normX),
-                targetY = d.target.y - (targetPadding * normY);
-//                    return "M" + sourceX + "," + sourceY + "A" + dist + "," + dist + " 0 0,1 " + targetX + "," + targetY;
-            if (d.index > 1) return 'M' + sourceX + ',' + sourceY + 'A' + dr + ',' + dr + ' 0 0,1' + targetX + ',' + targetY;
-            else return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
-          });
-          container.selectAll('.node').attr("transform", function(d) {
-            return "translate(" + d.x + "," + d.y + ")";
-          });
-        }
+
       }
 
       function updateLinks() {
@@ -347,8 +367,6 @@ wb.viz.network = function() {
         nodeEnter.append('circle')
         nodeEnter.append('text');
 
-
-        node.call(networkLayout.drag);
         node.select('circle')
           .attr('r', 12)
           .attr('fill', function(d) { return 'url(#img-' + d.primary.entity_type + '-' + uuid + ')'; });
@@ -362,20 +380,20 @@ wb.viz.network = function() {
             return name.length < 20 ? name : name.substring(0, 20) + '..';
           })
           .style("-webkit-user-select", "none"); // disable text selection when dragging mouse
+      }
 
-        function onMouseOverNode(d) {
-          var pos = {top: d3.event.pageY, left: d3.event.pageX};
-          window.mouseoverTimeout = setTimeout(function() {
-            dispatch.elaborate(d, pos);
-          }, 500)
-        }
+      function onMouseOverNode(d) {
+        var pos = {top: d3.event.pageY, left: d3.event.pageX};
+        window.mouseoverTimeout = setTimeout(function() {
+          dispatch.elaborate(d, pos);
+        }, 500)
+      }
 
-        function onMouseOutNode(d) {
-          if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
-          setTimeout(function() {
-            if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
-          }, 300);
-        }
+      function onMouseOutNode(d) {
+        if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+        setTimeout(function() {
+          if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
+        }, 300);
       }
 
       function updateBehavior() {
@@ -391,6 +409,7 @@ wb.viz.network = function() {
           container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
           zoom.on('zoom', zoomed);
         }
+        container.selectAll('.node').call(drag);
       }
     });
   }
