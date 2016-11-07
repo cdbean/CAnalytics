@@ -11,6 +11,22 @@ wb.hypothesis = {
     // }
   ],
   currentPath: [], // the current hypothesis path
+  current: {}, // the current hypothesis
+
+  setCurrent: function(id) {
+    var current;
+    for (var i = 0, len = this.items.length; i < len; i++) {
+      if (this.items[i].id === id) {
+        current = this.items[i];
+        break;
+      }
+    }
+    this.current = current;
+    this.currentPath = current.path;
+    d3.selectAll('.hypothesis').classed('current', function(d) {
+      return d.id === current.id;
+    });
+  },
 
   addItems: function(d) {
     if (d.constructor === Array) {

@@ -67,7 +67,7 @@ $(function() {
     e.preventDefault();
     var state = JSON.parse($('#view-hypothesis-modal').find('#view').val());
     var currentPath = $('#view-hypothesis-modal').find('#path').val().split(',').map(function(d) { return +d; });
-    wb.hypothesis.currentPath = currentPath;
+    wb.hypothesis.setCurrent(currentPath[currentPath.length - 1])
     wb.utility.setAllState(state);
 
     $('#view-hypothesis-modal').modal('hide');
@@ -97,15 +97,7 @@ $(function() {
 
   function onCreateHypoBtnClick() {
     var state = wb.utility.getAllState();
-    var currentId = wb.hypothesis.currentPath[wb.hypothesis.currentPath.length - 1];
-    var current;
-    for (var i = 0, len = wb.hypothesis.items.length; i < len; i++) {
-      var h = wb.hypothesis.items[i];
-      if (h.id === currentId) {
-        current = h;
-        break;
-      }
-    }
+    var current = wb.hypothesis.current;
 
     $('#create-hypothesis-modal').find('#case').val(CASE).end()
       .find('#path').val(wb.hypothesis.currentPath).end()

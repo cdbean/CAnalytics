@@ -1,7 +1,8 @@
 .hypothesis {
   font-size: 1.1em;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding: 5px;
 }
 .hypothesis .username {
 }
@@ -12,4 +13,8 @@
 .hypothesis .message {
   margin-left: 1em;
   padding: 5px;
+}
+
+.hypothesis.current {
+  background-color: rgba(70, 130, 180, 0.3);
 }
