@@ -53,6 +53,12 @@ $(function() {
 
   $('#create-hypothesis-modal form').on('submit', function(e) {
     e.preventDefault();
+    if ($('#create-hypothesis-modal').find('input[name=heritance]:checked').val() == 0) {
+      // set hypothesis as a new thread
+      wb.hypothesis.setCurrent(null);
+      var state = wb.utility.getAllState();
+      $('#create-hypothesis-modal').find('#view').val(JSON.stringify(state));
+    }
     $.ajax({
       type: 'post',
       url: $(this).attr('action'),
@@ -66,9 +72,9 @@ $(function() {
   $('#view-hypothesis-modal form').on('submit', function(e) {
     e.preventDefault();
     var state = JSON.parse($('#view-hypothesis-modal').find('#view').val());
-    var currentPath = $('#view-hypothesis-modal').find('#path').val().split(',').map(function(d) { return +d; });
-    wb.hypothesis.setCurrent(currentPath[currentPath.length - 1])
     wb.utility.setAllState(state);
+    var currentHypoId = +$('#view-hypothesis-modal').find('#id').val();
+    wb.hypothesis.setCurrent(currentHypoId);
 
     $('#view-hypothesis-modal').modal('hide');
     wb.utility.notify('You have changed to the view of the hypothesis');

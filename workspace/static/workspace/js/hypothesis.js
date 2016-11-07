@@ -14,6 +14,12 @@ wb.hypothesis = {
   current: {}, // the current hypothesis
 
   setCurrent: function(id) {
+    if (!id) {
+      this.current = {};
+      this.currentPath = [];
+      d3.selectAll('.hypothesis').classed('current', false);
+      return;
+    }
     var current;
     for (var i = 0, len = this.items.length; i < len; i++) {
       if (this.items[i].id === id) {
