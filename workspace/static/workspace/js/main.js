@@ -88,12 +88,12 @@ $(function() {
     hint.run();
   });
 
-  if (!$.cookie('hinted')) {
-    var hint = new EnjoyHint({});
-    hint.set(wb.help.main);
-    hint.run();
-    $.cookie('hinted', true);
-  }
+  // if (!$.cookie('hinted')) {
+  //   var hint = new EnjoyHint({});
+  //   hint.set(wb.help.main);
+  //   hint.run();
+  //   $.cookie('hinted', true);
+  // }
 
   function onCreateHypoBtnClick() {
     var state = wb.utility.getAllState();
