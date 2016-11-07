@@ -77,6 +77,13 @@ $(function() {
   }
 
   function onBeforeUnload() {
+    // if the user is watching, stop watching first
+    var watchingUser = $('.userlist-item .watching')
+    if (watchingUser.length) {
+      var id = +watchingUser.attr('id').split('-')[1];
+      $.publish('view/stop', id);
+    }
+
     wb.log.log({
       operation: 'logout',
       item: '',

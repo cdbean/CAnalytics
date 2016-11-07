@@ -39,12 +39,37 @@
   //  state: the state of the view
   //  to: the user the stream is sent to
   //  from: the user the stream is from
-  function onStreamView(e, data) {
-    if (window.ishout) {
-      ishout.rooms.forEach(function(r) {
-        if (ishout.socket)
-          ishout.socket.emit('view.stream', r.roomName, data);
-      });
+  function onStreamView(e, users) {
+    if (!window.streamViewInterval) {
+      window.streamViewInterval = setInterval(streamView, 500);
+    }
+
+    function streamView() {
+      var data = {};
+
+      // check if the watching user is still online
+      var watchingUsers = wb.info.watchingUsers;
+      for (var i = 0, len = watchingUsers.length; i < len; i++) {
+        if (wb.info.online_users.indexOf(watchingUsers[i].toString()) < 0) {
+          watchingUsers.splice(i, 1);
+        }
+      }
+      wb.info.watchingUsers = watchingUsers;
+
+      data.watching = wb.info.watchingUsers;
+      data.watched = USER;
+      data.windowState = wb.utility.getWindowState();
+      data.filter = wb.filter.filter;
+      if($('.viz.network').length) {
+        data.networkState = $('.viz.network').data('instance').getState();
+      }
+
+      if (window.ishout) {
+        ishout.rooms.forEach(function(r) {
+          if (ishout.socket)
+            ishout.socket.emit('view.stream', r.roomName, data);
+        });
+      }
     }
   }
 
@@ -52,7 +77,7 @@
     if (window.ishout) {
       ishout.rooms.forEach(function(r) {
         if (ishout.socket)
-          ishout.socket.emit('view.stop', user, {from: USER, to: user});
+          ishout.socket.emit('view.stop', user, {watching: USER, watched: user});
       });
     }
   }
@@ -115,8 +140,24 @@
             $(this).text('Watching ' + name);
             $.publish('view/request', id);
           } else {
+            // stop watching
             $(this).text(name);
             $.publish('view/stop', id);
+            // ask user if they want to keep the view or switch to previous view
+            var content = '<p>You stopped watching your teammate\'s view. Do you want to keep this view or switch back to your view before you started watching?</p>'
+            $(content).dialog({
+              title: 'Keep this view?',
+              width: 'auto',
+              buttons: {
+                'keep this view': function() {
+                  $(this).dialog("destroy");
+                },
+                'Switch to my view before': function() {
+                  $(this).dialog("destroy");
+                  wb.utility.loadAllState();
+                }
+              }
+            });
           }
         });
     }
@@ -127,8 +168,8 @@
 
     // restore windows after data are loaded
     // so window info can be broadcast
-    var state = $.cookie('windowState');
-    if (state) {
+    var state = JSON.parse($.cookie('windowState'));
+    if (!$.isEmptyObject(state)) {
       var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
       $(content).dialog({
         title: 'Reopen windows?',

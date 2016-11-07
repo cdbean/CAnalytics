@@ -47,6 +47,11 @@
   color: white;
 }
 
+.navbar #userlist li a.watchedBy {
+  background-color: #5cb85c;
+  color: white;
+}
+
 #progressbar {
     position: absolute;
     top: 40%;

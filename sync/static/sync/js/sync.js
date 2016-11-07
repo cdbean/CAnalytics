@@ -44,24 +44,25 @@ $(function() {
 
   function onViewRequested(d) {
     // start streaming views
-    window.streamViewInterval = setInterval(streamView, 500);
+    wb.info.watchingUsers = wb.info.watchingUsers || [];
+    if (wb.info.watchingUsers.indexOf(d.watching) < 0)
+      wb.info.watchingUsers.push(d.watching);
 
-    function streamView() {
-      var data = {};
-
-      data.watching = [d.watching];
-      data.watched = d.watched;
-      data.windowState = wb.utility.getWindowState();
-      data.filter = wb.filter.filter;
-      if($('.viz.network').length) {
-        data.networkState = $('.viz.network').data('instance').getState();
+    // style watching users
+    $('.userlist-item a').each(function(i, el) {
+      var userId = +$(el).attr('id').split('-')[1];
+      if (wb.info.watchingUsers.indexOf(userId) > -1) {
+        $(el).addClass('watchedBy');
+        var text = $(el).text();
+        $(el).text('Watched by ' + text);
+      } else {
+        $(el).removeClass('watchedBy');
+        var name = wb.info.users[userId].name
+        $(el).text(name);
       }
+    });
 
-      ishout.rooms.forEach(function(r) {
-        if (ishout.socket)
-          ishout.socket.emit('view.stream', r.roomName, data);
-      });
-    }
+    $.publish('view/stream', wb.info.watchingUsers)
   }
 
   function onViewStreamed(d) {
@@ -72,7 +73,24 @@ $(function() {
   function onViewStopped(d) {
     // stop streaming views
     if (window.streamViewInterval) {
+      var i = wb.info.watchingUsers.indexOf(d.watching);
+      if (i > -1) wb.info.watchingUsers.splice(i, 1);
       clearInterval(window.streamViewInterval);
+      delete window.streamViewInterval;
+
+      // style watching users
+      $('.userlist-item a').each(function(i, el) {
+        var userId = +$(el).attr('id').split('-')[1];
+        if (wb.info.watchingUsers.indexOf(userId) > -1) {
+          $(el).addClass('watchedBy');
+          var text = $(el).text();
+          $(el).text('Watched by ' + text);
+        } else {
+          $(el).removeClass('watchedBy');
+          var name = wb.info.users[userId].name
+          $(el).text(name);
+        }
+      });
     }
   }
 
