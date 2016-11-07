@@ -104,7 +104,7 @@ $(function() {
       .find('#group').val(GROUP).end()
       .find('#view').val(JSON.stringify(state)).end()
       .find('#message').val('').end();
-    if (current) {
+    if (!$.isEmptyObject(current)) {
       $('#heritanceDiv').show();
       $('#create-hypothesis-modal')
         .find('#hypoRef .username').text(wb.info.users[current.created_by].name).end()
