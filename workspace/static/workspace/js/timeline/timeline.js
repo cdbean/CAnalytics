@@ -225,7 +225,7 @@ wb.viz.timeline = function() {
           .scale(scaleX)
           .nodeHeight(itemHeight)
           .nodeMinWidth(itemMinWidth)
-          .nodeMaxWidth(itemMaxWidth)
+          // .nodeMaxWidth(itemMaxWidth)
           .nodePadding(itemPadding)
           .layout();
       }

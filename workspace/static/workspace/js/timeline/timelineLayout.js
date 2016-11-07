@@ -143,9 +143,9 @@ wb.viz.timelineLayout = function() {
       var trackPos = []; // the position of all sub tracks
       tracks[trackName].start = trackHeight;
       trackNodes.forEach(function(d) {
-        d.x = scale(d.start)
-        d.width = scale(d.end) - scale(d.start)
-        d.width = Math.max(nodeMinWidth, Math.min(d.width, nodeMaxWidth))
+        d.x = scale(d.start);
+        d.width = scale(d.end) - scale(d.start);
+        d.width = Math.max(nodeMinWidth, d.width);
         d.height = nodeHeight;
         for (var i = 0; i < trackPos.length; i++) {
           if (d.x > trackPos[i]) break;
