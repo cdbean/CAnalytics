@@ -133,6 +133,9 @@ def random_assign_roles(case, group, user):
     # get roles that have not been assigned
     roles = case.role_set.exclude(id__in=existed_roles)
 
+    if len(roles) == 0:
+        # if all roles have been taken, pick any one
+        roles = case.role_set.all()
     # random
     i = randint(0, len(roles) - 1)
     UserCaseGroupRole.objects.create(case=case,group=group,user=user,role=roles[i])
