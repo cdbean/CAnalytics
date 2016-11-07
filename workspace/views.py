@@ -122,7 +122,7 @@ def join_case(request):
         group.user_set.add(request.user)
         case.groups.add(group)
 
-        if case.roles and (not request.user.role):
+        if case.role_set.exists() and (not UserCaseGroupRole.objects.filter(case=case,user=request.user,group=group)):
             random_assign_roles(case, group, request.user)
 
         return redirect('ws:case_page', case=case.id, group=group.id)
