@@ -240,6 +240,16 @@ wb.utility = {};
     });
   };
 
+  wb.utility.getAllState = function() {
+    var state = {};
+    state.windowState = wb.utility.getWindowState();
+    state.filter = wb.filter.filter;
+    if ($('.viz.network').length) {
+      state.networkState = $('.viz.network').data('instance').getState();
+    }
+    return state;
+  };
+
   wb.utility.saveAllState = function() {
     var state = wb.utility.getWindowState();
     $.cookie('windowState', JSON.stringify(state));

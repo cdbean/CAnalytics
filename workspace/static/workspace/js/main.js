@@ -22,37 +22,56 @@ $.get(GLOBAL_URL.case_info, {
   wb.info.group = res.group;
   wb.info.othergroups = res.othergroups;
   wb.info.userRole = res.user_role;
+  var users = res.users;
+  for (var i = 0, len = users.length; i < len; i++) {
+    var user = users[i];
+    // if already exists, do nothing
+    if (user.id in wb.info.users) continue;
+    user.color = '#ff7f0e';
+    wb.info.users[user.id] = user;
+  }
+
+  // load hypotheses
+  $.get(GLOBAL_URL.hypothesis, {
+    case: CASE,
+    group: GROUP
+  }, function(res) {
+    wb.hypothesis.addItems(res).updateView();
+  });
 });
 
-
 $(function() {
+
+
   $(window).on('beforeunload', onBeforeUnload)
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
   $('#case-info').click(onCaseInfo);
   $('.viz-opts').click(onVizSelect);
   $('#case-sync').click(onSyncCase);
-  $('#share-network-modal form').on('submit', function(e) {
+  $('#createHypoBtn').click(onCreateHypoBtnClick);
+
+  $('#create-hypothesis-modal form').on('submit', function(e) {
     e.preventDefault();
     $.ajax({
       type: 'post',
       url: $(this).attr('action'),
       data: $(this).serialize(),
       success: function() {
-        wb.utility.notify('You have shared your view!');
       },
     });
-    $('#share-network-modal').modal('hide');
+    $('#create-hypothesis-modal').modal('hide');
   });
 
-  $('#use-network-modal form').on('submit', function(e) {
+  $('#view-hypothesis-modal form').on('submit', function(e) {
     e.preventDefault();
-    var network = $('.viz.network').data('instance');
-    var state = $('#use-network-modal').data('state');
-    var id = $(this).find('#viewId').val();
-    network.useState(state, id);
-    $('#use-network-modal').modal('hide');
-    wb.utility.notify('You have changed your network view');
+    var state = JSON.parse($('#view-hypothesis-modal').find('#view').val());
+    var currentPath = $('#view-hypothesis-modal').find('#path').val().split(',').map(function(d) { return +d; });
+    wb.hypothesis.currentPath = currentPath;
+    wb.utility.setAllState(state);
+
+    $('#view-hypothesis-modal').modal('hide');
+    wb.utility.notify('You have changed to the view of the hypothesis');
   });
 
   $('body').on('mouseover', '.wb-item', onMouseOverEntity);
@@ -74,6 +93,35 @@ $(function() {
     hint.set(wb.help.main);
     hint.run();
     $.cookie('hinted', true);
+  }
+
+  function onCreateHypoBtnClick() {
+    var state = wb.utility.getAllState();
+    var currentId = wb.hypothesis.currentPath[wb.hypothesis.currentPath.length - 1];
+    var current;
+    for (var i = 0, len = wb.hypothesis.items.length; i < len; i++) {
+      var h = wb.hypothesis.items[i];
+      if (h.id === currentId) {
+        current = h;
+        break;
+      }
+    }
+
+    $('#create-hypothesis-modal').find('#case').val(CASE).end()
+      .find('#path').val(wb.hypothesis.currentPath).end()
+      .find('#group').val(GROUP).end()
+      .find('#view').val(JSON.stringify(state)).end()
+      .find('#message').val('').end();
+    if (current) {
+      $('#heritanceDiv').show();
+      $('#create-hypothesis-modal')
+        .find('#hypoRef .username').text(wb.info.users[current.created_by].name).end()
+        .find('#hypoRef .timestamp').text(current.created_at).end()
+        .find('#refMessage').text(current.message).end()
+    } else {
+      $('#heritanceDiv').hide();
+    }
+    $('#create-hypothesis-modal').modal();
   }
 
   function onBeforeUnload() {

@@ -9,7 +9,7 @@ from random import randint
 
 from canalytics import settings
 from django.contrib.auth.models import Group
-from workspace.models import Case, DataEntry, Entity, Relationship, View, UserCaseGroupRole
+from workspace.models import Case, DataEntry, Entity, Relationship, Hypothesis, UserCaseGroupRole
 from annotator.models import Annotation
 from workspace.entity import get_or_create_entity, set_primary_attr, get_or_create_relationship
 from sync.views import sync_item
@@ -173,6 +173,7 @@ def case_info(request):
             case = group.case_set.get(id=request.GET['case'])
             othergroups = request.user.groups.exclude(id=request.GET['group']) & case.groups.all()
             user_case_group_role = UserCaseGroupRole.objects.filter(user=request.user,case=case,group=group)
+            users = group.user_set.all()
             role = None
             if len(user_case_group_role):
                 role = user_case_group_role[0].role
@@ -199,6 +200,16 @@ def case_info(request):
                 'name': role.name,
                 'description': role.description
             }
+        res['users'] = []
+        for u in users:
+            res['users'].append({
+                'id': u.id,
+                'name': u.first_name,
+                'fname': u.first_name,
+                'lname': u.last_name,
+                'username': u.username,
+                'email': u.email
+            })
 
         res['othergroups'] = []
         for g in othergroups:
@@ -449,45 +460,36 @@ def restore_relationship(request, id):
     return HttpResponse(json.dumps(res), content_type='application/json')
 
 
-'''
-read or save network view, including
-a screenshot image
-state info, e.g. node position, node state (dim, display), zoom
-user comment,
-and other meta info
-'''
-import re
-import base64
-import os
-from datetime import datetime
-from django.utils import dateformat
-import canalytics.settings
 @login_required
-def network_view(request):
+def hypothesis(request):
     res = {}
     if request.method == 'POST':
-        img = request.POST.get('image', None)
-        state = request.POST.get('state', None)
-        comment = request.POST.get('comment', '')
-        parent = request.POST.get('parent', [])
+        view = request.POST.get('view', '')
+        message = request.POST.get('message', '')
+        heritance = request.POST.get('heritance', 0)
         path = []
-        depth = 0
-        if parent:
-            parent = View.objects.get(id=parent)
-            path = parent.path
-            depth = parent.depth + 1
+        if heritance:
+            # if the hypothesis is heritated from parent, set path
+            # path becomes a string in the form, convert it to array first
+            pathstr = request.POST.get('path', '')
+            pathstr = pathstr.split(',')
+            for p in pathstr:
+                if p:
+                    path.append(p)
+
         group = request.user.groups.get(id=request.POST['group'])
         case = group.case_set.get(id=request.POST['case'])
-        # save the view to get an ID
-        view = View.objects.create(image=img, state=state, comment=comment, path=path, depth=depth, group=group, case=case, created_by=request.user)
-        view.path = view.path.append(view.id)
-        view.save()
-        sync_view(view.serialize(), case, group, request.user)
+
+        hypo = Hypothesis.objects.create(view=view, message=message, path=path, group=group, case=case, created_by=request.user)
+        path.append(hypo.id)
+        hypo.path = path
+        hypo.save()
+        sync.sync_hypothesis(hypo.serialize(), case, group, request.user)
         return HttpResponse('success')
     elif request.method == 'GET':
         group = request.user.groups.get(id=request.GET['group'])
         case = group.case_set.get(id=request.GET['case'])
-        views = View.objects.filter(group=group, case=case)
-        res = [v.serialize() for v in views]
+        hypos = Hypothesis.objects.filter(group=group, case=case)
+        res = [h.serialize() for h in hypos]
         return HttpResponse(json.dumps(res), content_type='application/json')
     return HttpResponseBadRequest()

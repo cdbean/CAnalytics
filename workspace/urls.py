@@ -18,5 +18,5 @@ urlpatterns = patterns('',
     url(r'^relationships$', views.relationships, name='relationships'),
     url(r'^relationship/(\d+)$', views.relationship, name='relationship_id'),
     url(r'^relationship$', views.relationship, name='relationship'),
-    url(r'^view/network$', views.network_view, name='network_view'),
+    url(r'^hypothesis$', views.hypothesis, name='hypothesis'),
 )

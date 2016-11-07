@@ -1,0 +1,15 @@
+.hypothesis {
+  font-size: 1.1em;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.hypothesis .username {
+}
+.hypothesis .timestamp {
+  margin-left:10px;
+  font-size: .8em;
+}
+.hypothesis .message {
+  margin-left: 1em;
+  padding: 5px;
+}

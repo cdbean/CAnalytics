@@ -113,11 +113,11 @@ def message(request):
         res = 'success'
         return HttpResponse(res)
 
-def sync_view(data, case, group, user):
+def sync_hypothesis(data, case, group, user):
     name = group_name(case, group)
     data['user'] = user.id
     try:
-        ishout_client.broadcast_group(name, 'view.share', data)
+        ishout_client.broadcast_group(name, 'hypothesis.share', data)
     except:
         print '[warning] Sync failed. Is sync server running?'
 

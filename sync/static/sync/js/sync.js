@@ -30,16 +30,16 @@ $(function() {
   ishout.on('view.request', onViewRequested); // somebody requested to watch my view
   ishout.on('view.stream', onViewStreamed); // somebody streamed their view to me
   ishout.on('view.stop', onViewStopped); // somebody stopped watching my view
-  ishout.on('view.share', onViewShared); // somebody shared a view
+  ishout.on('hypothesis.share', onHypothesisShared); // somebody shared a view
 
 
-  function onViewShared(v) {
-    var network = $('.network').data('instance');
-    if (network) {
-      network.loadView(v);
+  function onHypothesisShared(h) {
+    wb.hypothesis.addItem(h).updateView();
+    if (h.created_by != wb.info.user) {
+      wb.utility.notify(wb.info.users[h.created_by].name + ' created a hypothesis');
+    } else {
+      wb.utility.notify('Hypothesis created');
     }
-    if (v.user != wb.info.user)
-      wb.utility.notify(wb.info.users[v.user].name + ' shared a view');
   }
 
   function onViewRequested(d) {
