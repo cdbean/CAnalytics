@@ -244,6 +244,7 @@ wb.utility = {};
     var state = {};
     state.windowState = wb.utility.getWindowState();
     state.filter = wb.filter.filter;
+    state.hypothesis = wb.hypothesis.current.id;
     if ($('.viz.network').length) {
       state.networkState = $('.viz.network').data('instance').getState();
     }
@@ -258,11 +259,13 @@ wb.utility = {};
       var networkState = $('.viz.network').data('instance').getState();
       $.cookie('networkState', JSON.stringify(networkState));
     }
+    $.cookie('hypothesis', wb.hypothesis.current.id);
   };
 
   wb.utility.setAllState = function(state) {
     var windowState = state.windowState,
         filter = state.filter,
+        hypothesis = state.hypothesis,
         networkState = state.networkState;
     if (!$.isEmptyObject(windowState)) {
       wb.utility.setWindowState(windowState);
@@ -280,6 +283,9 @@ wb.utility = {};
         wb.filter.remove(win);
       }
     }
+    if (hypothesis) {
+      wb.hypothesis.setCurrent(hypothesis);
+    }
     if (!$.isEmptyObject(networkState)) {
       if ($('.viz.network').length) {
         $('.viz.network').data('instance').setState(networkState);
@@ -291,10 +297,12 @@ wb.utility = {};
     var windowState = JSON.parse($.cookie('windowState'));
     var filter = JSON.parse($.cookie('filter'));
     var networkState = JSON.parse($.cookie('networkState'));
+    var hypothesis = +$.cookie('hypothesis');
     wb.utility.setAllState({
       windowState: windowState,
       filter: filter,
-      networkState: networkState
+      networkState: networkState,
+      hypothesis: hypothesis
     });
   }
 })();
