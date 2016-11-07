@@ -57,7 +57,7 @@ $(function() {
       type: 'post',
       url: $(this).attr('action'),
       data: $(this).serialize(),
-      success: function() {
+      success: function(hypo) {
       },
     });
     $('#create-hypothesis-modal').modal('hide');

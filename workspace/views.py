@@ -466,7 +466,7 @@ def hypothesis(request):
     if request.method == 'POST':
         view = request.POST.get('view', '')
         message = request.POST.get('message', '')
-        heritance = request.POST.get('heritance', 0)
+        heritance = int(request.POST.get('heritance', 0))
         path = []
         if heritance:
             # if the hypothesis is heritated from parent, set path
@@ -484,8 +484,9 @@ def hypothesis(request):
         path.append(hypo.id)
         hypo.path = path
         hypo.save()
-        sync.sync_hypothesis(hypo.serialize(), case, group, request.user)
-        return HttpResponse('success')
+        res = hypo.serialize()
+        sync.sync_hypothesis(res, case, group, request.user)
+        return HttpResponse(json.dumps(res), content_type='application/json')
     elif request.method == 'GET':
         group = request.user.groups.get(id=request.GET['group'])
         case = group.case_set.get(id=request.GET['case'])

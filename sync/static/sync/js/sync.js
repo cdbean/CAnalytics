@@ -38,6 +38,7 @@ $(function() {
     if (h.created_by != wb.info.user) {
       wb.utility.notify(wb.info.users[h.created_by].name + ' created a hypothesis');
     } else {
+      wb.hypothesis.setCurrent(h.id);
       wb.utility.notify('Hypothesis created');
     }
   }
