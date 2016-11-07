@@ -15,6 +15,7 @@
 <script src="{% static 'lib/selectize.js/selectize.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/jquery.dataTables.min.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/DataTables-1.9.4/plugin/ColReorderWithResize.js' %}"></script>
+<script type="text/javascript" language="javascript" src="{% static 'lib/bootstrap-drawer-1.0.6/dist/js/drawer.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/jEditable/jquery.jeditable.js' %}"></script>
 <script type="text/javascript" language="javascript" src="{% static 'lib/ckeditor-4.4.3/ckeditor.js' %}"></script>
 <script type="text/javascript" src="{% static 'lib/bootstrap-notify/bootstrap-notify.js' %}"></script>
@@ -96,6 +97,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery-aceditable/jquery.aceditable.css' %}" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/selectize.js/selectize.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'lib/enjoyhint/enjoyhint.css' %}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-drawer-1.0.6/dist/css/bootstrap-drawer.min.css' %}" rel="stylesheet">
 <!-- <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery-layout-1.4/layout-default.css' %}"> -->
 <link rel="stylesheet" type="text/css" href="{% static 'annotator/css/annotator.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'workspace/css/viz.css' %}">
@@ -112,6 +114,68 @@
 {% endblock %}
 
 {% block page-header %}
+  <div id="hDrawer" class="drawer drawer-right dw-xs-10 dw-sm-6 dw-md-4 fold" aria-labelledby="drawerExample">
+      <div class="drawer-controls">
+          <a href="#hDrawer" data-toggle="drawer" aria-foldedopen="false" aria-controls="hDrawer" class="drawer-hamburger">
+            <span class="sr-only">toggle navigation</span>
+            <span class="drawer-hamburger-icon"></span>
+          </a>
+      </div>
+      <div class="drawer-contents">
+          <div class="drawer-heading">
+              <h2 class="drawer-title">Hypotheses</h2>
+          </div>
+          <div class="drawer-body">
+              <p>
+                  This is a properly padded container for content in the
+                  drawer that isn't a navigation.
+              </p>
+              <a href="#">A Regular Link</a>
+          </div>
+          <ul class="drawer-nav">
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation" class="active"><a href="#">Home</a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages</a></li>
+
+          </ul>
+          <div class="drawer-footer">
+              <small>&copy; Caroline Amaba</small>
+          </div>
+      </div>
+  </div>
   {% include 'page_header.html' %}
   <div class='notifications top-right'></div>
 {% endblock %}
