@@ -10,6 +10,11 @@
 .drawer-open .drawer-hamburger-icon:before{-webkit-transform:rotate(45deg);transform:rotate(45deg)}
 .drawer-open .drawer-hamburger-icon:after{-webkit-transform:rotate(-45deg);transform:rotate(-45deg)}
 
+.drawer-right .drawer-controls {
+  margin-left: -60px !important;
+  width: auto !important;
+}
+
 .navbar-default {
   background-color: #1A40A0;
 }

@@ -57,19 +57,19 @@ def register(request):
         return render(request, 'account/register.html')
 
     if request.method == 'POST':
-        username = request.POST.get('username', '')
         email = request.POST.get('email', '')
         psd   = request.POST.get('password', '')
         fname = request.POST.get('fname')
         lname = request.POST.get('lname')
-        if username and email and psd:
+        if email and psd and fname and lname:
+            username = email.split('@')[0]
             if User.objects.filter(username=username).exists():
                 user = authenticate(username=username, password=psd)
                 if user:
                     auth_login(request, user)
                     return redirect('home')
                 else:
-                    return HttpResponse('User name exists')
+                    return HttpResponse('email exists')
             else:
                 User.objects.create_user(username=username, email=email, password=psd, first_name=fname, last_name=lname)
                 user = authenticate(username=username, password=psd)
