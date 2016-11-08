@@ -137,7 +137,7 @@ wb.viz.timeline = function() {
 
       function brushing() {
         var ext = brush.extent();
-        container.selectAll('.item').classed('active', function(d) {
+        container.selectAll('.item').classed('selected', function(d) {
           return (d.start <= ext[1]  && d.start >= ext[0])
             || (d.end >= ext[0] && d.end <= ext[1])
             || (d.start <= ext[0] && d.end >= ext[1]);
@@ -146,7 +146,7 @@ wb.viz.timeline = function() {
 
       function brushed() {
         var filter = [];
-        container.selectAll('.item.active').each(function(d) {
+        container.selectAll('.item.selected').each(function(d) {
           filter.push(d);
         });
         var ext = brush.empty() ? null : brush.extent();

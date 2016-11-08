@@ -24,7 +24,7 @@
 .link.dim text {
   fill-opacity: .2;
 }
-circle.selected {
+.node.selected circle {
     stroke: #3276b1 !important;
     stroke-width: dpx;
 }

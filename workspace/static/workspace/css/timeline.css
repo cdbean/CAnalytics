@@ -22,6 +22,10 @@
     fill: none;
 }
 
+.timeline.viz .item.selected rect {
+  stroke: red;
+}
+
 /* brush */
 
 #detailTimeline, #overviewTimeline {

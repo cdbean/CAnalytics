@@ -245,6 +245,8 @@ wb.viz.network = function() {
         container.selectAll('.node.selected').each(function(d) {
           filter.push(d)
         });
+        var e = brush.extent()
+        console.log(e[0][0], e[0][1])
         return dispatch.filter(filter);
       }
 
@@ -276,6 +278,7 @@ wb.viz.network = function() {
         d.draggedFix = true;
         tick();
         networkLayout.resume();
+        if (d.primary.name === 'New York') console.log(d.x, d.y)
       }
 
 
@@ -317,18 +320,21 @@ wb.viz.network = function() {
 
         if (!scaleX || !scaleY) {
           scaleX = d3.scale.linear()
-            .range([0, width])
-            .domain([0, width]);
+            .range([0, innerW])
+            .domain([0, innerW]);
           scaleY = d3.scale.linear()
-            .range([0, height])
-            .domain([0, height]);
+            .range([0, innerH])
+            .domain([0, innerH]);
           zoom.x(scaleX).y(scaleY);
         } else {
           if (brush) {
             brushExtent = brush.extent();
           }
-          scaleX.range([0, width]);
-          scaleY.range([0, height]);
+          scaleX.range([0, innerW])
+            .domain([0, innerW]);
+          scaleY.range([0, innerH])
+            .domain([0, innerH]);
+          zoom.x(scaleX).y(scaleY);
         }
       }
 
