@@ -73,7 +73,7 @@ class Case(models.Model):
 
 class Role(models.Model):
     name = models.CharField(max_length=200)
-    description = models.TextField()
+    description = HTMLField()
     case = models.ForeignKey(Case)
 
     def __unicode__(self):

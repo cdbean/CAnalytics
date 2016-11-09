@@ -142,7 +142,7 @@ class HTMLAdmin(MCEFilebrowserAdmin):
 
 admin.site.register(models.Case, GoogleAdmin)
 admin.site.register(models.Dataset)
-admin.site.register(models.Role)
+admin.site.register(models.Role, HTMLAdmin)
 admin.site.register(models.DataEntry, HTMLAdmin)
 admin.site.register(models.Entity, EntityAdmin)
 admin.site.register(models.Relationship, RelationshipAdmin)
