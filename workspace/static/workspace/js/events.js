@@ -38,6 +38,12 @@
           ishout.socket.emit('view.request', user, {watching: USER, watched: user});
       });
     }
+    wb.log.log({
+      operation: 'start watch',
+      item: 'user',
+      data: user.toString(),
+      public: true
+    });
   }
 
   // data = {
@@ -81,6 +87,12 @@
           ishout.socket.emit('view.stop', user, {watching: USER, watched: user});
       });
     }
+    wb.log.log({
+      operation: 'stop watch',
+      item: 'user',
+      data: user.toString(),
+      public: true
+    });
   }
 
   function onUserTool(e, d) {

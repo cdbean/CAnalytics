@@ -213,7 +213,6 @@ def get_annotations(request):
 
 def post_annotations(request):
     res = {'annotations': [], 'entities': [], 'relationships': []}
-    log_anns = []
     data = json.loads(request.body)
 
     group = data.get('group', '')
@@ -230,12 +229,12 @@ def post_annotations(request):
         ann_data['group'] = group.id
         ann_data['case'] = case.id
         ann, ents, rels = create_ann(ann_data, case, group, request.user)
-
         res['annotations'].append(ann.serialize())
 
+    if rels:
         res['relationships'] += [r.serialize() for r in rels if r is not None]
+    if ents:
         res['entities'] += [e.serialize() for e in ents if e is not None]
-        log_anns.append({'id': ann.id, 'name': ann.quote})
 
     sync_item('create', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')
@@ -261,9 +260,12 @@ def update_annotations(request):
         ann, ents, rels, del_rels = update_ann(annotation, ann_data, case, group, request.user)
 
         res['annotations'].append(annotation.serialize())
-        res['relationships'] += [r.serialize() for r in rels if r is not None]
-        res['entities'] += [e.serialize() for e in ents if e is not None]
 
+    if rels:
+        res['relationships'] += [r.serialize() for r in rels if r is not None]
+    if ents:
+        res['entities'] += [e.serialize() for e in ents if e is not None]
+    if del_rels:
         for r in del_rels:
             r.deleted = True
             r.save()
@@ -291,29 +293,29 @@ def del_annotations(request):
         annotation = Annotation.objects.get(id=ann_data['id'])
         ann = del_ann(annotation)
         res['annotations'].append(ann.serialize())
-        if ann.entity:
-            ann.entity.deleted = True
-            ann.entity.save()
-            res['entity'].append(ann.entity.serialize())
-            rels = ann.entity.relates_as_source.all() | ann.entity.relates_as_target.all()
-            rels.update(deleted=True)
-            res['relationship'] = [r.serialize() for r in rels]
-        if ann.relationship:
-            ann.relationship.deleted = True
-            ann.relationship.save()
-            res['relationship'].append(ann.relationship.serialize())
+    if ann.entity:
+        ann.entity.deleted = True
+        ann.entity.save()
+        res['entity'].append(ann.entity.serialize())
+        rels = ann.entity.relates_as_source.all() | ann.entity.relates_as_target.all()
+        rels.update(deleted=True)
+        res['relationship'] = [r.serialize() for r in rels]
+    if ann.relationship:
+        ann.relationship.deleted = True
+        ann.relationship.save()
+        res['relationship'].append(ann.relationship.serialize())
 
-            rel = ann.relationship
-            if rel.relation == 'involve':
-                source = Entity.objects.filter(id=rel.source.id).select_subclasses()[0]
-                target = Entity.objects.filter(id=rel.target.id).select_subclasses()[0]
-                if source.entity_type == 'event':
-                    if target.entity_type == 'person': source.person.remove(target)
-                    if target.entity_type == 'location': source.location = None
-                    if target.entity_type == 'organization': source.organization.remove(target)
-                elif source.entity_type == 'organization':
-                    if target.entity_type == 'person': source.person.remove(target)
-                res['entity'] = [source.serialize(), target.serialize()]
+        rel = ann.relationship
+        if rel.relation == 'involve':
+            source = Entity.objects.filter(id=rel.source.id).select_subclasses()[0]
+            target = Entity.objects.filter(id=rel.target.id).select_subclasses()[0]
+            if source.entity_type == 'event':
+                if target.entity_type == 'person': source.person.remove(target)
+                if target.entity_type == 'location': source.location = None
+                if target.entity_type == 'organization': source.organization.remove(target)
+            elif source.entity_type == 'organization':
+                if target.entity_type == 'person': source.person.remove(target)
+            res['entity'] = [source.serialize(), target.serialize()]
 
     sync_item('delete', 'annotation', res, case, group, request.user)
     return HttpResponse(json.dumps(res), content_type='application/json')

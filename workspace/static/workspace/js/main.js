@@ -69,12 +69,19 @@ $(function() {
     wb.state.setHypothesisState(currentHypoId);
 
     $('#view-hypothesis-modal').modal('hide');
-    wb.utility.notify('You have changed to the view of the hypothesis');
+    wb.utility.notify('Changed to the selected hypothesis view');
+
+    wb.log.log({
+      operation: 'clone',
+      item: 'hypothesis',
+      data: h.id.toString(),
+      public: true
+    });
   });
 
   $('body').on('mouseover', '.wb-item', onMouseOverEntity);
   $('body').on('mouseout', '.wb-item', onMouseOutEntity);
-  $('body').on('click', '.wb-item', onClickEntity);
+  // $('body').on('click', '.wb-item', onClickEntity);
   $('body').on('click', onClickOutside);
   $('body').on('mouseleave', '.viewer', function() {
     wb.viewer.hide();
@@ -113,6 +120,7 @@ $(function() {
       $('#heritanceDiv').hide();
     }
     $('#create-hypothesis-modal').modal();
+
   }
 
   function onBeforeUnload() {
@@ -123,20 +131,13 @@ $(function() {
       $.publish('view/stop', id);
     }
 
-    wb.log.log({
-      operation: 'logout',
-      item: '',
-      tool: '',
-      public: false
-    });
-
     // store tool windows size and position in cookie, for later restore
     wb.state.SaveStateToCookie();
 
-    $.post('/sync/leave', {
-      'case': CASE,
-      'group': GROUP
-    });
+    // $.post('/sync/leave', {
+    //   'case': CASE,
+    //   'group': GROUP
+    // });
 
     return 'Are you leaving?';
   }
@@ -165,11 +166,25 @@ $(function() {
       if (ent) {
         var entity = wb.store.items.entities[ent.id || ent]; // ent could be an object or an id only
         wb.viewer.data(entity, 'entity').show(wb.utility.mousePosition(e, 'body'), 'name tag');
+        wb.log.log({
+          operation: 'read',
+          item: 'entity',
+          tool: 'history',
+          data: wb.log.logItem(ent),
+          public: false
+        });
       } else {
         var rel = $(e.target).data('relationship');
         if (rel) {
           var relationship = wb.store.items.relationships[rel.id || rel];
           wb.viewer.data(relationship, 'relationship').show(wb.utility.mousePosition(e, 'body'), 'name tag');
+          wb.log.log({
+            operation: 'read',
+            item: 'relationship',
+            tool: 'history',
+            data: wb.log.logItem(relationship),
+            public: false
+          });
         }
       }
     }, 500);

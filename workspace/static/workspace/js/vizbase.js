@@ -56,6 +56,12 @@ $.widget('viz.vizbase', {
     resize: function() {
         this.element.css("width", "auto");
         this.element.parents('.ui-dialog').css("height", 'auto');
+        wb.log.log({
+          operation: 'resized',
+          item: this.options.tool,
+          tool: this.options.tool,
+          public: false
+        });
         return this;
     },
     _destroy: function() {

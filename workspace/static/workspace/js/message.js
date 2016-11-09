@@ -107,7 +107,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
       if ($(d).hasClass('wb-entity')) {
         var id = $(d).data('entity');
         item = wb.store.items.entities[id];
-        item_type = item.primary.entity_type;
+        item_type = 'entity';
       } else if ($(d).hasClass('wb-relationship')) {
         var id = $(d).data('relationship');
         item = wb.store.items.relationships[id];
@@ -121,7 +121,7 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
           data: wb.log.logItem(item),
           public: false
         });
-      } 
+      }
     });
     var msg = el.html();
     el.html('');
@@ -149,17 +149,17 @@ $.widget('viz.vizmessage', $.viz.vizbase, {
         _this.loadMessage(data.items[i]);
       }
       // message is ordered from latest to oldest
-      // so data.previous refers to later messages 
-      if (data.has_previous) 
+      // so data.previous refers to later messages
+      if (data.has_previous)
         $('.pager .prev', this.element).removeClass('hidden')
           .data('page', data.previous_page);
-      else 
+      else
         $('.pager .prev', this.element).addClass('hidden');
 
-      if (data.has_next) 
+      if (data.has_next)
         $('.pager .next', this.element).removeClass('hidden')
           .data('page', data.next_page);
-      else 
+      else
         $('.pager .next', this.element).addClass('hidden');
       // scroll to bottom
       var ele = _this.element.find('ul.messages');

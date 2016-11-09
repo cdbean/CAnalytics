@@ -18,3 +18,7 @@
 .hypothesis.current {
   background-color: rgba(70, 130, 180, 0.3);
 }
+
+.hypothesis.highlight {
+  background-color: rgba(203, 226, 7, 0.3);
+}

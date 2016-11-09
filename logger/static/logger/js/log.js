@@ -69,9 +69,9 @@ wb.log.logAnnotations = function(anns) {
 // dump entity or relationship
 wb.log.logItem = function(item) {
   if (item.constructor === Object) {
-    return (ent.id || ent.meta.id).toString();
+    return (item.id || item.meta.id).toString();
   } else if (item.constructor === Array) {
-    if (item.constructor === Object) {
+    if (item[0].constructor === Object) {
       return item.map(function(d) { return d.id || d.meta.id; }).toString();
     } else {
       return item.toString();

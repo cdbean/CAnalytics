@@ -18,6 +18,7 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
         .width(this.width)
         .height(this.height)
         .on('filter', this.onFilter.bind(this))
+        .on('zoomstart', this.onZoomStart.bind(this))
         .on('elaborate', this.onElaborate.bind(this))
         .on('delaborate', this.onDelaborate.bind(this));
 
@@ -107,6 +108,24 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
       }
     },
 
+    onZoomStart: function() {
+      wb.log.log({
+        operation: 'reconfig',
+        item: 'network',
+        tool: 'network',
+        public: false
+      });
+    },
+
+    onDragStart: function() {
+      wb.log.log({
+        operation: 'reconfig',
+        item: 'network',
+        tool: 'network',
+        public: false
+      });
+    },
+
     onElaborate: function(d, pos) {
       if (d.primary.entity_type) {
         var entity = wb.store.items.entities[d.meta.id];
@@ -115,6 +134,13 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
         var relationship = wb.store.items.relationships[d.meta.id];
         wb.viewer.data(relationship, 'relationship').show(pos, 'network');
       }
+      wb.log.log({
+        operation: 'read',
+        item: d.primary.entity_type ? 'entity' : 'relationship',
+        tool: 'network',
+        data: wb.log.logItem(d),
+        public: false
+      });
     },
 
     onDelaborate: function() {

@@ -24,7 +24,7 @@ wb.viz.timeline = function() {
 
   var scaleY;
 
-  var dispatch = d3.dispatch('filter', 'zoom', 'elaborate', 'delaborate');
+  var dispatch = d3.dispatch('filter', 'zoom', 'elaborate', 'delaborate', 'zoomstart');
 
   var formatDate = d3.time.format("%m/%d/%Y-%H:%M:%S");
 
@@ -119,7 +119,7 @@ wb.viz.timeline = function() {
   function updateBehavior() {
     if (brushable) {
       // enable brush and disable zoom
-      zoom.on('zoom', null);
+      zoom.on('zoom', null).on('zoomstart', null);
       brush.y(scaleY);
       if (brushExtent) brush.extent(brushExtent);
 
@@ -134,8 +134,13 @@ wb.viz.timeline = function() {
     } else { // enable zoom and disable brush
       container.select('.brush').style('display', 'none');
       container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
-      zoom.on('zoom', zoomed);
+      zoom.on('zoom', zoomed)
+        .on('zoomstart', zoomstart);
     }
+  }
+
+  function zoomstart() {
+    dispatch.zoomstart();
   }
 
   function zoomed() {
@@ -344,7 +349,8 @@ wb.viz.timeline = function() {
           container.append('g').attr('class', 'brush');
 
           zoom = d3.behavior.zoom()
-            .on('zoom', zoomed);
+            .on('zoom', zoomed)
+            .on('zoomstart', zoomstart);
           brush = d3.svg.brush()
             .on('brush', brushing)
             .on('brushend', brushed);

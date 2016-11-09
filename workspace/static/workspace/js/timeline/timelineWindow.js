@@ -17,6 +17,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         .height(this.height)
         .trackBy('person')
         .on('zoom', this.onDetailZoom.bind(this))
+        .on('zoomstart', this.onDetailZoomStart.bind(this))
         .on('elaborate', this.onDetailElaborate.bind(this))
         .on('delaborate', this.onDetailDelaborate.bind(this))
         .on('filter', this.onDetailFilter.bind(this));
@@ -61,8 +62,23 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     onDetailElaborate: function(d, pos) {
       var entity = wb.store.items.entities[d.id];
       wb.viewer.data(entity, 'entity').show(pos, 'timeline');
+      wb.log.log({
+        operation: 'read',
+        item: 'entity',
+        tool: 'timeline',
+        data: wb.log.logItem(entity),
+        public: false
+      })
     },
 
+    onDetailZoomStart: function(domain) {
+      wb.log.log({
+        operation: 'reconfig',
+        item: 'timeline',
+        tool: 'timeline',
+        public: false
+      })
+    },
     onDetailZoom: function(domain) {
       this.overviewTimeline.setBrush(domain);
     },

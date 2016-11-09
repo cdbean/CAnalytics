@@ -36,7 +36,7 @@ class Action(models.Model):
             'operation': self.operation,
             'item': self.item,
             'tool': self.tool,
-            'data': json.loads(self.data),
+            'data': self.data,
             'public': self.public,
             'group': self.group.id,
             'case': self.case.id,
@@ -49,41 +49,6 @@ class Action(models.Model):
         data = self.serialize()
         if self.public:
             sync.views.broadcast_activity(data, self.case, self.group, self.user)
-
-        if self.item in ['person', 'location', 'event', 'organization', 'resource']:
-            d = json.loads(self.data)
-            try:
-                ent = Entity.objects.get(id=d['id'])
-            except:
-                pass
-            else:
-                DoEntity.objects.create(user=self.user, operation=self.operation,entity=ent,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
-        elif self.item == 'relationship':
-            d = json.loads(self.data)
-            try:
-                rel = Relationship.objects.get(id=d['id'])
-            except:
-                pass
-            else:
-                DoRelationship.objects.create(user=self.user, operation=self.operation,relationship=rel,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
-        elif self.item == 'entities':
-            ds = json.loads(self.data)
-            for d in ds:
-                try:
-                    ent = Entity.objects.get(id=d['meta']['id'])
-                except:
-                    pass
-                else:
-                    DoEntity.objects.create(user=self.user, operation=self.operation,entity=ent,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
-        elif self.item == 'relationships':
-            ds = json.loads(self.data)
-            for d in ds:
-                try:
-                    rel = Relationship.objects.get(id=d['id'])
-                except:
-                    pass
-                else:
-                    DoRelationship.objects.create(user=self.user, operation=self.operation,relationship=rel,tool=self.tool,data=self.data,time=self.time,public=self.public,case=self.case, group=self.group)
 
         super(Action, self).save(*args, **kwargs)
 

@@ -67,56 +67,139 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     return this;
   },
 
+  _addFormattedEntityName(entity, container) {
+    if (entity.constructor !== Object) {
+      entity = wb.store.items.entities[entity];
+    }
+    if (!entity) return;
+
+    $('<a class="wb-item">').appendTo(container)
+      .text(entity.primary.name)
+      .addClass('wb-entity')
+      .addClass(entity.primary.entity_type)
+      .data('entity', {id: entity.meta.id});
+  },
+
+  _addFormattedRelationshipName(rel, container) {
+    if (rel.constructor !== Object) {
+      rel = wb.store.items.relationships[rel];
+    }
+    if (!rel) return;
+    var source = wb.store.items.entities[rel.primary.source];
+    var target = wb.store.items.entities[rel.primary.target];
+
+    $('<a class="wb-item">').appendTo(container)
+      .text(rel.primary.relation)
+      .addClass('wb-relationship')
+      .data('relationship', {id: rel.meta.id});
+    container.append('<span class="separator"> from </span>');
+    this._addFormattedEntityName(source, container);
+    container.append('<span class="separator"> to </span>');
+    this._addFormattedEntityName(target, container);
+  },
+
+  _addFormattedHypothesis(hypo, container) {
+    if (hypo.constructor !== Object) {
+      var i = wb.utility.indexOf({id: hypo}, wb.hypothesis.items);
+      hypo = wb.hypothesis.items[i];
+    }
+    if (!hypo) return;
+    container.append('<span class="username"> ')
+      .text(wb.info.users[hypo.created_by].name + '\'s ')
+      .css('color', wb.info.users[hypo.created_by].color);
+
+    $('<i style="cursor: pointer;">').appendTo(container)
+      .text(hypo.message)
+      .data('hypothesis', hypo)
+      .click(function(d) {
+        $('#hDrawer').drawer('show');
+        var hypo = $(this).data('hypothesis');
+        $('.hypothesis').each(function(i, el) {
+          if (el.__data__.id === hypo.id) {
+            wb.utility.scrollTo($(el), $('.hypotheses'));
+            // blink
+            window.blinkInterval = setInterval(function() {
+              $(el).toggleClass('highlight');
+            }, 300);
+            setTimeout(function() {
+              if (window.blinkInterval) {
+                clearInterval(window.blinkInterval);
+                window.blinkInterval = false;
+              }
+              $(el).removeClass('highlight');
+            }, 2000);
+            return false;
+          }
+        });
+        wb.log.log({
+          operation: 'read',
+          item: 'hypothesis',
+          tool: 'history',
+          data: hypo.id.toString(),
+          public: false
+        });
+      });
+  },
+
   add: function(item) {
     // item structure:
     // {'user': user_id, 'operation': '', 'time': '', 'data': ''}
     var lastrow = $('ul.history-list li.history-item:last', this.element);
-    var row = $('<li class="history-item">').appendTo(this.element.find('ul.history-list'));
+    var rowStr = '\
+      <li class="history-item"> \
+        <span class="username"></span> \
+        <span class="timestamp"></span> \
+        <span class="content"> \
+          <span class="actTool"></span> \
+          <i class="actOperation"></i> \
+          <span class="actItem"></span> \
+          <span class="itemNames"></span> \
+        </span> \
+      </li> \
+    ';
     var user = wb.info.users[item.user];
-    var usertag = $('<span class="username">').appendTo(row).text(user.name).css('color', user.color);
-    var timetag = $('<span class="timestamp">').appendTo(row).text(this._timeformat(this._servertimeformat.parse(item.time)));
-
-    var action = 'In ' + item.tool + '<i> ' + item.operation + ' </i>' + item.item;
-    var entity;
-    if (item.data) {
-      var d = item.data;
-      if (d.constructor === Array) {
-        d = d[0]
-      }
-      if (d.name) {
-        action += ' <a class="wb-item">' + d.name + '</span>';
-      }
+    var $row = $(rowStr).appendTo(this.element.find('ul.history-list'))
+      .find('.username').text(user.name).css('color', user.color).end()
+      .find('.timestamp').text(this._timeformat(this._servertimeformat.parse(item.time))).end()
+      .find('.actOperation').text(item.operation).end()
+      .find('.actItem').text(item.item).end();
+    if (item.tool) {
+      $row.find('.actTool').text('in ' + item.tool);
     }
-    $('<span class="content">').appendTo(row).html(action);
-    if (item.item === 'annotation' || item.item === 'annotations') {
-      row.find('.wb-item').addClass('annotation').data('annotation', {id: item.data.id});
-    } else if (item.item === 'relationship') {
-      row.find('.wb-item').addClass('wb-relationship').data('relationship', {id: item.data.id});
-    } else if (wb.store.static.entity_types.indexOf(item.item) > -1) {
-      row.find('.wb-item').addClass('wb-entity').addClass(item.item).data('entity', {id: item.data.id});
-    } else if (item.item === 'entities') {
-      // multiple entities
-      item.data.forEach(function(d) {
-        var el = ' <a class="wb-item">' + d.name + '</span>';
-        $(el).appendTo($('.content', row)).addClass('wb-entity').addClass(d.primary.entity_type).data('entity', {id: d.id});
-      });
+
+    var _this = this;
+    if (item.data) {
+      item.data = item.data.split(',');
+      if (item.item === 'entity') {
+        item.data.forEach(function(d) {
+          _this._addFormattedEntityName(d, $row.find('.itemNames'))
+        });
+      } else if (item.item === 'relationship') {
+        item.data.forEach(function(d) {
+          _this._addFormattedRelationshipName(d, $row.find('.itemNames'))
+        });
+      } else if (item.item === 'hypothesis') {
+        item.data.forEach(function(d) {
+          _this._addFormattedHypothesis(d, $row.find('.itemNames'))
+        });
+      }
     }
 
     // hide user and time tag when it's the same user and within 60s
-    if (lastrow.find('.username').text() === usertag.text()) {
+    if (lastrow.find('.username').text() === $row.find('.username').text()) {
       var lasttime = this._timeformat.parse(lastrow.find('.timestamp').text());
-      var thistime = this._timeformat.parse(row.find('.timestamp').text());
+      var thistime = this._timeformat.parse($row.find('.timestamp').text());
       if (Math.floor((thistime - lasttime) / 1000) < 60) {
-        usertag.addClass('hidden');
-        timetag.addClass('hidden');
+        $row.find('.username').hide();
+        $row.find('.timestamp').hide();
       }
     }
 
     if (item.user !== wb.info.user) {
-      row.css('background-color', '#eee')
+      $row.css('background-color', '#eee')
     }
 
-    row.data('context', item)
+    $row.data('context', item)
     return this;
   },
 

@@ -170,7 +170,7 @@ wb.viz.table = function() {
                 wb.utility.notify('Entity is restored', 'success');
                 wb.log.log({
                   operation: 'restored',
-                  item: res.entity.primary.entity_type,
+                  item: 'entity',
                   tool: 'table',
                   data: wb.log.logItem(res.entity),
                 });

@@ -97,7 +97,7 @@ Annotator.Plugin.Store = (function(_super) {
               // the annotation is to create an entity
               wb.log.log({
                 operation: 'created',
-                item: , 'entity'
+                item: 'entity',
                 tool: 'document',
                 data: wb.log.logItem(entities),
                 public: true
@@ -105,7 +105,7 @@ Annotator.Plugin.Store = (function(_super) {
             } else {
               wb.log.log({
                 operation: 'created',
-                item: , 'relationship',
+                item: 'relationship',
                 tool: 'document',
                 data: wb.log.logItem(relationships),
                 public: true
@@ -183,7 +183,7 @@ Annotator.Plugin.Store = (function(_super) {
               // the annotation is to create an entity
               wb.log.log({
                 operation: 'updated',
-                item: , 'entity',
+                item: 'entity',
                 tool: 'document',
                 data: wb.log.logItem(entities),
                 public: true
@@ -191,7 +191,7 @@ Annotator.Plugin.Store = (function(_super) {
             } else {
               wb.log.log({
                 operation: 'updated',
-                item: , 'relationship',
+                item: 'relationship',
                 tool: 'document',
                 data: wb.log.logItem(relationships),
                 public: true
@@ -223,7 +223,7 @@ Annotator.Plugin.Store = (function(_super) {
                   // the annotation is to create an entity
                   wb.log.log({
                     operation: 'updated',
-                    item: , 'entity',
+                    item: 'entity',
                     tool: 'document',
                     data: wb.log.logItem(entities),
                     public: true
@@ -231,7 +231,7 @@ Annotator.Plugin.Store = (function(_super) {
                 } else {
                   wb.log.log({
                     operation: 'updated',
-                    item: , 'relationship',
+                    item: 'relationship',
                     tool: 'document',
                     data: wb.log.logItem(relationships),
                     public: true
@@ -256,7 +256,7 @@ Annotator.Plugin.Store = (function(_super) {
                   wb.log.log({
                     // treat deletion of an annotation as update of an entity
                     operation: 'updated',
-                    item: , 'entity',
+                    item: 'entity',
                     tool: 'document',
                     data: wb.log.logItem(annotation.entity),
                     public: true
@@ -264,7 +264,7 @@ Annotator.Plugin.Store = (function(_super) {
                 } else {
                   wb.log.log({
                     operation: 'updated',
-                    item: , 'relationship',
+                    item: 'relationship',
                     tool: 'document',
                     data: wb.log.logItem(annotation.relationship),
                     public: true
@@ -309,15 +309,15 @@ Annotator.Plugin.Store = (function(_super) {
                 wb.log.log({
                   // treat deletion of an annotation as update of an entity
                   operation: 'archived',
-                  item: , 'entity',
+                  item: 'entity',
                   tool: 'document',
                   data: wb.log.logItem(annotations[0].entity, 'entity'),
                   public: true
                 });
-              } else if {
+              } else {
                 wb.log.log({
                   operation: 'archived',
-                  item: , 'relationship',
+                  item: 'relationship',
                   tool: 'document',
                   data: wb.log.logItem(annotations[0].relationship),
                   public: true

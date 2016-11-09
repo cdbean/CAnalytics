@@ -40,7 +40,7 @@ def log(request):
     if request.method == 'POST':
         group = Group.objects.get(id=request.POST['group'])
         case = Case.objects.get(id=request.POST['case'])
-        data = json.loads(request.POST.get('data', '{}'))
+        data = request.POST.get('data', '')
         log = {
             'operation': request.POST['operation'],
             'item'     : request.POST['item'],
@@ -66,7 +66,7 @@ def serverlog(data):
         operation=data['operation'],
         item=data['item'],
         tool=data['tool'],
-        data=json.dumps(data['data']),
+        data=data['data'],
         group=data['group'],
         case=data['case'],
         public=data['public']

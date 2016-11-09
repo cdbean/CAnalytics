@@ -13,7 +13,7 @@ wb.viz.network = function() {
   var brushExtent = null;
   var uuid = wb.utility.uuid();
 
-  var dispatch = d3.dispatch('filter', 'elaborate', 'delaborate', 'drawn');
+  var dispatch = d3.dispatch('filter', 'elaborate', 'delaborate', 'zoomstart', 'dragstart');
 
   exports.width = function(_) {
     if (!arguments.length) return width;
@@ -213,7 +213,8 @@ wb.viz.network = function() {
             .attr('class', 'linkarrow');
 
         zoom = d3.behavior.zoom()
-          .on('zoom', zoomed);
+          .on('zoom', zoomed)
+          .on('zoomstart', zoomstart);
         brush = d3.svg.brush()
           .on('brush', brushing)
           .on('brushend', brushed)
@@ -253,6 +254,8 @@ wb.viz.network = function() {
           if (dd.source.meta.id === d.meta.id) return dd.target.fixed = false || dd.target.draggedFix;
           if (dd.target.meta.id === d.meta.id) return dd.source.fixed = false || dd.target.draggedFix;
         });
+
+        dispatch.dragstart();
       }
 
       function dragged(d) {
@@ -449,7 +452,7 @@ wb.viz.network = function() {
 
   function updateBehavior() {
     if (brushable) {
-      zoom.on('zoom', null);
+      zoom.on('zoom', null).on('zoomstart', null);
       brush.x(zoom.x())
         .y(zoom.y());
       if (brushExtent) brush.extent(brushExtent);
@@ -458,7 +461,7 @@ wb.viz.network = function() {
     } else {
       container.select('.brush').style('display', 'none');
       container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
-      zoom.on('zoom', zoomed);
+      zoom.on('zoom', zoomed).on('zoomstart', zoomstart);
     }
     container.selectAll('.node').call(drag);
   }
@@ -467,6 +470,10 @@ wb.viz.network = function() {
     container.select('.chart').attr("transform", "translate("
       + d3.event.translate + ")"
       + " scale(" + d3.event.scale + ")");
+  }
+
+  function zoomstart() {
+    dispatch.zoomstart();
   }
 
   return d3.rebind(exports, dispatch, 'on');

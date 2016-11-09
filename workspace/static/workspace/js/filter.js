@@ -20,7 +20,7 @@ wb.filter.set = function(data, tool, brush, logged) {
       operation: 'filtered',
       item: 'entity',
       tool: tool,
-      data: data,
+      data: wb.log.logItem(data),
       public: false
     });
   }

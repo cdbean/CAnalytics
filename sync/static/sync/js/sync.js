@@ -40,6 +40,12 @@ $(function() {
     } else {
       wb.hypothesis.setCurrent(h.id);
       wb.utility.notify('Hypothesis created');
+      wb.log.log({
+        operation: 'create',
+        item: 'hypothesis',
+        data: h.id.toString(),
+        public: true
+      });
     }
   }
 
