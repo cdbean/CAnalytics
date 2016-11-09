@@ -93,13 +93,24 @@ Annotator.Plugin.Store = (function(_super) {
             wb.store.updateItems(entities, 'entities');
             wb.store.updateItems(relationships, 'relationships');
 
-            wb.log.log({
+            if (to_create[0].entity.entity_type !== 'relationship') {
+              // the annotation is to create an entity
+              wb.log.log({
                 operation: 'created',
-                item: 'annotations',
+                item: , 'entity'
                 tool: 'document',
-                data: wb.log.logAnnotations(annotations),
+                data: wb.log.logItem(entities),
                 public: true
-            });
+              });
+            } else {
+              wb.log.log({
+                operation: 'created',
+                item: , 'relationship',
+                tool: 'document',
+                data: wb.log.logItem(relationships),
+                public: true
+              });
+            }
 
             $.publish('data/updated');
 
@@ -126,13 +137,24 @@ Annotator.Plugin.Store = (function(_super) {
                 $.publish('data/updated');
 
                 wb.utility.notify('Annotation created!', 'success');
-                wb.log.log({
-                    operation: 'created',
-                    item: 'annotation',
-                    tool: 'document',
-                    data: wb.log.logAnnotation(annotation),
-                    public: true
-                });
+
+                if (annotation.entity.entity_type !== 'relationship') {
+                  wb.log.log({
+                      operation: 'created',
+                      item: 'entity',
+                      tool: 'document',
+                      data: wb.log.logItem(entities),
+                      public: true
+                  });
+                } else {
+                  wb.log.log({
+                      operation: 'created',
+                      item: 'relationship',
+                      tool: 'document',
+                      data: wb.log.logItem(relationships),
+                      public: true
+                  });
+                }
             });
         } else {
             return this.updateAnnotation(annotation, {});
@@ -157,13 +179,24 @@ Annotator.Plugin.Store = (function(_super) {
 
             $.publish('data/updated');
 
-            wb.log.log({
+            if (annotations[0].entity.entity_type !== 'relationship') {
+              // the annotation is to create an entity
+              wb.log.log({
                 operation: 'updated',
-                item: 'annotations',
+                item: , 'entity',
                 tool: 'document',
-                data: wb.log.logAnnotations(anns),
-                public: true,
-            });
+                data: wb.log.logItem(entities),
+                public: true
+              });
+            } else {
+              wb.log.log({
+                operation: 'updated',
+                item: , 'relationship',
+                tool: 'document',
+                data: wb.log.logItem(relationships),
+                public: true
+              });
+            }
             // Annotator.showNotification(Annotator._t("Updated " + to_update.length + " annotations!"), Annotator.Notification.SUCCESS);
             wb.utility.notify(annotations.length + ' annotations updated!', 'success');
         });
@@ -186,13 +219,24 @@ Annotator.Plugin.Store = (function(_super) {
                 $.publish('data/updated');
 
                 wb.utility.notify('Annotation updated!', 'success');
-                wb.log.log({
+                if (annotation.entity.entity_type !== 'relationship') {
+                  // the annotation is to create an entity
+                  wb.log.log({
                     operation: 'updated',
-                    item: 'annotation',
+                    item: , 'entity',
                     tool: 'document',
-                    data: wb.log.logAnnotation(ann),
-                    public: true,
-                });
+                    data: wb.log.logItem(entities),
+                    public: true
+                  });
+                } else {
+                  wb.log.log({
+                    operation: 'updated',
+                    item: , 'relationship',
+                    tool: 'document',
+                    data: wb.log.logItem(relationships),
+                    public: true
+                  });
+                }
             }));
         }
     };
@@ -207,13 +251,25 @@ Annotator.Plugin.Store = (function(_super) {
 
                 wb.store.updateItems(annotation, 'annotations');
 
-                wb.log.log({
-                    operation: 'deleted',
-                    item: 'annotation',
+                if (annotation.entity.entity_type !== 'relationship') {
+                  // the annotation is to create an entity
+                  wb.log.log({
+                    // treat deletion of an annotation as update of an entity
+                    operation: 'updated',
+                    item: , 'entity',
                     tool: 'document',
-                    data: wb.log.logAnnotation(annotation),
+                    data: wb.log.logItem(annotation.entity),
                     public: true
-                });
+                  });
+                } else {
+                  wb.log.log({
+                    operation: 'updated',
+                    item: , 'relationship',
+                    tool: 'document',
+                    data: wb.log.logItem(annotation.relationship),
+                    public: true
+                  });
+                }
 
                 _this.unregisterAnnotation(annotation);
 
@@ -244,17 +300,30 @@ Annotator.Plugin.Store = (function(_super) {
               wb.store.updateItems(entity, 'entities');
               wb.store.updateItems(relationship, 'relationships');
 
-              wb.log.log({
-                  operation: 'deleted',
-                  item: 'annotations',
-                  tool: 'document',
-                  data: wb.log.logAnnotations(annotations),
-                  public: true
-              });
-
               $.publish('data/updated');
               // Annotator.showNotification(Annotator._t("Deleted " + to_delete.length + " annotations!"), Annotator.Notification.SUCCESS);
               wb.utility.notify(annotations.length + ' annotations deleted', 'success');
+
+              if (annotations[0].entity.entity_type !== 'relationship') {
+                // the annotation is to create an entity
+                wb.log.log({
+                  // treat deletion of an annotation as update of an entity
+                  operation: 'archived',
+                  item: , 'entity',
+                  tool: 'document',
+                  data: wb.log.logItem(annotations[0].entity, 'entity'),
+                  public: true
+                });
+              } else if {
+                wb.log.log({
+                  operation: 'archived',
+                  item: , 'relationship',
+                  tool: 'document',
+                  data: wb.log.logItem(annotations[0].relationship),
+                  public: true
+                });
+              }
+
             });
         }
     };

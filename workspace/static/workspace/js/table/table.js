@@ -141,8 +141,8 @@ wb.viz.table = function() {
 
                 wb.utility.notify('Entity is archived', 'success');
                 wb.log.log({
-                  operation: 'deleted',
-                  item: res.entity.primary.entity_type,
+                  operation: 'archived',
+                  item: 'entity',
                   tool: 'table',
                   data: wb.log.logItem(res.entity),
                 });

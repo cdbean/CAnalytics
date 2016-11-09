@@ -446,34 +446,23 @@ Annotator = (function(_super) {
         var _this = this;
         // log read annotations
         annotations.forEach(function(ann) {
-            wb.log.log({
-                operation: 'read',
-                item: 'annotation',
-                tool: 'document',
-                data: wb.log.logAnnotation(ann),
-                public: false
-            });
             if (ann.entity) {
                 if (ann.entity.entity_type === 'relationship') {
-                    var relationship = wb.store.items.relationships[ann.entity.id];
-                    if (relationship)
-                        wb.log.log({
-                            operation: 'read',
-                            item: 'relationship',
-                            tool: 'document',
-                            data: wb.log.logItem(relationship),
-                            public: false
-                        });
+                  wb.log.log({
+                      operation: 'read',
+                      item: 'relationship',
+                      tool: 'document',
+                      data: wb.log.logItem(ann.entity.id),
+                      public: false
+                  });
                 } else {
-                    var entity = wb.store.items.entities[ann.entity.id];
-                    if (entity)
-                        wb.log.log({
-                            operation: 'read',
-                            item: entity.primary.entity_type,
-                            tool: 'document',
-                            data: wb.log.logItem(entity),
-                            public: false
-                        });
+                  wb.log.log({
+                      operation: 'read',
+                      item: 'entity',
+                      tool: 'document',
+                      data: wb.log.logItem(ann.entity.id),
+                      public: false
+                  });
                 }
             }
         });

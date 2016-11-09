@@ -260,11 +260,11 @@ $.widget('viz.vizeditor', {
           wb.utility.notify('Entity updated!', 'success');
           wb.log.log({
             operation: 'updated',
-            item: item.primary.entity_type,
+            item: 'entity',
             tool: tool,
             data: wb.log.logItem(item),
           });
-        } else if (item_type === 'relationship') {
+        } else {
           wb.utility.notify('Relationship updated!', 'success');
           wb.log.log({
             operation: 'updated',

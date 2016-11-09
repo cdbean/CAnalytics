@@ -196,8 +196,8 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         wb.viewer.data(entity, 'entity').show(pos, 'map');
 
         wb.log.log({
-            operation: 'elaborate',
-            item: 'location',
+            operation: 'read',
+            item: 'entity',
             tool: 'map',
             data: wb.log.logItem(entity),
             public: false

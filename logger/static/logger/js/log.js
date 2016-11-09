@@ -68,37 +68,17 @@ wb.log.logAnnotations = function(anns) {
 
 // dump entity or relationship
 wb.log.logItem = function(item) {
-  var geo = null;
-  if ('geometry' in item.primary) {
-    geo = item.primary.geometry;
-    delete item.primary.geometry;
+  if (item.constructor === Object) {
+    return (ent.id || ent.meta.id).toString();
+  } else if (item.constructor === Array) {
+    if (item.constructor === Object) {
+      return item.map(function(d) { return d.id || d.meta.id; }).toString();
+    } else {
+      return item.toString();
+    }
+  } else {
+    return item.toString();
   }
-  var ent = JSON.parse(JSON.stringify(item));
-  if (geo) item.primary.geometry = geo;
-
-  ent.id = item.meta.id;
-  ent.name = item.primary.name || item.primary.relation;
-  // address some special attributes
-  ['organization', 'person', 'location', 'source', 'target'].forEach(function(attr) {
-    if (attr in ent.primary) {
-      if (ent.primary[attr].constructor !== Array) ent.primary[attr] = [ent.primary[attr]];
-      ent.primary[attr] = ent.primary[attr].map(function(d) {
-        var e = wb.store.items.entities[d];
-        if (e) return {id: e.meta.id, name: e.primary.name};
-      });
-    }
-  });
-  ['created_by', 'last_edited_by'].forEach(function(attr) {
-    if (attr in ent.meta) {
-      var u = wb.info.users[ent.meta[attr]];
-      if (u) ent.meta[attr] = {id: u.id, name: u.name};
-    }
-  });
-  return JSON.stringify(ent);
-};
-
-wb.log.logItems = function(items) {
-  return '[' + items.map(wb.log.logItem).join(',') + ']';
 };
 
 wb.log.logDocs = function(docs) {

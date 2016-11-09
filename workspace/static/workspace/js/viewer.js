@@ -132,7 +132,7 @@ $.widget('viz.vizviewer', {
       } else {
         wb.log.log({
           operation: 'read',
-          item: this.item.primary.entity_type,
+          item: 'entity',
           tool: this.tool,
           data: wb.log.logItem(this.item),
           public: false
@@ -200,6 +200,7 @@ $.widget('viz.vizviewer', {
             item: 'relationship',
             tool: tool,
             data: wb.log.logItem(res.relationship),
+            public: true,
           });
         },
         error: function(e) {
@@ -223,9 +224,10 @@ $.widget('viz.vizviewer', {
           wb.utility.notify('Entity is restored', 'success');
           wb.log.log({
             operation: 'restored',
-            item: res.entity.primary.entity_type,
+            item: 'entity',
             tool: tool,
             data: wb.log.logItem(res.entity),
+            public: true,
           });
         },
         error: function(e) {
@@ -270,7 +272,7 @@ $.widget('viz.vizviewer', {
 
           wb.utility.notify('Relationship is archived', 'success');
           wb.log.log({
-            operation: 'deleted',
+            operation: 'archived',
             item: 'relationship',
             tool: tool,
             data: wb.log.logItem(res.relationship),
@@ -298,8 +300,8 @@ $.widget('viz.vizviewer', {
 
           wb.utility.notify('Entity is archived', 'success');
           wb.log.log({
-            operation: 'deleted',
-            item: res.entity.primary.entity_type,
+            operation: 'archived',
+            item: 'entity',
             tool: tool,
             data: wb.log.logItem(res.entity),
           });

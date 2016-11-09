@@ -203,7 +203,7 @@ $(function() {
         });
         wb.log.log({
             operation: 'filtered',
-            item: ent.primary.entity_type,
+            item: 'entity',
             tool: 'reference',
             data: wb.log.logItem(ent),
             public: false
@@ -217,7 +217,7 @@ $(function() {
         if (i >= 0) wb.store.shelf_by.entities.splice(i, 1);
         wb.log.log({
             operation: 'defiltered',
-            item: ent.primary.entity_type,
+            item: 'entity',
             tool: 'reference',
             data: wb.log.logItem(ent),
             public: false

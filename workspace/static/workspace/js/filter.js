@@ -18,7 +18,9 @@ wb.filter.set = function(data, tool, brush, logged) {
   if (logged) {
     wb.log.log({
       operation: 'filtered',
+      item: 'entity',
       tool: tool,
+      data: data,
       public: false
     });
   }
