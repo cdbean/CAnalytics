@@ -141,7 +141,7 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
           <svg id="chart" xmlns: "http://www.w3.org/2000/svg"> \
         </div> \
         <div class="jumbotron placeholder"> \
-          <div class="container"> \
+          <div> \
             <div class="text-center"> \
               <p>Add entities and relationships to display here</p> \
             </div> \

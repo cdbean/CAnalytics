@@ -10,12 +10,11 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this._super('_create');
 
       this.updateSize();
-
       this.setupUI();
 
       this.detailTimeline = wb.viz.timeline()
-        .width(this.width)
-        .height(this.detailTimelineHeight)
+        .width(this.detailTimelineWidth)
+        .height(this.height)
         .trackBy('person')
         .on('zoom', this.onDetailZoom.bind(this))
         .on('elaborate', this.onDetailElaborate.bind(this))
@@ -23,12 +22,11 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         .on('filter', this.onDetailFilter.bind(this));
 
       this.overviewTimeline = wb.viz.timeline()
-        .width(this.width)
-        .height(this.overviewTimelineHeight)
+        .width(this.overviewTimelineWidth)
+        .height(this.height)
         .trackBy('person')
-        .itemHeight(10)
-        .itemMinWidth(5)
-        .itemMaxWidth(10)
+        .itemWidth(10)
+        .itemMinHeight(5)
         .itemPadding(2)
         .showLabel(false) // do not show labels
         .brushable(true)
@@ -46,12 +44,10 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     updateSize() {
       this.width = this.element.innerWidth() - 20,
       this.height = this.element.innerHeight() - 20;
-
-      var detailTimelineHeightRatio = .75,
-          overviewTimelineHeightRatio = .25;
-
-      this.detailTimelineHeight = this.height * detailTimelineHeightRatio,
-      this.overviewTimelineHeight = this.height * overviewTimelineHeightRatio;
+      this.overviewTimelineWidthRatio = .25;
+      this.detailTimelineWidthRatio = .75;
+      this.overviewTimelineWidth = this.width * this.overviewTimelineWidthRatio;
+      this.detailTimelineWidth = this.width * this.detailTimelineWidthRatio;
     },
 
     _destroy: function() {
@@ -90,9 +86,9 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
     updateData: function() {
       var data = [];
-      for (var d in wb.store.items.entities) {
+      wb.store.shelf.entities.forEach(function(d) {
         var entity = wb.store.items.entities[d];
-        if (entity.meta.deleted) continue;
+        if (entity.meta.deleted) return;
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
             if (entity.primary.repeated) {
@@ -125,7 +121,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
             }
           }
         }
-      }
+      });
 
       if (data.length) {
         this.element.find('.placeholder').hide();
@@ -179,10 +175,11 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
     },
 
     updateView: function() {
-      if (this.data.length) {
-        this.detailTimeline.filter(wb.store.shelf.entities);
-        this.overviewTimeline.filter(wb.store.shelf.entities);
-      }
+      // if (this.data.length) {
+      //   this.detailTimeline.filter(wb.store.shelf.entities);
+      //   this.overviewTimeline.filter(wb.store.shelf.entities);
+      // }
+      this.updateData();
       return this;
     },
 
@@ -194,8 +191,12 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
               <button id="filterBtn" class="btn btn-sm"> Filter </button> \
             </li> \
           </ul> \
-          <svg id="detailTimeline"></svg> \
-          <svg id="overviewTimeline"></svg> \
+          <div class="pull-left"> \
+            <svg id="overviewTimeline"></svg> \
+          </div> \
+          <div class="pull-left"> \
+            <svg id="detailTimeline"></svg> \
+          </div> \
         </div> \
         <div class="jumbotron placeholder"> \
           <div class="container"> \
@@ -209,13 +210,13 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       d3.select(this.element[0])
         .select('svg#detailTimeline')
-        .attr('width', this.width)
-        .attr('height', this.detailTimelineHeight);
+        .attr('width', this.detailTimelineWidth)
+        .attr('height', this.height);
 
       d3.select(this.element[0])
         .select('svg#overviewTimeline')
-        .attr('width', this.width)
-        .attr('height', this.overviewTimelineHeight);
+        .attr('width', this.overviewTimelineWidth)
+        .attr('height', this.height);
 
       // register events
       var _this = this;
@@ -233,20 +234,20 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this._super('resize');
       this.updateSize();
 
-      this.detailTimeline.width(this.width).height(this.detailTimelineHeight);
-      this.overviewTimeline.width(this.width).height(this.overviewTimelineHeight);
+      this.detailTimeline.width(this.detailTimelineWidth).height(this.height);
+      this.overviewTimeline.width(this.overviewTimelineWidth).height(this.height);
 
       if (this.data.length) {
         d3.select(this.element[0])
           .select('svg#detailTimeline')
-          .attr('width', this.width)
-          .attr('height', this.detailTimelineHeight)
+          .attr('width', this.detailTimelineWidth)
+          .attr('height', this.height)
           .call(this.detailTimeline);
 
         d3.select(this.element[0])
           .select('svg#overviewTimeline')
-          .attr('width', this.width)
-          .attr('height', this.overviewTimelineHeight)
+          .attr('width', this.overviewTimelineWidth)
+          .attr('height', this.height)
           .call(this.overviewTimeline);
       }
 

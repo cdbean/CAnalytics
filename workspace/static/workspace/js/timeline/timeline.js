@@ -1,14 +1,13 @@
 wb.viz.timeline = function() {
-  var margin = {top: 10, right: 20, bottom: 20, left: 80},
+  var margin = {top: 20, right: 20, bottom: 20, left: 80},
       width = 960,
       height = 500 ;
   var innerW = width - margin.left - margin.right,
       innerH = height - margin.top - margin.bottom;
   var tracks = [],
       itemPadding = 5,
-      itemHeight = 20,
-      itemMinWidth = 10,
-      itemMaxWidth = 100;
+      itemMinHeight = 15,
+      itemWidth = 50;
   var axis;
   var timelineLayout;
   var clipId = wb.utility.uuid();
@@ -23,7 +22,7 @@ wb.viz.timeline = function() {
 
   var container = null;
 
-  var scaleX;
+  var scaleY;
 
   var dispatch = d3.dispatch('filter', 'zoom', 'elaborate', 'delaborate');
 
@@ -41,21 +40,15 @@ wb.viz.timeline = function() {
     return exports
   }
 
-  exports.itemMinWidth = function(_) {
-    if (!arguments.length) return itemMinWidth;
-    itemMinWidth = _;
+  exports.itemMinHeight = function(_) {
+    if (!arguments.length) return itemMinHeight;
+    itemMinHeight = _;
     return exports
   }
 
-  exports.itemMaxWidth = function(_) {
-    if (!arguments.length) return itemMaxWidth;
-    itemMaxWidth = _;
-    return exports
-  }
-
-  exports.itemHeight = function(_) {
-    if (!arguments.length) return itemHeight;
-    itemHeight = _;
+  exports.itemWidth = function(_) {
+    if (!arguments.length) return itemWidth;
+    itemWidth = _;
     return exports
   }
 
@@ -73,17 +66,17 @@ wb.viz.timeline = function() {
 
   exports.domain = function(_) {
     if (!arguments.length) {
-      if (scaleX) {
-        return scaleX.domain();
+      if (scaleY) {
+        return scaleY.domain();
       }
       else {
         return
       }
     }
-    if (scaleX) {
-      scaleX.domain(_);
+    if (scaleY) {
+      scaleY.domain(_);
     }
-    if (zoom) zoom.x(scaleX)
+    if (zoom) zoom.x(scaleY)
     return exports
   }
 
@@ -100,7 +93,7 @@ wb.viz.timeline = function() {
   exports.setBrush = function(extent) {
     if (!brush) return;
     brushExtent = extent;
-    var domain = scaleX.domain()
+    var domain = scaleY.domain()
     // set extent within the range of domain
     extent[0] = Math.max(extent[0], domain[0]);
     extent[1] = Math.min(extent[1], domain[1]);
@@ -119,7 +112,7 @@ wb.viz.timeline = function() {
   exports.defilter = function() {
     if (!container) return;
     brush.clear();
-    container.select('.brush').transition().call(brush)
+    container.select('.brush').call(brush)
   }
 
   // zoom, brush, etc.
@@ -127,17 +120,17 @@ wb.viz.timeline = function() {
     if (brushable) {
       // enable brush and disable zoom
       zoom.on('zoom', null);
-      brush.x(scaleX);
+      brush.y(scaleY);
       if (brushExtent) brush.extent(brushExtent);
 
       container.select('.brush')
         .style('display', '')
-        .attr('height', innerH)
+        .attr('width', innerW)
         .call(brush);
       container.select('.brush')
         .selectAll('rect')
-        .attr('y', 0)
-        .attr('height', innerH)
+        .attr('x', 0)
+        .attr('width', innerW)
     } else { // enable zoom and disable brush
       container.select('.brush').style('display', 'none');
       container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
@@ -150,7 +143,7 @@ wb.viz.timeline = function() {
     updateItems()
     updateTracks()
     updateAxis()
-    dispatch.zoom(zoom.x().domain())
+    dispatch.zoom(zoom.y().domain())
   }
 
 
@@ -161,16 +154,14 @@ wb.viz.timeline = function() {
 
     container.select('clipPath rect').attr('width', innerW).attr('height', innerH);
 
-    container.select('.axis').attr('transform', 'translate(0,' + innerH + ')')
-
     timelineLayout = wb.viz.timelineLayout()
       .data(data)
       .width(innerW)
       .height(innerH)
       .trackBy(trackBy)
-      .scale(scaleX)
-      .nodeHeight(itemHeight)
-      .nodeMinWidth(itemMinWidth)
+      .scale(scaleY)
+      .nodeWidth(itemWidth)
+      .nodeMinHeight(itemMinHeight)
       // .nodeMaxWidth(itemMaxWidth)
       .nodePadding(itemPadding)
       .layout();
@@ -178,27 +169,27 @@ wb.viz.timeline = function() {
 
   function updateScale() {
     // keep zoom scale domain
-    scaleX = zoom.x();
+    scaleY = zoom.y();
 
-    if (!scaleX) { // if scale has not been defined
+    if (!scaleY) { // if scale has not been defined
       var min = d3.min(data, function(d) { return d.start; })
       var max = d3.max(data, function(d) { return d.end; })
       max = max || min; // max might be undefined if events are all instant events
-      scaleX = d3.time.scale()
+      scaleY = d3.time.scale()
         .domain([min, max])
-        .rangeRound([0, innerW])
+        .rangeRound([0, innerH])
         .nice(d3.time.week)
-      zoom.x(scaleX);
+      zoom.y(scaleY);
     } else {
       if (brush) {
         brushExtent = brush.extent();
       }
-      scaleX.rangeRound([0, innerW])
+      scaleY.rangeRound([0, innerH])
     }
 
     axis = d3.svg.axis()
-      .scale(scaleX)
-      .orient('bottom')
+      .scale(scaleY)
+      .orient('left')
   }
 
   function updateItems() {
@@ -241,22 +232,37 @@ wb.viz.timeline = function() {
     if (showLabel) {
       item.select('text')
         .attr('x', function(d) { return d.x; })
-        .attr('y', function(d) { return d.y + itemHeight/2; })
-        .attr('dy', '.35em')
+        .attr('y', function(d) { return d.y; })
+        .attr('dy', '1em')
         .attr('text-anchor', 'start')
         .text(function(d) { return d.label; })
-        .each(wrap); // cut text to fit in rect
+        .call(wrap); // cut text to fit in rect
     }
 
-    function wrap(d) {
-      var self = d3.select(this),
-          textLength = self.node().getBBox().width,
-          text = self.text(),
-          width = d.width,
-          limitLength = width / (textLength / text.length);
-
-      text = text.substring(0, limitLength);
-      self.text(text)
+    // thanks to https://bl.ocks.org/mbostock/7555321
+    function wrap(text) {
+      text.each(function(d) {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            width = d.width,
+            y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null).append("tspan").attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+          line.push(word);
+          tspan.text(line.join(" "));
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop();
+            tspan.text(line.join(" "));
+            line = [word];
+            tspan = text.append("tspan").attr('x', d.x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          }
+        }
+      });
     }
   }
 
@@ -273,19 +279,20 @@ wb.viz.timeline = function() {
     trackEnter.append('path')
 
     track.select('text')
-      .attr('x', 0)
-      .attr('y', function(d, i) { return d.start - d.height/2; })
+      .attr('x', function(d, i) { return d.start + d.width/2; })
+      .attr('y', 0)
       .attr('dy', '.35em')
-      .attr('dx', '-5px')
-      .attr('text-anchor', 'end')
-      .text(function(d) { return d.label; })
+      .attr('text-anchor', 'middle')
+      .text(function(d) {
+        return showLabel ? d.label : d.label[0];
+      })
       .style('fill', '#aaa');
 
     track.select('path')
       .attr('d', function(d, i) {
         if (i < trackNum - 1) {
-          var y = d.start - d.height - itemPadding/2;
-          return 'M0,' + y + 'L' + innerW + ',' + y;
+          var x = d.start + d.width - itemPadding/2;
+          return 'M' + x + ',0L' + x + ',' + innerH;
         } else {
           return null;
         }

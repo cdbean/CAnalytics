@@ -1,8 +1,7 @@
 wb.viz.timelineLayout = function() {
   var timeline = {},
-      nodeHeight = 20,
-      nodeMinWidth = 10,
-      nodeMaxWidth = 100,
+      nodeWidth = 20,
+      nodeMinHeight = 15,
       trackBy = '',
       width = 1,
       height = 1,
@@ -37,21 +36,15 @@ wb.viz.timelineLayout = function() {
     return timeline;
   }
 
-  timeline.nodeHeight = function(_) {
-    if (!arguments.length) return nodeHeight;
-    nodeHeight = _;
+  timeline.nodeWidth = function(_) {
+    if (!arguments.length) return nodeWidth;
+    nodeWidth = _;
     return timeline;
   }
 
-  timeline.nodeMinWidth = function(_) {
-    if (!arguments.length) return nodeMinWidth;
-    nodeMinWidth = _;
-    return timeline;
-  }
-
-  timeline.nodeMaxWidth = function(_) {
-    if (!arguments.length) return nodeMaxWidth;
-    nodeMaxWidth = _;
+  timeline.nodeMinHeight = function(_) {
+    if (!arguments.length) return nodeMinHeight;
+    nodeMinHeight = _;
     return timeline;
   }
 
@@ -75,19 +68,9 @@ wb.viz.timelineLayout = function() {
   }
 
   timeline.layout = function() {
-    // computeScale();
     sortNodes();
     computeNodes();
     return timeline;
-  }
-
-  function computeScale() {
-    var min = d3.min(data, function(d) { return d.start; })
-    var max = d3.max(data, function(d) { return d.end; })
-    scale = d3.time.scale()
-      .domain([min, max])
-      .rangeRound([0, width])
-      .nice(d3.time.week)
   }
 
   function sortNodes() {
@@ -135,30 +118,30 @@ wb.viz.timelineLayout = function() {
   }
 
   function computeNodes() {
-    var trackHeight = height; // the accumulated height of tracks
+    var trackWidth = 0; // the accumulated height of tracks
 
     for (var trackName in tracks) {
       var trackNodes = tracks[trackName].nodes;
       var lastNode = null;
       var trackPos = []; // the position of all sub tracks
-      tracks[trackName].start = trackHeight;
+      tracks[trackName].start = trackWidth;
       trackNodes.forEach(function(d) {
-        d.x = scale(d.start);
-        d.width = scale(d.end) - scale(d.start);
-        d.width = Math.max(nodeMinWidth, d.width);
-        d.height = nodeHeight;
+        d.y = scale(d.start);
+        d.height = scale(d.end) - scale(d.start);
+        d.height = Math.max(nodeMinHeight, d.height);
+        d.width = nodeWidth;
         for (var i = 0; i < trackPos.length; i++) {
-          if (d.x > trackPos[i]) break;
+          if (d.y > trackPos[i]) break;
         }
         d.track = i + 1;
         // TODO: set the node end as text or node (whichever is bigger)
-        trackPos[i] = d.x + d.width;
-        d.y = trackHeight - d.track * (nodeHeight + nodePadding);
+        trackPos[i] = d.y + d.height;
+        d.x = trackWidth + (d.track - 1) * (nodeWidth + nodePadding);
         nodes.push(d);
       })
       tracks[trackName].trackNum = trackPos.length;
-      tracks[trackName].height = trackPos.length * (nodeHeight + nodePadding);
-      trackHeight -= tracks[trackName].height;
+      tracks[trackName].width = trackPos.length * (nodeWidth + nodePadding);
+      trackWidth += tracks[trackName].width;
     }
   }
 
