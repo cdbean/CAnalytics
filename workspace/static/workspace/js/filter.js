@@ -79,7 +79,7 @@ wb.filter.remove = function(tool, logged) {
     $.publish('data/filter');
     $('.viz').each(function(i, v) {
       var $viz = $(v).data('instance');
-      if ($viz) $viz.defilter();
+      if ($viz && $viz.defilter) $viz.defilter();
     });
     return;
   }

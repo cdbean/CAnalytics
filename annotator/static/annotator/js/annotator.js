@@ -481,15 +481,15 @@ Annotator = (function(_super) {
     };
 
     Annotator.prototype.startViewerHideTimer = function() {
-        if (!this.viewerHideTimer) {
-            return this.viewerHideTimer = setTimeout(this.viewer.hide, 250);
+        if (!window.viewerHideTimer) {
+            return window.viewerHideTimer = setTimeout(this.viewer.hide, 250);
         }
-        clearTimeout(this.showAnnViewerTimer);
+        clearTimeout(window.showAnnViewerTimer);
     };
 
     Annotator.prototype.clearViewerHideTimer = function() {
-        clearTimeout(this.viewerHideTimer);
-        return this.viewerHideTimer = false;
+        clearTimeout(window.viewerHideTimer);
+        return window.viewerHideTimer = false;
     };
 
     Annotator.prototype.checkForStartSelection = function(event) {
@@ -530,7 +530,7 @@ Annotator = (function(_super) {
 
     Annotator.prototype.onHighlightMouseover = function(event) {
         var annotations;
-        this.showAnnViewerTimer = setTimeout(function() {
+        window.showAnnViewerTimer = setTimeout(function() {
             this.clearViewerHideTimer();
             if (this.mouseIsDown || this.viewer.isShown()) {
                 return false;
