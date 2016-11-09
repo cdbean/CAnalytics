@@ -74,7 +74,7 @@ $(function() {
     wb.log.log({
       operation: 'clone',
       item: 'hypothesis',
-      data: h.id.toString(),
+      data: currentHypoId.toString(),
       public: true
     });
   });

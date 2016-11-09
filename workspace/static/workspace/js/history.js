@@ -104,9 +104,6 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
       hypo = wb.hypothesis.items[i];
     }
     if (!hypo) return;
-    container.append('<span class="username"> ')
-      .text(wb.info.users[hypo.created_by].name + '\'s ')
-      .css('color', wb.info.users[hypo.created_by].color);
 
     $('<i style="cursor: pointer;">').appendTo(container)
       .text(hypo.message)
@@ -179,6 +176,16 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
           _this._addFormattedRelationshipName(d, $row.find('.itemNames'))
         });
       } else if (item.item === 'hypothesis') {
+        if (item.operation === 'clone') {
+          var hypo = item.data;
+          if (hypo.constructor !== Object) {
+            var i = wb.utility.indexOf({id: hypo}, wb.hypothesis.items);
+            hypo = wb.hypothesis.items[i];
+          }
+          $('<span class="username">').insertBefore($row.find('.actItem'))
+            .text(' ' + wb.info.users[hypo.created_by].name + '\'s')
+            .css('color', wb.info.users[hypo.created_by].color);
+        }
         item.data.forEach(function(d) {
           _this._addFormattedHypothesis(d, $row.find('.itemNames'))
         });
