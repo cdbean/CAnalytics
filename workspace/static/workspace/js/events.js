@@ -128,6 +128,8 @@
         .attr('id', 'user-' + id)
         // .css('color', color)
         .mouseover(function() {
+          var id = +$(this).attr('id').split('-')[1],
+              name = wb.info.users[id].name;
           if ($(this).hasClass('watching')) {
             $(this).text('Stop watching ' + name);
           } else {
@@ -135,6 +137,8 @@
           }
         })
         .mouseout(function() {
+          var id = +$(this).attr('id').split('-')[1],
+              name = wb.info.users[id].name;
           if ($(this).hasClass('watching')) {
             $(this).text('Watching ' + name);
           } else {
