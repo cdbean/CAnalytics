@@ -22,7 +22,7 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
             })
             .on('filter', function(selected) {
               if (selected.length) {
-                wb.filter.set(selected, _this.options.tool);
+                wb.filter.set(selected, _this.options.tool, selected);
               } else {
                 wb.filter.remove(_this.options.tool);
               }
@@ -67,6 +67,10 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
 
     filter: function() {
 
+    },
+
+    setFilter: function(extent) {
+      this.table.setFilter(extent);
     },
 
     defilter: function() {

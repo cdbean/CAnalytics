@@ -217,6 +217,17 @@ wb.viz.table = function() {
       return dispatch.filter(records_id);
     }
 
+    exports.setFilter = function(extent) {
+      $('tr', table).each(function(idx, row) {
+        var id = $(row).data('id');
+        if (extent.indexOf(id) > -1) {
+          $(row).addClass('row_selected');
+        } else {
+          $(row).removeClass('row_selected');
+        }
+      });
+    }
+
     exports.filter = function(subset) {
       // filter table
       var shelf = '';
