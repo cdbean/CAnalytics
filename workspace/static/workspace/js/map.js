@@ -162,6 +162,22 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         return this;
     },
 
+    getState: function() {
+      return {
+        extent: this.map.getExtent(),
+        zoom: this.map.zoom
+      };
+    },
+
+    setState: function(state) {
+      this.map.zoomToExtent(state.extent);
+      this.map.zoomTo(state.zoom);
+    },
+
+    setFilter: function() {
+
+    },
+
     onMouseOverFeature: function(e) {
       window.mouseoverTimeout = setTimeout(popup.bind(this), 500);
 

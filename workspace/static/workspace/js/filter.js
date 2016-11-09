@@ -81,7 +81,7 @@ wb.filter.remove = function(tool, logged) {
       var $viz = $(v).data('instance');
       if ($viz && $viz.defilter) $viz.defilter();
     });
-    return;
+    return this.update();
   }
 
   if (!(tool in this.filter)) {
