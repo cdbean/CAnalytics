@@ -353,7 +353,7 @@ wb.viz.network = function() {
         var link = container.select('.links').selectAll('.link')
           .data(networkLayout.links(), function(d) { return d.meta.id; });
 
-        link.exit().transition().style('opacity', 0).remove();
+        link.exit().transition().duration(1000).style('opacity', 0).remove();
 
         var linkEnter = link.enter().append('g').attr('class', 'link')
           .on('mouseover', onMouseOverLink)
@@ -363,7 +363,7 @@ wb.viz.network = function() {
           .style('opacity', 0)
           .transition()
           .duration(1000)
-          .style('opacity', 1)
+          .style('opacity', 1);
 
         linkEnter.append('path')
           .attr('id', function(d) { return 'path-' + d.meta.id + '-' + uuid; });

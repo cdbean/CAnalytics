@@ -205,7 +205,7 @@ wb.viz.timeline = function() {
     var item = container.select('.items').selectAll('.item')
       .data(timelineLayout.nodes());
 
-    item.exit().remove();
+    item.exit().transition().duration(1000).style('opacity', 0).remove();
 
     var itemEnter = item.enter().append('g').attr('class', 'item')
       .on('mouseover', function(d) {
@@ -220,6 +220,12 @@ wb.viz.timeline = function() {
           if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
         }, 300);
       });
+
+    itemEnter.style('opacity', 0)
+      .transition()
+      .duration(1000)
+      .style('opacity', 1);
+
     itemEnter.append('rect');
     if (showLabel) {
       itemEnter.append('text');
