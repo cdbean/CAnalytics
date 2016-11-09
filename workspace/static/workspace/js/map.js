@@ -209,11 +209,10 @@ $.widget("viz.vizmap", $.viz.vizbase, {
           }
         });
 
-        var windowId = '#' + this.element.attr('id');
         if (filter.length) {
-          wb.filter.set(filter, 'map', windowId);
+          wb.filter.set(filter, 'map');
         } else {
-          wb.filter.remove(windowId);
+          wb.filter.remove('map');
         }
 
         return this;

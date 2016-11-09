@@ -1,18 +1,24 @@
 wb.viz.timeline = function() {
   var margin = {top: 10, right: 20, bottom: 20, left: 80},
       width = 960,
-      height = 500
-  ;
+      height = 500 ;
+  var innerW = width - margin.left - margin.right,
+      innerH = height - margin.top - margin.bottom;
   var tracks = [],
       itemPadding = 5,
       itemHeight = 20,
       itemMinWidth = 10,
       itemMaxWidth = 100;
+  var axis;
+  var timelineLayout;
+  var clipId = wb.utility.uuid();
+  var data;
 
   var showLabel = true;
 
   var trackBy = '';
   var brushable = false;
+  var brushExtent = null; // record brush extent before scale changes
   var zoom = null, brush = null;
 
   var container = null;
@@ -93,14 +99,12 @@ wb.viz.timeline = function() {
 
   exports.setBrush = function(extent) {
     if (!brush) return;
+    brushExtent = extent;
     var domain = scaleX.domain()
     // set extent within the range of domain
     extent[0] = Math.max(extent[0], domain[0]);
     extent[1] = Math.min(extent[1], domain[1]);
-    brush.extent(extent);
-    container.select('.brush').transition().call(brush);
-    // fire brushstart, brushmove, brushend events
-    // brush.event(container.select(".brush"))
+    updateBehavior();
   }
 
   exports.filter = function(subset) {
@@ -118,40 +122,198 @@ wb.viz.timeline = function() {
     container.select('.brush').transition().call(brush)
   }
 
+  // zoom, brush, etc.
+  function updateBehavior() {
+    if (brushable) {
+      // enable brush and disable zoom
+      zoom.on('zoom', null);
+      brush.x(scaleX);
+      if (brushExtent) brush.extent(brushExtent);
+
+      container.select('.brush')
+        .style('display', '')
+        .attr('height', innerH)
+        .call(brush);
+      container.select('.brush')
+        .selectAll('rect')
+        .attr('y', 0)
+        .attr('height', innerH)
+    } else { // enable zoom and disable brush
+      container.select('.brush').style('display', 'none');
+      container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
+      zoom.on('zoom', zoomed);
+    }
+  }
+
+  function zoomed() {
+    updateLayout()
+    updateItems()
+    updateTracks()
+    updateAxis()
+    dispatch.zoom(zoom.x().domain())
+  }
+
+
+  function updateLayout() {
+    container.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+
+    container.select('.chartArea').attr('width', innerW).attr('height', innerH).call(zoom)
+
+    container.select('clipPath rect').attr('width', innerW).attr('height', innerH);
+
+    container.select('.axis').attr('transform', 'translate(0,' + innerH + ')')
+
+    timelineLayout = wb.viz.timelineLayout()
+      .data(data)
+      .width(innerW)
+      .height(innerH)
+      .trackBy(trackBy)
+      .scale(scaleX)
+      .nodeHeight(itemHeight)
+      .nodeMinWidth(itemMinWidth)
+      // .nodeMaxWidth(itemMaxWidth)
+      .nodePadding(itemPadding)
+      .layout();
+  }
+
+  function updateScale() {
+    // keep zoom scale domain
+    scaleX = zoom.x();
+
+    if (!scaleX) { // if scale has not been defined
+      var min = d3.min(data, function(d) { return d.start; })
+      var max = d3.max(data, function(d) { return d.end; })
+      max = max || min; // max might be undefined if events are all instant events
+      scaleX = d3.time.scale()
+        .domain([min, max])
+        .rangeRound([0, innerW])
+        .nice(d3.time.week)
+      zoom.x(scaleX);
+    } else {
+      if (brush) {
+        brushExtent = brush.extent();
+      }
+      scaleX.rangeRound([0, innerW])
+    }
+
+    axis = d3.svg.axis()
+      .scale(scaleX)
+      .orient('bottom')
+  }
+
+  function updateItems() {
+    var item = container.select('.items').selectAll('.item')
+      .data(timelineLayout.nodes());
+
+    item.exit().remove();
+
+    var itemEnter = item.enter().append('g').attr('class', 'item')
+      .on('mouseover', function(d) {
+        var pos = {top: d3.event.pageY, left: d3.event.pageX};
+        window.mouseoverTimeout = setTimeout(function() {
+          dispatch.elaborate(d, pos);
+        }, 500)
+      })
+      .on('mouseout', function(d) {
+        if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
+        setTimeout(function() {
+          if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
+        }, 300);
+      });
+    itemEnter.append('rect');
+    if (showLabel) {
+      itemEnter.append('text');
+    }
+
+    item.select('rect')
+      .attr('x', function(d) { return d.x; })
+      .attr('y', function(d) { return d.y; })
+      .attr('width', function(d) { return d.width; })
+      .attr('height', function(d) { return d.height; })
+      .style('fill', 'steelblue')
+
+    if (showLabel) {
+      item.select('text')
+        .attr('x', function(d) { return d.x; })
+        .attr('y', function(d) { return d.y + itemHeight/2; })
+        .attr('dy', '.35em')
+        .attr('text-anchor', 'start')
+        .text(function(d) { return d.label; })
+        .each(wrap); // cut text to fit in rect
+    }
+
+    function wrap(d) {
+      var self = d3.select(this),
+          textLength = self.node().getBBox().width,
+          text = self.text(),
+          width = d.width,
+          limitLength = width / (textLength / text.length);
+
+      text = text.substring(0, limitLength);
+      self.text(text)
+    }
+  }
+
+  function updateTracks() {
+    var dd = d3.values(timelineLayout.tracks());
+    var trackNum = dd.length;
+    var track = container.select('.tracks').selectAll('.track')
+      .data(dd)
+
+    track.exit().remove()
+
+    var trackEnter = track.enter().append('g').attr('class', 'track')
+    trackEnter.append('text')
+    trackEnter.append('path')
+
+    track.select('text')
+      .attr('x', 0)
+      .attr('y', function(d, i) { return d.start - d.height/2; })
+      .attr('dy', '.35em')
+      .attr('dx', '-5px')
+      .attr('text-anchor', 'end')
+      .text(function(d) { return d.label; })
+      .style('fill', '#aaa');
+
+    track.select('path')
+      .attr('d', function(d, i) {
+        if (i < trackNum - 1) {
+          var y = d.start - d.height - itemPadding/2;
+          return 'M0,' + y + 'L' + innerW + ',' + y;
+        } else {
+          return null;
+        }
+      })
+      .style('stroke', '#ccc');
+  }
+
+  function updateAxis() {
+    container.select('.axis').call(axis)
+  }
+
+  function brushing() {
+    var ext = brush.extent();
+    container.selectAll('.item').classed('selected', function(d) {
+      return (d.start <= ext[1]  && d.start >= ext[0])
+        || (d.end >= ext[0] && d.end <= ext[1])
+        || (d.start <= ext[0] && d.end >= ext[1]);
+    });
+  }
+
+  function brushed() {
+    var filter = [];
+    container.selectAll('.item.selected').each(function(d) {
+      filter.push(d);
+    });
+    var ext = brush.empty() ? null : brush.extent();
+    return dispatch.filter(filter, ext);
+  }
+
   function exports(selection) {
     selection.each(function(dd) {
-      var innerW = width - margin.left - margin.right,
-          innerH = height - margin.top - margin.bottom;
-      var axis;
-      var timelineLayout;
-      var clipId = wb.utility.uuid();
-      var brushExtent = null; // record brush extent before scale changes
-
-      function zoomed() {
-        updateLayout()
-        updateItems()
-        updateTracks()
-        updateAxis()
-        dispatch.zoom(zoom.x().domain())
-      }
-
-      function brushing() {
-        var ext = brush.extent();
-        container.selectAll('.item').classed('selected', function(d) {
-          return (d.start <= ext[1]  && d.start >= ext[0])
-            || (d.end >= ext[0] && d.end <= ext[1])
-            || (d.start <= ext[0] && d.end >= ext[1]);
-        });
-      }
-
-      function brushed() {
-        var filter = [];
-        container.selectAll('.item.selected').each(function(d) {
-          filter.push(d);
-        });
-        var ext = brush.empty() ? null : brush.extent();
-        return dispatch.filter(filter, ext);
-      }
+      innerW = width - margin.left - margin.right;
+      innerH = height - margin.top - margin.bottom;
+      data = dd;
 
       init.apply(this);
       update.apply(this);
@@ -177,174 +339,14 @@ wb.viz.timeline = function() {
       }
 
       function update() {
-        updateScale(dd);
+        updateScale();
         updateLayout();
         updateItems();
         updateTracks();
         updateAxis();
         updateBehavior();
       }
-
-      // zoom, brush, etc.
-      function updateBehavior() {
-        if (brushable) {
-          // enable brush and disable zoom
-          zoom.on('zoom', null);
-          brush.x(scaleX);
-          if (brushExtent) brush.extent(brushExtent);
-
-          container.select('.brush')
-            .style('display', '')
-            .attr('height', innerH)
-            .call(brush);
-          container.select('.brush')
-            .selectAll('rect')
-            .attr('y', 0)
-            .attr('height', innerH)
-        } else { // enable zoom and disable brush
-          container.select('.brush').style('display', 'none');
-          container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
-          zoom.on('zoom', zoomed);
-        }
-      }
-
-      function updateLayout() {
-        container.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-
-        container.select('.chartArea').attr('width', innerW).attr('height', innerH).call(zoom)
-
-        container.select('clipPath rect').attr('width', innerW).attr('height', innerH);
-
-        container.select('.axis').attr('transform', 'translate(0,' + innerH + ')')
-
-        timelineLayout = wb.viz.timelineLayout()
-          .data(dd)
-          .width(innerW)
-          .height(innerH)
-          .trackBy(trackBy)
-          .scale(scaleX)
-          .nodeHeight(itemHeight)
-          .nodeMinWidth(itemMinWidth)
-          // .nodeMaxWidth(itemMaxWidth)
-          .nodePadding(itemPadding)
-          .layout();
-      }
-
-      function updateScale(dd) {
-        // keep zoom scale domain
-        scaleX = zoom.x();
-
-        if (!scaleX) { // if scale has not been defined
-          var min = d3.min(dd, function(d) { return d.start; })
-          var max = d3.max(dd, function(d) { return d.end; })
-          max = max || min; // max might be undefined if events are all instant events
-          scaleX = d3.time.scale()
-            .domain([min, max])
-            .rangeRound([0, innerW])
-            .nice(d3.time.week)
-          zoom.x(scaleX);
-        } else {
-          if (brush) {
-            brushExtent = brush.extent();
-          }
-          scaleX.rangeRound([0, innerW])
-        }
-
-        axis = d3.svg.axis()
-          .scale(scaleX)
-          .orient('bottom')
-      }
-
-      function updateItems() {
-        var item = container.select('.items').selectAll('.item')
-          .data(timelineLayout.nodes());
-
-        item.exit().remove();
-
-        var itemEnter = item.enter().append('g').attr('class', 'item')
-          .on('mouseover', function(d) {
-            var pos = {top: d3.event.pageY, left: d3.event.pageX};
-            window.mouseoverTimeout = setTimeout(function() {
-              dispatch.elaborate(d, pos);
-            }, 500)
-          })
-          .on('mouseout', function(d) {
-            if (window.mouseoverTimeout) clearTimeout(window.mouseoverTimeout)
-            setTimeout(function() {
-              if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
-            }, 300);
-          });
-        itemEnter.append('rect');
-        if (showLabel) {
-          itemEnter.append('text');
-        }
-
-        item.select('rect')
-          .attr('x', function(d) { return d.x; })
-          .attr('y', function(d) { return d.y; })
-          .attr('width', function(d) { return d.width; })
-          .attr('height', function(d) { return d.height; })
-          .style('fill', 'steelblue')
-
-        if (showLabel) {
-          item.select('text')
-            .attr('x', function(d) { return d.x; })
-            .attr('y', function(d) { return d.y + itemHeight/2; })
-            .attr('dy', '.35em')
-            .attr('text-anchor', 'start')
-            .text(function(d) { return d.label; })
-            .each(wrap); // cut text to fit in rect
-        }
-
-        function wrap(d) {
-          var self = d3.select(this),
-              textLength = self.node().getBBox().width,
-              text = self.text(),
-              width = d.width,
-              limitLength = width / (textLength / text.length);
-
-          text = text.substring(0, limitLength);
-          self.text(text)
-        }
-      }
-
-      function updateTracks() {
-        var dd = d3.values(timelineLayout.tracks());
-        var trackNum = dd.length;
-        var track = container.select('.tracks').selectAll('.track')
-          .data(dd)
-
-        track.exit().remove()
-
-        var trackEnter = track.enter().append('g').attr('class', 'track')
-        trackEnter.append('text')
-        trackEnter.append('path')
-
-        track.select('text')
-          .attr('x', 0)
-          .attr('y', function(d, i) { return d.start - d.height/2; })
-          .attr('dy', '.35em')
-          .attr('dx', '-5px')
-          .attr('text-anchor', 'end')
-          .text(function(d) { return d.label; })
-          .style('fill', '#aaa');
-
-        track.select('path')
-          .attr('d', function(d, i) {
-            if (i < trackNum - 1) {
-              var y = d.start - d.height - itemPadding/2;
-              return 'M0,' + y + 'L' + innerW + ',' + y;
-            } else {
-              return null;
-            }
-          })
-          .style('stroke', '#ccc');
-      }
-
-      function updateAxis() {
-        container.select('.axis').call(axis)
-      }
-    })
+    });
   }
 
   return d3.rebind(exports, dispatch, 'on');

@@ -22,9 +22,9 @@ $.widget('viz.vizentitytable', $.viz.vizbase, {
             })
             .on('filter', function(selected) {
               if (selected.length) {
-                wb.filter.set(selected, _this.options.title + ' table', '#' + _this.element.attr('id'));
+                wb.filter.set(selected, _this.options.tool);
               } else {
-                wb.filter.remove('#' + _this.element.attr('id'));
+                wb.filter.remove(_this.options.tool);
               }
             })
         ;

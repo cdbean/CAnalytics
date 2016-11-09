@@ -90,21 +90,20 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
         this.element.find('.placeholder').show();
       }
 
-
       return this;
     },
 
     defilter: function() {
+      this.network.defilter();
     },
 
-    onFilter: function(filter) {
+    onFilter: function(filter, extent) {
       var filter_id = filter.map(function(d) { return d.meta.id; })
-      var windowId = '#' + this.element.attr('id');
 
       if (!filter.length) {
-        wb.filter.remove(windowId);
+        wb.filter.remove('network');
       } else {
-        wb.filter.set(filter_id, 'network', windowId);
+        wb.filter.set(filter_id, 'network', extent);
       }
     },
 
@@ -135,7 +134,7 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
         </div> \
         <ul class="controls" style="margin-top:10px;"> \
           <li class="control" id="filter"> \
-            <button class="btn btn-sm">Filter</button> \
+            <button id="filterBtn" class="btn btn-sm">Filter</button> \
           </li> \
         </ul> \
         <div id="main"> \
@@ -209,6 +208,14 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
     setState: function(state) {
       return this.network.state(state);
+    },
+
+    setFilter: function(brushExtent) {
+      this.element.find('#filterBtn').addClass('btn-primary');
+
+      this.network.brushable(true)
+        .setBrush(brushExtent);
+      d3.select(this.element[0]).select('svg#chart').call(this.network);
     },
 
     help: function() {

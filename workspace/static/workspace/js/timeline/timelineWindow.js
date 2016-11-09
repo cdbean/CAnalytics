@@ -71,14 +71,13 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       this.overviewTimeline.setBrush(domain);
     },
 
-    onDetailFilter: function(filter) {
+    onDetailFilter: function(filter, extent) {
       var filter_id = filter.map(function(d) { return d.id; })
-      var windowId = '#' + this.element.attr('id');
 
       if (!filter.length) {
-        wb.filter.remove(windowId);
+        wb.filter.remove('timeline');
       } else {
-        wb.filter.set(filter_id, 'timeline', windowId);
+        wb.filter.set(filter_id, 'timeline', extent);
       }
     },
 
@@ -151,8 +150,32 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
       return this;
     },
 
+    // cancel filter
     defilter: function() {
       this.detailTimeline.defilter();
+    },
+
+    // get the detailTimeline time range
+    getState: function() {
+      return this.detailTimeline.domain();
+    },
+
+    setState: function(state) {
+      var state = state.map(function(d) { return wb.utility.Date(d); });
+      this.overviewTimeline.setBrush(state);
+      this.detailTimeline.domain(state);
+      d3.select(this.element[0])
+        .select('svg#detailTimeline')
+        .call(this.detailTimeline);
+    },
+
+    setFilter: function(extent) {
+      // extent is time string
+      this.element.find('#filterBtn').addClass('btn-primary');
+      extent = extent.map(function(d) { return wb.utility.Date(d); });
+
+      this.detailTimeline.brushable(true)
+        .setBrush(extent);
     },
 
     updateView: function() {
@@ -168,7 +191,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         <div class="main"> \
           <ul class="controls" style="margin-top:10px;"> \
             <li class="control"> \
-              <button class="btn btn-sm"> Filter </button> \
+              <button id="filterBtn" class="btn btn-sm"> Filter </button> \
             </li> \
           </ul> \
           <svg id="detailTimeline"></svg> \

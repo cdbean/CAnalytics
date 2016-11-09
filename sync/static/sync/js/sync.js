@@ -68,7 +68,7 @@ $(function() {
 
   function onViewStreamed(d) {
     // get views data; display them
-    wb.utility.setAllState(d);
+    wb.state.setAllState(d.state);
   }
 
   function onViewStopped(d) {

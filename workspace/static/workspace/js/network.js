@@ -930,19 +930,18 @@ $.widget("viz.viznetwork", $.viz.vizbase, {
         }
 
         function brushend() {
-            var windowId = '#' + _this.element.attr('id');
             d3.select(this).call(d3.event.target);
             var e = _this.brush.extent();
             // empty brush deselects all nodes
             if (_this.brush.empty()) {
-              wb.filter.remove(windowId);
+              wb.filter.remove('network');
             }
             else {
                 var filter = [];
                 _this.chart.selectAll('.node.selected').each(function(d) {
                     filter.push(d.id);
                 })
-                wb.filter.set(filter, 'network', windowId);
+                wb.filter.set(filter, 'network', e);
             }
         }
         return this;

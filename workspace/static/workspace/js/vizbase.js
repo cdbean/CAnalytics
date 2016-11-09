@@ -59,8 +59,10 @@ $.widget('viz.vizbase', {
         return this;
     },
     _destroy: function() {
-        wb.filter.remove('#' + this.element.attr('id'));
-        $.publish("viz/close", this.element.attr("id"));
+        if (this.options.tool in wb.filter.filter) {
+          wb.filter.remove(this.options.tool);
+        }
+        $.publish("viz/close", this.options.tool);
         this.element.dialog('destroy').remove();
     },
     help: function() {

@@ -41,8 +41,6 @@ $.get(GLOBAL_URL.case_info, {
 });
 
 $(function() {
-
-
   $(window).on('beforeunload', onBeforeUnload)
   $('.filter-div').on('click', '.filter-item .remove', onRemoveFilter);
   $('ul.dataset-list input:checkbox').change(onDatasetChecked);
@@ -53,12 +51,6 @@ $(function() {
 
   $('#create-hypothesis-modal form').on('submit', function(e) {
     e.preventDefault();
-    if ($('#create-hypothesis-modal').find('input[name=heritance]:checked').val() == 0) {
-      // set hypothesis as a new thread
-      wb.hypothesis.setCurrent(null);
-      var state = wb.utility.getAllState();
-      $('#create-hypothesis-modal').find('#view').val(JSON.stringify(state));
-    }
     $.ajax({
       type: 'post',
       url: $(this).attr('action'),
@@ -72,9 +64,9 @@ $(function() {
   $('#view-hypothesis-modal form').on('submit', function(e) {
     e.preventDefault();
     var state = JSON.parse($('#view-hypothesis-modal').find('#view').val());
-    wb.utility.setAllState(state);
+    wb.state.setViewState(state);
     var currentHypoId = +$('#view-hypothesis-modal').find('#id').val();
-    wb.hypothesis.setCurrent(currentHypoId);
+    wb.state.setHypothesisState(currentHypoId);
 
     $('#view-hypothesis-modal').modal('hide');
     wb.utility.notify('You have changed to the view of the hypothesis');
@@ -102,14 +94,15 @@ $(function() {
   // }
 
   function onCreateHypoBtnClick() {
-    var state = wb.utility.getAllState();
+    var viewState = wb.state.getViewState();
     var current = wb.hypothesis.current;
 
     $('#create-hypothesis-modal').find('#case').val(CASE).end()
       .find('#path').val(wb.hypothesis.currentPath).end()
       .find('#group').val(GROUP).end()
-      .find('#view').val(JSON.stringify(state)).end()
-      .find('#message').val('').end();
+      .find('#view').val(JSON.stringify(viewState)).end()
+      .find('#message').val('').end()
+      .find('input[name="heritance"][value="1"]').prop('checked', true);
     if (!$.isEmptyObject(current)) {
       $('#heritanceDiv').show();
       $('#create-hypothesis-modal')
@@ -138,7 +131,7 @@ $(function() {
     });
 
     // store tool windows size and position in cookie, for later restore
-    wb.utility.saveAllState();
+    wb.state.SaveStateToCookie();
 
     $.post('/sync/leave', {
       'case': CASE,
@@ -159,7 +152,7 @@ $(function() {
 
   function onRemoveFilter(e) {
     var item = $(e.target).parent()[0].__data__;
-    wb.filter.remove(item.windowId);
+    wb.filter.remove(item.tool);
   }
 
   function onClickOutside() {

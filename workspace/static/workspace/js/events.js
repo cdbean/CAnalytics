@@ -24,7 +24,12 @@
   // stop watching other's view
   $.subscribe('view/stop', onStopView);
 
+  $.subscribe('viz/close', onVizClose);
 
+
+  function onVizClose(vizName) {
+
+  }
 
   function onRequestView(e, user) { // user: which user to watch
     if (window.ishout) {
@@ -58,11 +63,7 @@
 
       data.watching = wb.info.watchingUsers;
       data.watched = USER;
-      data.windowState = wb.utility.getWindowState();
-      data.filter = wb.filter.filter;
-      if($('.viz.network').length) {
-        data.networkState = $('.viz.network').data('instance').getState();
-      }
+      data.state = wb.state.getAllState();
 
       if (window.ishout) {
         ishout.rooms.forEach(function(r) {
@@ -135,8 +136,7 @@
               name = wb.info.users[id].name;
           if ($(this).hasClass('watching')) {
             // save current state first
-            wb.utility.saveAllState();
-
+            wb.state.SaveStateToCookie();
             $(this).text('Watching ' + name);
             $.publish('view/request', id);
           } else {
@@ -154,7 +154,7 @@
                 },
                 'Switch to my view before': function() {
                   $(this).dialog("destroy");
-                  wb.utility.loadAllState();
+                  wb.state.loadStateFromCookie();
                 }
               }
             });
@@ -168,9 +168,12 @@
 
     // restore windows after data are loaded
     // so window info can be broadcast
-    var state = JSON.parse($.cookie('windowState'));
-    if (!$.isEmptyObject(state)) {
-      var content = '<p>You had windows open when you left last time. Do you want to reopen them?</p>'
+    var state = JSON.parse($.cookie('caState'));
+    if (!$.isEmptyObject(state.windowState)) {
+      var content = '\
+        <div><p>Do you want to resume your analysis last time?</p> \
+        <p> If Yes, you will reopen the windows, reapply the filter if any, start from the hypothesis you were on</p></div> \
+      ';
       $(content).dialog({
         title: 'Reopen windows?',
         width: 'auto',
@@ -180,7 +183,7 @@
           },
           'Yes': function() {
             $(this).dialog("destroy");
-            wb.utility.loadAllState();
+            wb.state.loadStateFromCookie();
           }
         }
       });
@@ -200,7 +203,7 @@
   function onDataFiltered() {
     wb.store.setShelf();
 
-    var except = [].slice.call(arguments, 1)
+    var except = [].slice.call(arguments, 1);
     updateViewsBut(except);
   }
 
@@ -217,10 +220,13 @@
     })
   }
 
+  // except is tool name
   function updateViewsBut(except) {
     except = except || [];
     if (except.constructor !== Array)
       except = [except];
+
+    except= except.map(function(d) { return '.' + d.replace(' ', '.'); });
 
     $('.viz').not(except.join(',')).not('.locked').each(function(i, viz) {
       var viz = $(viz).data('instance');

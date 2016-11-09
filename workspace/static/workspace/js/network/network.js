@@ -10,6 +10,7 @@ wb.viz.network = function() {
 
   var networkLayout;
   var brushable = false;
+  var brushExtent = null;
   var uuid = wb.utility.uuid();
 
   var dispatch = d3.dispatch('filter', 'elaborate', 'delaborate', 'drawn');
@@ -38,20 +39,11 @@ wb.viz.network = function() {
     return exports;
   }
 
-  // controller
-
-  exports.doZoom = function() {
-
+  exports.setBrush = function(extent) {
+    if (!brush) return;
+    brushExtent = extent;
+    updateBehavior();
   }
-
-  exports.doFilter = function() {
-
-  }
-
-  exports.doDraw = function() {
-
-  }
-  // end controller
 
   // API
   exports.state = function(_) {
@@ -125,6 +117,12 @@ wb.viz.network = function() {
     });
   }
 
+  exports.defilter = function() {
+    if (!container) return;
+    brush.clear();
+    container.select('.brush').transition().call(brush)
+  }
+
   exports.displaySome = function(data) {
     if (!container) return;
 
@@ -154,7 +152,6 @@ wb.viz.network = function() {
     selection.each(function(dd) {
       var innerW = width - margin.left - margin.right,
           innerH = height - margin.top - margin.bottom;
-      var brushExtent = null;
 
       init.apply(this);
       update.apply(this);
@@ -226,11 +223,7 @@ wb.viz.network = function() {
           .on('dragend', dragend);
       }
 
-      function zoomed() {
-        container.select('.chart').attr("transform", "translate("
-          + d3.event.translate + ")"
-          + " scale(" + d3.event.scale + ")");
-      }
+
 
       function brushing() {
         var e = brush.extent();
@@ -246,8 +239,7 @@ wb.viz.network = function() {
           filter.push(d)
         });
         var e = brush.extent()
-        console.log(e[0][0], e[0][1])
-        return dispatch.filter(filter);
+        return dispatch.filter(filter, e);
       }
 
       function dragstart(d) {
@@ -280,8 +272,6 @@ wb.viz.network = function() {
         networkLayout.resume();
         if (d.primary.name === 'New York') console.log(d.x, d.y)
       }
-
-
 
       function update() {
         updateData();
@@ -330,11 +320,16 @@ wb.viz.network = function() {
           if (brush) {
             brushExtent = brush.extent();
           }
+          var scale = zoom.scale(),
+              translate = zoom.translate();
           scaleX.range([0, innerW])
             .domain([0, innerW]);
           scaleY.range([0, innerH])
             .domain([0, innerH]);
+          // after zoom.x(), zoom is reset to scale 1 and translate [0,0]
           zoom.x(scaleX).y(scaleY);
+          // set the scale and translate back
+          zoom.scale(scale).translate(translate);
         }
       }
 
@@ -352,8 +347,6 @@ wb.viz.network = function() {
           .on('tick', tick);
 
         networkLayout.start();
-
-
       }
 
       function updateLinks() {
@@ -451,23 +444,29 @@ wb.viz.network = function() {
           if (!$('.viewer:hover').length > 0) dispatch.delaborate(d);
         }, 300);
       }
-
-      function updateBehavior() {
-        if (brushable) {
-          zoom.on('zoom', null);
-          brush.x(zoom.x())
-            .y(zoom.y());
-          if (brushExtent) brush.extent(brushExtent);
-
-          container.select('.brush').style('display', '').call(brush);
-        } else {
-          container.select('.brush').style('display', 'none');
-          container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
-          zoom.on('zoom', zoomed);
-        }
-        container.selectAll('.node').call(drag);
-      }
     });
+  }
+
+  function updateBehavior() {
+    if (brushable) {
+      zoom.on('zoom', null);
+      brush.x(zoom.x())
+        .y(zoom.y());
+      if (brushExtent) brush.extent(brushExtent);
+
+      container.select('.brush').style('display', '').call(brush);
+    } else {
+      container.select('.brush').style('display', 'none');
+      container.on("mousemove.brush", null).on('mousedown.brush', null).on('mouseup.brush', null);
+      zoom.on('zoom', zoomed);
+    }
+    container.selectAll('.node').call(drag);
+  }
+
+  function zoomed() {
+    container.select('.chart').attr("transform", "translate("
+      + d3.event.translate + ")"
+      + " scale(" + d3.event.scale + ")");
   }
 
   return d3.rebind(exports, dispatch, 'on');
