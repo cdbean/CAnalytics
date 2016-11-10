@@ -65,32 +65,30 @@ wb.store = {
     });
   },
 
-  updateItems: function(items) {
+  updateItems: function(items, type) {
     var _this = this;
 
-    for (var type in items) {
-      var item = items[type];
-      if (item.constructor !== Array) item = [item];
+    if (items.constructor !== Array) items = [items];
 
-      item.forEach(function(d) {
-        if (!d) return;
-        if (d.primary) {
-          if (d.primary.date) d.primary.date = wb.utility.Date(d.primary.date);
-          if (d.primary.geometry) d.primary.geometry = wb.utility.formatGeometry(d);
-        }
-        var id = d.id || d.meta.id;
-        _this.items[type][id] = d;
+    items.forEach(function(d) {
+      if (!d) return;
+      if (d.primary) {
+        if (d.primary.date) d.primary.date = wb.utility.Date(d.primary.date);
+        if (d.primary.geometry) d.primary.geometry = wb.utility.formatGeometry(d);
+      }
+      var id = d.id || d.meta.id;
+      _this.items[type][id] = d;
 
-        var shelf = _this.shelf[type];
-        var i = shelf.indexOf(id);
-        if (i < 0) {
-          shelf.push(id);
-        }
-      });
-    }
-    if (!$.isEmptyObject(wb.filter.filter)) {
-      this.cleanShelf();
-    }
+      var shelf = _this.shelf[type];
+      var i = shelf.indexOf(id);
+      if (i < 0) {
+        shelf.push(id);
+        _this.cleanShelf(type);
+      }
+      else {
+        // if (d.deleted || d.meta.deleted) shelf.splice(i, 1);
+      }
+    });
   },
 
   // put items on shelf
