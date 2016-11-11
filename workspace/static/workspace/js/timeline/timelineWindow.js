@@ -100,7 +100,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         .call(this.detailTimeline.domain(domain));
     },
 
-    updateData: function() {
+    updateView: function() {
       var data = [];
       wb.store.shelf.entities.forEach(function(d) {
         var entity = wb.store.items.entities[d];
@@ -190,12 +190,7 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         .setBrush(extent);
     },
 
-    updateView: function() {
-      // if (this.data.length) {
-      //   this.detailTimeline.filter(wb.store.shelf.entities);
-      //   this.overviewTimeline.filter(wb.store.shelf.entities);
-      // }
-      this.updateData();
+    updateData: function() {
       return this;
     },
 
@@ -239,10 +234,17 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
 
       this.element.find('.control button').click(function() {
         $(this).toggleClass('btn-primary');
-        _this.detailTimeline.brushable($(this).hasClass('btn-primary'));
+        var infilter = $(this).hasClass('btn-primary');
+        _this.detailTimeline.brushable(infilter);
         d3.select(_this.element[0])
           .select('svg#detailTimeline')
           .call(_this.detailTimeline)
+        if (!infilter) {
+          // if filter is deactivated, cancel the filter if any
+          if ('timeline' in wb.filter.filter) {
+            wb.filter.remove('timeline');
+          }
+        }
       });
     },
 

@@ -190,9 +190,11 @@ $.widget('viz.vizviewer', {
         },
         type: 'RESTORE',
         success: function(res) {
-          wb.store.updateItems(res.annotation, 'annotations');
-          wb.store.updateItems(res.entity, 'entities');
-          wb.store.updateItems(res.relationship, 'relationships');
+          wb.store.updateItems({
+            annotations: res.annotation,
+            entities: res.entity,
+            relationships: res.relationship
+          });
           $.publish('data/updated');
           wb.utility.notify('Relationship is restored', 'success');
           wb.log.log({
@@ -217,9 +219,11 @@ $.widget('viz.vizviewer', {
         },
         type: 'RESTORE',
         success: function(res) {
-          wb.store.updateItems(res.annotation, 'annotations');
-          wb.store.updateItems(res.entity, 'entities');
-          wb.store.updateItems(res.relationship, 'relationships');
+          wb.store.updateItems({
+            annotations: res.annotation,
+            entities: res.entity,
+            relationships: res.relationship
+          });
           $.publish('data/updated');
           wb.utility.notify('Entity is restored', 'success');
           wb.log.log({
@@ -265,9 +269,11 @@ $.widget('viz.vizviewer', {
         },
         type: 'DELETE',
         success: function(res) {
-          wb.store.updateItems(res.annotation, 'annotations');
-          wb.store.updateItems(res.entity, 'entities');
-          wb.store.updateItems(res.relationship, 'relationships');
+          wb.store.updateItems({
+            annotations: res.annotation,
+            entities: res.entity,
+            relationships: res.relationship
+          });
           $.publish('data/updated');
 
           wb.utility.notify('Relationship is archived', 'success');
@@ -293,9 +299,11 @@ $.widget('viz.vizviewer', {
         },
         type: 'DELETE',
         success: function(res) {
-          wb.store.updateItems(res.annotation, 'annotations');
-          wb.store.updateItems(res.entity, 'entities');
-          wb.store.updateItems(res.relationship, 'relationships');
+          wb.store.updateItems({
+            annotations: res.annotation,
+            entities: res.entity,
+            relationships: res.relationship
+          });
           $.publish('data/updated');
 
           wb.utility.notify('Entity is archived', 'success');

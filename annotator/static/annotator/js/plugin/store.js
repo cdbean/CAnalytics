@@ -89,9 +89,11 @@ Annotator.Plugin.Store = (function(_super) {
               _this.updateAnnotation(to_create[i], annotations[i]); // assume the order of the sent annotations and returned annotations is the same
             }
 
-            wb.store.updateItems(annotations, 'annotations');
-            wb.store.updateItems(entities, 'entities');
-            wb.store.updateItems(relationships, 'relationships');
+            wb.store.updateItems({
+              annotations: data.annotations,
+              entities: data.entities,
+              relationships: data.relationships
+            });
 
             if (to_create[0].entity.entity_type !== 'relationship') {
               // the annotation is to create an entity
@@ -130,9 +132,11 @@ Annotator.Plugin.Store = (function(_super) {
 
                 _this.updateAnnotation(annotation, ann);
 
-                wb.store.updateItems(ann, 'annotations');
-                wb.store.updateItems(entities, 'entities');
-                wb.store.updateItems(relationships, 'relationships');
+                wb.store.updateItems({
+                  annotations: data.annotation,
+                  entities: data.entity,
+                  relationships: data.relationship
+                });
 
                 $.publish('data/updated');
 
@@ -173,9 +177,11 @@ Annotator.Plugin.Store = (function(_super) {
                 _this.updateAnnotation(annotations[i], ann);
             });
 
-            wb.store.updateItems(anns, 'annotations');
-            wb.store.updateItems(entities, 'entities');
-            wb.store.updateItems(relationships, 'relationships');
+            wb.store.updateItems({
+              annotations: data.annotations,
+              entities: data.entities,
+              relationships: data.relationships
+            });
 
             $.publish('data/updated');
 
@@ -212,9 +218,11 @@ Annotator.Plugin.Store = (function(_super) {
 
                 _this.updateAnnotation(annotation, ann);
 
-                wb.store.updateItems(ann, 'annotations');
-                wb.store.updateItems(entities, 'entities');
-                wb.store.updateItems(relationships, 'relationships');
+                wb.store.updateItems({
+                  annotations: data.annotation,
+                  entities: data.entity,
+                  relationships: data.relationship
+                });
 
                 $.publish('data/updated');
 
@@ -249,7 +257,7 @@ Annotator.Plugin.Store = (function(_super) {
                 // we do not delete entity or relationship if user only delete one annotation
                 var annotation = data.annotation;
 
-                wb.store.updateItems(annotation, 'annotations');
+                wb.store.updateItems({annotations: annotation});
 
                 if (annotation.entity.entity_type !== 'relationship') {
                   // the annotation is to create an entity
@@ -296,9 +304,11 @@ Annotator.Plugin.Store = (function(_super) {
                   _this.unregisterAnnotation(ann);
               });
 
-              wb.store.updateItems(annotations, 'annotations');
-              wb.store.updateItems(entity, 'entities');
-              wb.store.updateItems(relationship, 'relationships');
+              wb.store.updateItems({
+                annotations: data.annotations,
+                entities: data.entity,
+                relationships: data.relationship
+              });
 
               $.publish('data/updated');
               // Annotator.showNotification(Annotator._t("Deleted " + to_delete.length + " annotations!"), Annotator.Notification.SUCCESS);

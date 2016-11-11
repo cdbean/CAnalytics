@@ -204,10 +204,17 @@ $.widget('viz.viznetwork', $.viz.vizbase, {
 
       function onFilterBtnClick() {
         $(this).toggleClass('btn-primary'); // add 'btn-primary' when filter is activated
-        _this.network.brushable($(this).hasClass('btn-primary'));
+        var infilter = $(this).hasClass('btn-primary');
+        _this.network.brushable(infilter);
         d3.select(el[0])
           .select('svg#chart')
           .call(_this.network);
+        if (!infilter) {
+          // if filter is deactivated, cancel the filter if any
+          if ('network' in wb.filter.filter) {
+            wb.filter.remove('network');
+          }
+        }
       }
     },
 

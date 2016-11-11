@@ -198,9 +198,11 @@ $(function() {
     var entities = data.entity || data.entities;
     var relationships = data.relationship || data.relationships;
 
-    wb.store.updateItems(annotations, 'annotations');
-    wb.store.updateItems(entities, 'entities');
-    wb.store.updateItems(relationships, 'relationships');
+    wb.store.updateItems({
+      annotations: annotations,
+      entities: entities,
+      relationships: relationships
+    });
 
     var message = wb.info.users[data.user].name
       + ' ' + data.action + ' ' + data.item + ' ';

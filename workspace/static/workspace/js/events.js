@@ -206,6 +206,7 @@
     }
   }
 
+  // called after data is updated
   function onDataUpdated() {
     $('.viz').each(function(i, el) {
       var viz = $(el).data('instance');

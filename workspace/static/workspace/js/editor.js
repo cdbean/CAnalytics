@@ -251,9 +251,11 @@ $.widget('viz.vizeditor', {
       dataType: 'json',
       type: opt.data.id ? 'PUT' : 'POST',
       success: function(d) {
-        wb.store.updateItems(d.annotation, 'annotations');
-        wb.store.updateItems(d.entity, 'entities');
-        wb.store.updateItems(d.relationship, 'relationships');
+        wb.store.updateItems({
+          annotations: d.annotation,
+          entities: d.entity,
+          relationships: d.relationship
+        });
         $.publish('data/updated');
 
         if (item_type === 'entity') {

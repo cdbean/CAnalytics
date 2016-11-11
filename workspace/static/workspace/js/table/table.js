@@ -134,9 +134,11 @@ wb.viz.table = function() {
               },
               type: 'DELETE',
               success: function(res) {
-                wb.store.updateItems(res.annotation, 'annotations');
-                wb.store.updateItems(res.entity, 'entities');
-                wb.store.updateItems(res.relationship, 'relationships');
+                wb.store.updateItems({
+                  annotations: res.annotation,
+                  entities: res.entity,
+                  relationships: res.relationship
+                });
                 $.publish('data/updated');
 
                 wb.utility.notify('Entity is archived', 'success');
@@ -163,9 +165,11 @@ wb.viz.table = function() {
               },
               type: 'RESTORE',
               success: function(res) {
-                wb.store.updateItems(res.annotation, 'annotations');
-                wb.store.updateItems(res.entity, 'entities');
-                wb.store.updateItems(res.relationship, 'relationships');
+                wb.store.updateItems({
+                  annotations: res.annotation,
+                  entities: res.entity,
+                  relationships: res.relationship
+                });
                 $.publish('data/updated');
                 wb.utility.notify('Entity is restored', 'success');
                 wb.log.log({
