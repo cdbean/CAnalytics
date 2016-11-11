@@ -126,7 +126,7 @@
       $('<a class="label label-primary"></a>').appendTo(li)
         .text(name)
         .attr('id', 'user-' + id)
-        // .css('color', color)
+        .css('color', color)
         .mouseover(function() {
           var id = +$(this).attr('id').split('-')[1],
               name = wb.info.users[id].name;
@@ -146,6 +146,7 @@
           }
         })
         .click(function() {
+          return alert('The watching function is not available. Instead, create a hypothesis to share your view!');
           // request or stop watching
           $(this).toggleClass('watching');
           var id = +$(this).attr('id').split('-')[1],
