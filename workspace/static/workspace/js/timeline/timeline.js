@@ -177,8 +177,8 @@ wb.viz.timeline = function() {
     scaleY = zoom.y();
 
     if (!scaleY) { // if scale has not been defined
-      var min = d3.min(data, function(d) { return d.start; })
-      var max = d3.max(data, function(d) { return d.end; })
+      var min = d3.min(data, function(d) { return d.start; });
+      var max = d3.max(data, function(d) { return d.end || d.start; }); // if no end date is provided, use start date
       max = max || min; // max might be undefined if events are all instant events
       scaleY = d3.time.scale()
         .domain([min, max])
