@@ -37,6 +37,11 @@ def login(request):
                 email=res['mail'][0],
                 password=password
             )
+        else:
+            # if user exists, change password in case the psu password is changed.
+            u = User.objects.filter(username=res['uid'][0])[0]
+            u.set_password(password)
+            u.save()
 
         user = authenticate(username=username, password=password)
 
