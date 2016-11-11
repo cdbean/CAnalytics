@@ -105,7 +105,7 @@ $.widget('viz.vizhistory', $.viz.vizbase, {
     }
     if (!hypo) return;
 
-    $('<i style="cursor: pointer;">').appendTo(container)
+    $('<a href="#" class="hypothesis-text">').appendTo(container)
       .text(hypo.message)
       .data('hypothesis', hypo)
       .click(function(d) {
