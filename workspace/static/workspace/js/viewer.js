@@ -23,7 +23,6 @@ $.widget('viz.vizviewer', {
         <button type="button" title="archive" class="close delete"><span class="glyphicon glyphicon-trash"></span></button> \
         <button type="button" title="edit" class="close edit"><span class="glyphicon glyphicon-pencil"></span></button> \
         <button type="button" title="restore" class="close restore"><span class="glyphicon glyphicon-repeat"></span></button> \
-        <button type="button" title="history" class="close history"><span class="glyphicon glyphicon-time"></span></button> \
       </span> \
     '
     this.element.append(html);
@@ -34,7 +33,7 @@ $.widget('viz.vizviewer', {
     this.element.on('click', '.delete', this._onClickDelete.bind(this));
     this.element.on('click', '.edit', this._onClickEdit.bind(this));
     this.element.on('click', '.restore', this._onClickRestore.bind(this));
-    this.element.on('click', '.history', this._onClickHistory.bind(this));
+    // this.element.on('click', '.history', this._onClickHistory.bind(this));
     this.element.click(function(e) {
       e.stopPropagation();
     })
