@@ -70,6 +70,8 @@ wb.store = {
 
     for (var type in items) {
       var item = items[type];
+      // item could be undefined
+      if (!item) continue;
       if (item.constructor !== Array) item = [item];
 
       item.forEach(function(d) {
