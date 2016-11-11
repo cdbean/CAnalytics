@@ -252,7 +252,7 @@ wb.viz.network = function() {
         container.selectAll('.link').each(function(dd) {
           // if the node has been dragged, set it to fix
           if (dd.source.meta.id === d.meta.id) return dd.target.fixed = false || dd.target.draggedFix;
-          if (dd.target.meta.id === d.meta.id) return dd.source.fixed = false || dd.target.draggedFix;
+          if (dd.target.meta.id === d.meta.id) return dd.source.fixed = false || dd.source.draggedFix;
         });
 
         dispatch.dragstart();
