@@ -36,13 +36,22 @@ $.widget("viz.vizmap", $.viz.vizbase, {
         this.pointlayer = new OpenLayers.Layer.Vector("Points", {
             styleMap: new OpenLayers.StyleMap({
                 'default': new OpenLayers.Style({
-                    externalGraphic: GLOBAL_URL.static + 'workspace/img/red_pin.png'
-                  , pointRadius: 16
+                    externalGraphic: GLOBAL_URL.static + 'workspace/img/red_pin.png',
+                    pointRadius: 16,
+                    label: '${name}',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    fontColor: 'red',
+                    labelAlign: "cm",
+                    labelXOffset: "0",
+                    labelYOffset: "23",
                 }),
                 'select':  new OpenLayers.Style({
-                    externalGraphic: GLOBAL_URL.static + 'workspace/img/blue_pin.png'
-                  , pointRadius: 16
-                })
+                    externalGraphic: GLOBAL_URL.static + 'workspace/img/blue_pin.png',
+                    pointRadius: 16,
+                    fontColor: 'rgb(97, 139, 178)',
+                }),
+
             })
         });
         this.linelayer = new OpenLayers.Layer.Vector("Lines", {
