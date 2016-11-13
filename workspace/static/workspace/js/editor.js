@@ -166,13 +166,13 @@ $.widget('viz.vizeditor', {
         });
     } else if (attr === 'repeated') {
       var html = '\
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="0">S</input> \
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="1">M</input> \
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="2">T</input> \
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="3">W</input> \
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="4">T</input> \
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="5">F</input> \
-        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="6">S</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="0">S</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="1">M</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="2">T</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="3">W</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="4">T</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="5">F</input> \
+        <input class="annotator-attribute-value" style="width: auto;margin-left:6px;" type="checkbox" name="repeated" value="6">S</input> \
         ';
       var li = input.parent().empty();
       li.append(html);

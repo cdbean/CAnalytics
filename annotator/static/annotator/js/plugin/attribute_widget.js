@@ -135,13 +135,13 @@ $.widget('custom.attribute_widget', {
         });
       } else if (attr === 'repeated') {
         var html = '\
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="0">S</input> \
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="1">M</input> \
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="2">T</input> \
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="3">W</input> \
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="4">T</input> \
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="5">F</input> \
-          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="6">S</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="0" style="margin-left: 6px;">S</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="1" style="margin-left: 6px;">M</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="2" style="margin-left: 6px;">T</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="3" style="margin-left: 6px;">W</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="4" style="margin-left: 6px;">T</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="5" style="margin-left: 6px;">F</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="6" style="margin-left: 6px;">S</input> \
           ';
         var li = input.parent().empty();
         li.append(html);
