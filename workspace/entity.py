@@ -218,6 +218,7 @@ def set_primary_attr(entity, attr, value, user, case, group):
             except:
                 pass
 
+        print 'value: ', value
         setattr(entity, attr, value)
 
     entity.save()

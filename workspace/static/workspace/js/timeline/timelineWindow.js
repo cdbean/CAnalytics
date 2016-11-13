@@ -108,23 +108,48 @@ $.widget('viz.viztimeline', $.viz.vizbase, {
         if (entity.primary.entity_type === 'event') {
           if (entity.primary.start_date) {
             if (entity.primary.repeated) {
-              var repeat_delta = 1000 * 3600 * 24 * 7; // hard code: repeat every week
-              var repeated_until = wb.utility.Date(entity.primary.repeated_until) || wb.info.case.end_date;
-              var start_date = wb.utility.Date(entity.primary.start_date);
-              var end_date = wb.utility.Date(entity.primary.end_date);
-              var delta = end_date - start_date;
-              var date = start_date;
-              var index = 0;
-              while (date <= repeated_until) {
-                data.push({
-                  start: date,
-                  end: new Date(date.getTime() + delta),
-                  label: entity.primary.name,
-                  lid: entity.meta.id + '-' + index, // local id, for viz only
-                  id: entity.meta.id
-                });
-                date = new Date(date.getTime() + repeat_delta);
-                index ++;
+              if (entity.primary.repeated.constructor !== Array) {
+                // for backward compatibility, if repeated is boolean
+                var repeat_delta = 1000 * 3600 * 24 * 7; // hard code: repeat every week
+                var repeated_until = wb.utility.Date(entity.primary.repeated_until) || wb.info.case.end_date;
+                var start_date = wb.utility.Date(entity.primary.start_date);
+                var end_date = wb.utility.Date(entity.primary.end_date);
+                var delta = end_date - start_date;
+                var date = start_date;
+                var index = 0;
+                while (date <= repeated_until) {
+                  data.push({
+                    start: date,
+                    end: new Date(date.getTime() + delta),
+                    label: entity.primary.name,
+                    lid: entity.meta.id + '-' + index, // local id, for viz only
+                    id: entity.meta.id
+                  });
+                  date = new Date(date.getTime() + repeat_delta);
+                  index ++;
+                }
+              } else {
+                // repeated is array of days in week
+                var repeat_delta = 1000 * 3600 * 24; // one day
+                var repeated_until = wb.utility.Date(entity.primary.repeated_until) || wb.info.case.end_date;
+                var start_date = wb.utility.Date(entity.primary.start_date);
+                var end_date = wb.utility.Date(entity.primary.end_date);
+                var delta = end_date - start_date;
+                var date = start_date;
+                var index = 0;
+                while (date <= repeated_until) {
+                  if (entity.primary.repeated.indexOf(date.getDay()) > -1) {
+                    data.push({
+                      start: date,
+                      end: new Date(date.getTime() + delta),
+                      label: entity.primary.name,
+                      lid: entity.meta.id + '-' + index, // local id, for viz only
+                      id: entity.meta.id
+                    });
+                    index ++;
+                  }
+                  date = new Date(date.getTime() + repeat_delta);
+                }
               }
             } else {
               data.push({

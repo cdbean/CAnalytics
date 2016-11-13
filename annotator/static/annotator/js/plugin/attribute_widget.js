@@ -97,7 +97,10 @@ $.widget('custom.attribute_widget', {
                 else value = [];
                 res[attr] = value;
               } else if (attr === 'repeated') {
-                value = $(row).find('.annotator-attribute-value')[0].checked;
+                value = []
+                $(row).find('.annotator-attribute-value:checked').each(function(i, el) {
+                  return value.push(+el.value);
+                });
                 res[attr] = value;
               } else {
                 attr = Annotator.Util.escape(attr);
@@ -131,9 +134,24 @@ $.widget('custom.attribute_widget', {
           }
         });
       } else if (attr === 'repeated') {
-        var html = '<input class="annotator-attribute-value" type="checkbox" name="repeated">weekly</input>';
+        var html = '\
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="0">S</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="1">M</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="2">T</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="3">W</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="4">T</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="5">F</input> \
+          <input class="annotator-attribute-value" type="checkbox" name="repeated" value="6">S</input> \
+          ';
         var li = input.parent().empty();
-        $(html).appendTo(li).prop('checked', value);
+        li.append(html);
+        if (value && !$.isEmptyObject(value)) {
+          li.find('input[type="checkbox"]').each(function(i, el) {
+            if (value.indexOf(+el.value) > -1) {
+              $(el).prop('checked', true);
+            }
+          });
+        }
 
       } else if (attr === 'repeated_until') {
         input.datetimepicker({
@@ -237,6 +255,3 @@ $.widget('custom.attribute_widget', {
       return {opts: opts, optgroups: optgroups};
     }
 });
-
-
-

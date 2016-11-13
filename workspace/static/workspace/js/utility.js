@@ -137,6 +137,21 @@ wb.utility = {};
       }
     } else if (attr === 'created_by' || attr === 'last_edited_by') {
       if (value) value = wb.info.users[value].name;
+    } else if (attr === 'repeated') {
+      if (value && !$.isEmptyObject(value)) {
+        value = value.map(function(d) {
+          switch(d) {
+            case 0: return 'Sun';
+            case 1: return 'Mon';
+            case 2: return 'Tue';
+            case 3: return 'Wed';
+            case 4: return 'Thu';
+            case 5: return 'Fri';
+            case 6: return 'Sat';
+            default: return '';
+          }
+        }).join(', ');
+      }
     }
     return value || '';
   };

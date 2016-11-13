@@ -240,7 +240,7 @@ class Event(Entity):
     category     = models.CharField(max_length=100, null=True, blank=True, verbose_name='type')
     start_date   = models.DateTimeField(null=True, blank=True)
     end_date     = models.DateTimeField(null=True, blank=True)
-    repeated       = models.NullBooleanField(default=False, null=True, blank=True)  # 1 -7, stands for Mon - Sun
+    repeated       = IntegerArrayField(null=True, blank=True)  # 0-6, stands for Sun - Sat
     repeated_until = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):

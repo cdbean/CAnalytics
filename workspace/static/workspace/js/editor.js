@@ -165,9 +165,24 @@ $.widget('viz.vizeditor', {
           closeAfterSelect: true
         });
     } else if (attr === 'repeated') {
-        var html = '<input class="attr-value" style="width:auto;" type="checkbox" name="repeated"> weekly</input>';
-        var li = $(input).parent().empty();
-        $(html).appendTo(li).prop('checked', value);
+      var html = '\
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="0">S</input> \
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="1">M</input> \
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="2">T</input> \
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="3">W</input> \
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="4">T</input> \
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="5">F</input> \
+        <input class="annotator-attribute-value" style="width: auto;" type="checkbox" name="repeated" value="6">S</input> \
+        ';
+      var li = input.parent().empty();
+      li.append(html);
+      if (value && !$.isEmptyObject(value)) {
+        li.find('input[type="checkbox"]').each(function(i, el) {
+          if (value.indexOf(+el.value) > -1) {
+            $(el).prop('checked', true);
+          }
+        });
+      };
     }
   },
 
@@ -309,7 +324,10 @@ $.widget('viz.vizeditor', {
             else value = [];
             res[attr] = value;
           } else if (attr === 'repeated') {
-            value = $(row).find('.attr-value')[0].checked;
+            value = []
+            $(row).find('.annotator-attribute-value:checked').each(function(i, el) {
+              return value.push(+el.value);
+            });
             res[attr] = value;
           } else {
             res[attr] = value;
