@@ -76,7 +76,7 @@ wb.viz.timeline = function() {
     if (scaleY) {
       scaleY.domain(_);
     }
-    if (zoom) zoom.x(scaleY)
+    if (zoom) zoom.y(scaleY)
     return exports
   }
 
