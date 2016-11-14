@@ -61,7 +61,7 @@ Annotator.Plugin.Entity = (function(_super) {
 
           if (value === 'relationship') $(self.entityNameField).addClass('hidden');
           else $(self.entityNameField).removeClass('hidden');
-         
+
           var attribute_widget = $(self.attrField).find('.annotator-attribute-widget').data('instance');
           attribute_widget.reset();
           var attributes = wb.store.static[value];
@@ -75,7 +75,10 @@ Annotator.Plugin.Entity = (function(_super) {
           }
         });
 
-        $.subscribe('entity/name/update', function(e, value) {
+        this.subscribe('entity/name/update', function(value) {
+            if (!value) {
+              delete self.annotation.entity;
+            }
             var entity = wb.store.items.entities[value];
             if (!self.annotation.entity) {
                 self.annotation.entity = {};
@@ -84,9 +87,10 @@ Annotator.Plugin.Entity = (function(_super) {
                 self.annotation.entity.id = entity.meta.id;
                 self.annotation.entity.entity_type = entity.primary.entity_type;
                 self.annotation.entity.name = entity.primary.name;
-                self.updateEntityTypeField(self.entityTypeField, self.annotation);
-                self.updateAttrField(self.attrField, self.annotation);
             }
+
+            self.updateEntityTypeField(self.entityTypeField, self.annotation);
+            self.updateAttrField(self.attrField, self.annotation);
         });
 
         $.subscribe('entity/change', function(e, entity) {
@@ -134,25 +138,27 @@ Annotator.Plugin.Entity = (function(_super) {
     };
 
     Entity.prototype.initEntityNameField = function(field) {
+        var self = this;
         var opts = this.prepareSelectOptions();
-        $(field).find('.entity_name').autocomplete({
-                source: opts.opts,
-                placeholder: "Entity name or your annotation...",
-                minLength: 0,
-                focus: function(e, ui) {
-                    $(this).val(ui.item.label);
-                    return false;
-                },
-                select: function(e, ui) {
-                    if (ui.item.value) {
-                        $(this).val(ui.item.label);
-                        // update the attribute list to the attribute of the entity
-                        $.publish('entity/name/update', ui.item.value);
-                        return false;
-                    }
+        $(field).find('.entity_name').selectize({
+                valueField: 'label',
+                labelField: 'label',
+                searchField: 'label',
+                maxItems: 1 ,
+                placeholder: 'Brief name for the entity...',
+                create: true,
+                options: opts.opts,
+                closeAfterSelect: true,
+                onChange: function(value) {
+                  if (value in this.options) {
+                    var v = this.options[value].value;
+                    self.publish('entity/name/update', [v]);
+                  } else {
+                    self.publish('entity/name/update');
+                  }
                 }
-            })
-        ;
+            }
+        );
     };
 
 
@@ -160,36 +166,38 @@ Annotator.Plugin.Entity = (function(_super) {
         var name;
         var opts = this.prepareSelectOptions();
         this.annotation = annotation;
-        $(field).find('.entity_name').autocomplete('option', 'source', opts.opts);
+        // update options. If an option already exists, seletize takes care of it and nothing would happen
+        var selectize = $(field).find('.entity_name')[0].selectize;
+        // clear selected items silently
+        selectize.clearOptions();
+        selectize.clear(true);
+        selectize.addOption(opts.opts);
         if (annotation.entity) {
             var entity;
             if (annotation.entity.entity_type === 'relationship')
               entity = wb.store.items.relationships[annotation.entity.id];
             else
               entity = wb.store.items.entities[annotation.entity.id];
-            if (!entity) {
-                // entity does not exist
-                // delete this outdated entity
-                name = annotation.quote;
-                delete annotation.entity;
+            if (entity) {
+              // true is set to not fire the change event
+              selectize.addItem(entity.primary.name || entity.primary.relation, true);
+              return;
+            } else {
+              delete annotation.entity;
             }
-            else name = entity.primary.name || entity.primary.relation;
-            $(field).find('.entity_name').val(name);
+        }
+        // if the annotation does not include an entity yet
+        // check if the text matches an entity
+        if (annotation.quote in selectize.options) {
+          // add the item, and fire the entity name change event
+          selectize.addItem(annotation.quote, false);
         } else {
-            name = annotation.quote;
-            // var item = null;
-            // opts.opts.forEach(function(d) {
-            //     if (d.label === name) {
-            //         item = d;
-            //         return false;
-            //     }
-            // });
-            // if (item) 
-            //     $(field).find('.entity_name').data('ui-autocomplete')._trigger('select', 'autocompleteselect', {item:item});
-            // else
-                $(field).find('.entity_name').val(name);
-
-            $(field).find('.entity_name').autocomplete('search', name);
+          selectize.addOption({
+            entity_type: '',
+            value: annotation.quote,
+            label: annotation.quote,
+          });
+          selectize.addItem(annotation.quote, true);
         }
     };
 
