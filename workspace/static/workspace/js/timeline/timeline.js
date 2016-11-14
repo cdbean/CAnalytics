@@ -113,6 +113,7 @@ wb.viz.timeline = function() {
     if (!container) return;
     brush.clear();
     container.select('.brush').call(brush)
+    container.selectAll('.item').classed('selected', false);
   }
 
   // zoom, brush, etc.

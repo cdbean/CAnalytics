@@ -120,7 +120,8 @@ wb.viz.network = function() {
   exports.defilter = function() {
     if (!container) return;
     brush.clear();
-    container.select('.brush').call(brush)
+    container.select('.brush').call(brush);
+    container.selectAll('.node').classed('selected', false);
   }
 
   exports.displaySome = function(data) {
