@@ -192,12 +192,16 @@ Annotator.Plugin.Entity = (function(_super) {
           // add the item, and fire the entity name change event
           selectize.addItem(annotation.quote, false);
         } else {
-          selectize.addOption({
-            entity_type: '',
-            value: annotation.quote,
-            label: annotation.quote,
-          });
-          selectize.addItem(annotation.quote, true);
+          // only add the quote to name if the quote consists of less than 4 words
+          // (if it's a long sentence, there is high probability that user needs to rephrase it)
+          if (annotation.quote.split(' ').length < 4) {
+            selectize.addOption({
+              entity_type: '',
+              value: annotation.quote,
+              label: annotation.quote,
+            });
+            selectize.addItem(annotation.quote, true);
+          }
         }
     };
 
