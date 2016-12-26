@@ -16,43 +16,17 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        res = psuAuth(username=username, password=password)
-        if 'error' in res:
-            # using local auth
-            user = authenticate(username=username, password=password)
-            if user:
-                try:
-                    auth_login(request, user)
-                    return redirect('home')
-                except:
-                    return HttpResponse('Invalid credentials')
-            else:
-                return HttpResponse('Invalid credentials')
-
-        if not User.objects.filter(username=res['uid'][0]).exists():
-            User.objects.create_user(
-                username=res['uid'][0],
-                first_name=res['givenName'][0].title(),
-                last_name=res['sn'][0].title(),
-                email=res['mail'][0],
-                password=password
-            )
-        else:
-            # if user exists, change password in case the psu password is changed.
-            u = User.objects.filter(username=res['uid'][0])[0]
-            u.set_password(password)
-            u.save()
-
         user = authenticate(username=username, password=password)
 
         if user:
             try:
                 auth_login(request, user)
                 return redirect('home')
-            except Exception as e:
-                return HttpResponse('User name and password do not match')
+            except:
+                return HttpResponse('Invalid credentials')
         else:
-            return HttpResponse('User name and password do not match')
+            return HttpResponse('Invalid credentials')
+
     else:
         return render(request, 'account/login.html')
 
