@@ -94,17 +94,21 @@ wb.filter.remove = function(tool, logged) {
   var filter = this.filter[tool].filter;
   var tool = this.filter[tool].tool;
 
-  for (var i = 0, len = filter.length; i < len; i++) {
-    var id = filter[i];
-    var j = wb.store.shelf_by.entities.indexOf(id);
-    wb.store.shelf_by.entities.splice(j, 1);
+  delete this.filter[tool];
+
+  // recomputer shelf_by
+  var shelf_by = wb.store.shelf_by.entities = [];
+  for (var t in this.filter) {
+    this.filter[t].forEach(function(ent) {
+      if ((ent in shelf_by)) {
+        shelf_by.push(ent);
+      }
+    });
   }
 
   // if tool = 'person table', change it to 'person.table'
   var $viz = $('.viz.' + tool.replace(' ', '.')).data('instance');
   if ($viz) $viz.defilter();
-
-  delete this.filter[tool];
 
   $.publish('data/filter');
 
