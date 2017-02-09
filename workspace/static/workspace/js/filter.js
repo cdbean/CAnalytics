@@ -91,16 +91,13 @@ wb.filter.remove = function(tool, logged) {
     return;
   }
 
-  var filter = this.filter[tool].filter;
-  var tool = this.filter[tool].tool;
-
   delete this.filter[tool];
 
   // recomputer shelf_by
   var shelf_by = wb.store.shelf_by.entities = [];
   for (var t in this.filter) {
-    this.filter[t].forEach(function(ent) {
-      if ((ent in shelf_by)) {
+    this.filter[t].filter.forEach(function(ent) {
+      if (!(ent in shelf_by)) {
         shelf_by.push(ent);
       }
     });
