@@ -29,33 +29,33 @@ def log_export_csv(modeladmin, request, queryset):
         smart_str(u"Tool"),
         smart_str(u"Data"),
     ])
-    for obj in queryset: 
+    for obj in queryset:
         try:
-            d = json.loads(obj.data)
-            if 'primary' in d:
-                p = d['primary']
-                if 'source' in p:
-                    s = p['source'][0]
-                    if 'id' in s:
-                        s_id = s['id']
-                        try:
-                            ent = Entity.objects.get(id=s_id)
-                        except Exception as e:
-                            print e
-                            pass
-                        else:
-                            s['created_by'] = ent.created_by.id
-                if 'target' in p:
-                    s = p['target'][0]
-                    if 'id' in s:
-                        s_id = s['id']
-                        try:
-                            ent = Entity.objects.get(id=s_id)
-                        except Exception as e:
-                            print e
-                            pass
-                        else:
-                            s['created_by'] = ent.created_by.id 
+            # d = json.loads(obj.data)
+            # if 'primary' in d:
+            #     p = d['primary']
+            #     if 'source' in p:
+            #         s = p['source'][0]
+            #         if 'id' in s:
+            #             s_id = s['id']
+            #             try:
+            #                 ent = Entity.objects.get(id=s_id)
+            #             except Exception as e:
+            #                 print e
+            #                 pass
+            #             else:
+            #                 s['created_by'] = ent.created_by.id
+            #     if 'target' in p:
+            #         s = p['target'][0]
+            #         if 'id' in s:
+            #             s_id = s['id']
+            #             try:
+            #                 ent = Entity.objects.get(id=s_id)
+            #             except Exception as e:
+            #                 print e
+            #                 pass
+            #             else:
+            #                 s['created_by'] = ent.created_by.id
             writer.writerow([
 			    smart_str(obj.id),
 			    smart_str(obj.case.id),
@@ -69,9 +69,10 @@ def log_export_csv(modeladmin, request, queryset):
 			    smart_str(obj.operation),
 			    smart_str(obj.item),
 			    smart_str(obj.tool),
-			    smart_str(json.dumps(d)),
-			]) 
-        except Exception as e: 
+			    # smart_str(json.dumps(d)),
+			    smart_str(obj.data),
+			])
+        except Exception as e:
             print e
             pass
     return response
