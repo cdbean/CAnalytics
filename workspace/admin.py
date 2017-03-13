@@ -118,11 +118,45 @@ def rel_export_csv(modeladmin, request, queryset):
 rel_export_csv.short_description = u"Export CSV"
 
 
+def role_export_csv(modeladmin, request, queryset):
+    import csv
+    from django.utils.encoding import smart_str
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=relationship.csv'
+    writer = csv.writer(response, csv.excel)
+    # response.write(u'\ufeff'.encode('utf8')) # BOM (optional...Excel needs it to open UTF-8 file properly)
+    writer.writerow([
+        smart_str(u"ID"),
+        smart_str(u"Case ID"),
+        smart_str(u"Group ID"),
+        smart_str(u"User ID"),
+        smart_str(u"Role"),
+        ])
+    for obj in queryset:
+        try:
+            writer.writerow([
+                smart_str(obj.id),
+                smart_str(obj.case.id),
+                smart_str(obj.group.id),
+                smart_str(obj.user.id),
+                smart_str(obj.role.name),
+            ])
+        except Exception as e:
+            print e
+    return response
+
+role_export_csv.short_description = u"Export CSV"
+
+
 class EntityAdmin(admin.ModelAdmin):
     actions = [entity_export_csv,]
 
 class RelationshipAdmin(admin.ModelAdmin):
     actions = [rel_export_csv,]
+
+class UserCaseGroupRoleAdmin(admin.ModelAdmin):
+    actions = [role_export_csv,]
+
 
 class GoogleAdmin(admin.OSMGeoAdmin):
 #   extra_js = [GMAP.api_url + GMAP.key]
@@ -147,3 +181,4 @@ admin.site.register(models.Role, HTMLAdmin)
 admin.site.register(models.DataEntry, HTMLAdmin)
 admin.site.register(models.Entity, EntityAdmin)
 admin.site.register(models.Relationship, RelationshipAdmin)
+admin.site.register(models.UserCaseGroupRole, UserCaseGroupRoleAdmin)
