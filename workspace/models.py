@@ -86,7 +86,7 @@ class UserCaseGroupRole(models.Model):
     role = models.ForeignKey(Role)
 
     def __unicode__(self):
-        return '%s-%s-%s-%s' % (self.case.name, self.group.name, self.user.name, self.role.name)
+        return '%s-%s-%s-%s' % (self.case.name, self.group.name, self.user.username, self.role.name)
 
 
 class Attribute(models.Model):
