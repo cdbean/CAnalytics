@@ -149,12 +149,14 @@ def dataentry_export_csv(modeladmin, request, queryset):
     writer.writerow([
         smart_str(u"ID"),
         smart_str(u"Dataset ID"),
+        smart_str(u"Case ID"),
         ])
     for obj in queryset:
         try:
             writer.writerow([
                 smart_str(obj.id),
                 smart_str(obj.dataset.id),
+                smart_str(obj.dataset.case.id),
             ])
         except Exception as e:
             print e
